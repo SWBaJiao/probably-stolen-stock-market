@@ -26,6 +26,7 @@ public sealed class MarketEngine
         }
         ValidateState(State, config);
         MigrateCandles(State, config);
+        MigrateIntraday(State);
     }
 
     public string Serialize() => JsonSerializer.Serialize(State, JsonOptions);
@@ -34,6 +35,7 @@ public sealed class MarketEngine
         var state = JsonSerializer.Deserialize<MarketState>(json, JsonOptions) ?? throw new ArgumentException("股市存档为空");
         ValidateState(state, config);
         MigrateCandles(state, config);
+        MigrateIntraday(state);
         return state;
     }
 
@@ -42,6 +44,7 @@ public sealed class MarketEngine
         if (state.Version != 1 || state.LastDay < -1 || state.RandomState == 0 || state.Companies == null || state.Positions == null || state.Sessions == null || state.ProcessedEvents == null || state.OccurredEvents == null || state.Rumors == null || state.OfferedSessions == null || state.Reputations == null || state.Ledger == null) throw new ArgumentException("股市存档版本或结构无效");
         if (state.Companies.Any(x => x.Value == null || x.Value.Price < .01m || x.Value.Price > 10000000m || x.Value.DailyRetailImpact < 0 || x.Value.DailyRetailImpact > 1m || x.Value.History == null || x.Value.History.Any(p => p == null || p.Price < .01m)) || state.Positions.Any(x => x.Value == null || x.Value.Quantity < 0 || x.Value.Cost < 0 || !state.Companies.ContainsKey(x.Key))) throw new ArgumentException("股市存档行情或持仓无效");
         if (state.Companies.Values.Any(c => c.Candles == null || c.Candles.Any(k => !IsValidCandle(k, state.LastDay)) || c.Candles.Select(k => k.Day).Distinct().Count() != c.Candles.Count || !c.Candles.Select(k => k.Day).SequenceEqual(c.Candles.Select(k => k.Day).OrderBy(d => d)))) throw new ArgumentException("股市存档日 K 线无效");
+        if (state.Companies.Values.Any(c => c.IntradayDay < -1 || c.IntradayDay > state.LastDay || c.IntradayPoints == null || c.IntradayPoints.Any(p => p == null || p.Day != c.IntradayDay || p.Day < 0 || p.Price < .01m || p.Price > 10000000m))) throw new ArgumentException("股市存档当日分时样本无效");
         if (state.Sessions.Any(x => x.Value == null || x.Value.TradeIds == null || x.Value.Signals == null || x.Value.Signals.Keys.Any(k => !state.Companies.ContainsKey(k))) || state.Reputations.Any(x => x.Value == null || x.Value.Correct < 0 || x.Value.Incorrect < 0) || state.Rumors.Any(x => x.Value == null || x.Key != x.Value.Id || x.Value.Price < 0 || x.Value.Reliability < .2m || x.Value.Reliability > .9m || x.Value.CompanyIds == null)) throw new ArgumentException("股市存档成交或情报无效");
         // 持仓公司不能被配置删除，否则无法出售已有股份。
         if (state.Positions.Any(x => x.Value.Quantity > 0 && !config.Companies.Any(c => c.Id == x.Key))) throw new ArgumentException("公司配置删除了仍有持仓的公司");
@@ -73,6 +76,22 @@ public sealed class MarketEngine
                 else current.Close = company.Price;
             }
             TrimCandles(company, config.HistoryLimit);
+        }
+    }
+
+    private static void MigrateIntraday(MarketState state)
+    {
+        if (state.LastDay < 0) return;
+        foreach (var company in state.Companies.Values)
+        {
+            if (company.IntradayDay == state.LastDay && company.IntradayPoints.Count > 0) continue;
+            company.IntradayDay = state.LastDay;
+            company.IntradayIsPartial = true;
+            // 旧档只恢复当天实际保留的采样，既不借用旧日，也不补造缺失的日初路径。
+            company.IntradayPoints = company.History.Where(p => p.Day == state.LastDay)
+                .Select(p => new PricePoint { Day = p.Day, Price = p.Price, Reason = p.Reason }).ToList();
+            if (company.IntradayPoints.Count == 0 || company.IntradayPoints.Last().Price != company.Price)
+                company.IntradayPoints.Add(new PricePoint { Day = state.LastDay, Price = company.Price, Reason = "接入时当前价" });
         }
     }
 
@@ -130,6 +149,7 @@ public sealed class MarketEngine
             {
                 var s = State.Companies[company.Id];
                 EnsureCandle(s, d, firstObservation);
+                BeginIntraday(s, d, firstObservation);
                 s.DailyRetailImpact = 0;
                 var noise = (NextRandom() * 2m - 1m) * Config.DailyLimit * .75m;
                 var reversion = (Config.InitialPrice / s.Price - 1m) * .01m;
@@ -317,6 +337,7 @@ public sealed class MarketEngine
     {
         var c = State.Companies[id];
         var candle = State.LastDay >= 0 ? EnsureCandle(c, State.LastDay, false) : null;
+        if (State.LastDay >= 0 && (c.IntradayDay != State.LastDay || c.IntradayPoints.Count == 0)) BeginIntraday(c, State.LastDay, true);
         c.Price = Math.Clamp(decimal.Round(c.Price * (1m + change), 2, MidpointRounding.AwayFromZero), .01m, 10000000m);
         if (candle != null)
         {
@@ -325,6 +346,7 @@ public sealed class MarketEngine
             if (candle.Low.HasValue) candle.Low = Math.Min(candle.Low.Value, c.Price);
         }
         c.History.Add(new PricePoint { Day = State.LastDay, Price = c.Price, Reason = reason });
+        if (State.LastDay >= 0) c.IntradayPoints.Add(new PricePoint { Day = State.LastDay, Price = c.Price, Reason = reason });
         if (c.History.Count > Config.HistoryLimit) c.History.RemoveRange(0, c.History.Count - Config.HistoryLimit);
     }
     private DailyCandle EnsureCandle(CompanyState company, int day, bool partial)
@@ -339,6 +361,13 @@ public sealed class MarketEngine
     private static void TrimCandles(CompanyState company, int limit)
     {
         if (company.Candles.Count > limit) company.Candles.RemoveRange(0, company.Candles.Count - limit);
+    }
+    private static void BeginIntraday(CompanyState company, int day, bool partial)
+    {
+        company.IntradayDay = day;
+        company.IntradayIsPartial = partial;
+        company.IntradayPoints.Clear();
+        company.IntradayPoints.Add(new PricePoint { Day = day, Price = company.Price, Reason = partial ? "首次接入基准" : "开盘基准" });
     }
     private void Log(string kind, string text, string company = "", int quantity = 0, int cashDelta = 0)
     {

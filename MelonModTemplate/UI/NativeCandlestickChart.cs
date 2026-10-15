@@ -15,7 +15,7 @@ namespace MelonModTemplate.UI;
 // 用原生 UGUI Image 色块绘制日 K 线，不创建纹理，也不依赖 IMGUI、GL 或 Graphics 绘制。
 public sealed class NativeCandlestickChart : IDisposable
 {
-    private const int Capacity = 60;
+    private const int Capacity = 30;
     private static readonly Color Rising = new(.92f, .34f, .29f, 1f);
     private static readonly Color Falling = new(.25f, .76f, .44f, 1f);
     private static readonly Color Neutral = new(.64f, .67f, .65f, 1f);
@@ -83,8 +83,8 @@ public sealed class NativeCandlestickChart : IDisposable
         try
         {
             // 只展示真实记录，不为旧档补齐不存在的开、高、低或空缺游戏日。
-            var count = visibleDays switch { 1 => 1, 7 => 7, 60 => 60, _ => 30 };
-            var selected = (candles ?? Array.Empty<DailyCandle>()).Where(c => c != null && c.Close > 0 && (count != 1 || (currentDay.HasValue && c.Day == currentDay.Value)))
+            var count = visibleDays switch { 7 => 7, 14 => 14, _ => 30 };
+            var selected = (candles ?? Array.Empty<DailyCandle>()).Where(c => c != null && c.Close > 0)
                 .OrderBy(c => c.Day).TakeLast(count)
                 .Select(c => new CandleSample(c.Day, c.Open, c.High, c.Low, c.Close, c.IsPartial)).ToArray();
             var width = _parent.rect.width;
@@ -93,9 +93,7 @@ public sealed class NativeCandlestickChart : IDisposable
             if (_hasRendered && Math.Abs(width - _previousWidth) < .5f && Math.Abs(height - _previousHeight) < .5f
                 && count == _previousDays && day == _previousCurrentDay && currentPrice == _previousPrice && selected.SequenceEqual(_previous)) return;
 
-            _title.Text!.text = count == 1
-                ? "当日 K 线" + (currentDay.HasValue ? $" · 第 {currentDay.Value} 日" : "")
-                : $"日 K 线 · 最近 {selected.Length} 个有记录的游戏日";
+            _title.Text!.text = $"日 K 线 · 最近 {selected.Length} 个有记录的游戏日";
             Place(_title, 8, Math.Max(0, height - 23), Math.Max(80, width - (width < 430 ? 16 : 200)), 22);
             Place(_legend, Math.Max(8, width - 202), Math.Max(0, height - 22), 194, 20);
             Visible(_legend, width >= 430);
@@ -108,7 +106,7 @@ public sealed class NativeCandlestickChart : IDisposable
             else if (selected.Length == 0)
             {
                 HidePlot();
-                _note.Text!.text = count == 1 ? "当日暂无行情记录，等待实际行情更新。" : "暂无日行情记录；首次接入只记录可确认的收盘采样，不补造历史 K 线。";
+                _note.Text!.text = "暂无日行情记录；首次接入只记录可确认的收盘采样，不补造历史 K 线。";
             }
             else Draw(selected, currentPrice, currentDay, width, height);
 
@@ -263,6 +261,14 @@ public sealed class NativeCandlestickChart : IDisposable
 
     private static string Price(decimal value) => value.ToString("0.00", CultureInfo.InvariantCulture);
     private static string KnownPrice(decimal? value) => value.HasValue ? Price(value.Value) : "—";
+
+    public void SetVisible(bool visible)
+    {
+        if (_disposed) return;
+        if (_root.activeSelf == visible) return;
+        _root.SetActive(visible);
+        if (visible) _hasRendered = false;
+    }
 
     public void Dispose()
     {

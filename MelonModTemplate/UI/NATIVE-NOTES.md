@@ -6,7 +6,7 @@
 - 独立窗口 ID 为 `MelonModTemplate.stock_market.native`，使用管理器提供的 overlay 画布和窗口、按钮、标签、输入、滚动预制件。沿用原生 sprite、TMP 字体及关闭/拖动组件，只调整本窗口实例的色调。没有复制交易按钮、背包窗口或任何原版业务组件。
 - 当前代理没有指南中部分较新的快捷接口，例如 `BeginTabs/AddFlexibleSpace/GetWindow/OnClose` 构建器方法。本实现使用四个独立原生列容器切换分页，窗口关闭字段 `onClose` 绑定具名回调。
 - 按钮和输入事件通过 `DelegateSupport.ConvertDelegate` 转换到 `UnityAction`、`UnityAction<string>`，保存原生委托和托管入口；关闭时以相同实例 `RemoveListener`，然后销毁自己的窗口。输入使用 `TMP_InputField` 的整数限制。
-- 行情显示较昨收、最新变化、当日及 7/30/60 日 K 线、商品交叉权重、共同关联公司及已公开事件。情报只读取 `IMarketHost` 安全报价和 `GetRumors()` 的已购投影，不显示未购买未来事件。
+- 行情显示较昨收、最新变化、当日分时走势及 7/14/30 日 K 线、商品交叉权重、共同关联公司及已公开事件。情报只读取 `IMarketHost` 安全报价和 `GetRumors()` 的已购投影，不显示未购买未来事件。
 - 委托和内幕购买仍受 `CanTrade` 门控。确认委托时重新读取资金并调用 `QuoteOrder`，随后才通过 `PlaceOrder` 执行；界面不直接改资金和存档。
 - 情报购买提交上一次实际展示的 `OfferId`，由适配层拒绝已经更换顾客的报价，避免半秒刷新间隔内购买到其他顾客的情报。
 - 所有控件回调与定时刷新均校验打开时的行情引擎对象和存档标识；切档以及同档重新载入都关闭并解绑旧控件。关闭与异常路径恢复此前光标状态。窗口创建失败只记录本阶段一次完整异常，不触碰玩家背包。
@@ -26,3 +26,9 @@
 场景已有 `EventSystem.current` 时直接复用；缺失时才创建本 Mod 自有的 `EventSystem` 与 `StandaloneInputModule`。API 检查已确认使用的 `GameObject.GetComponent(Type)`、`AddComponent(Type)`、`Resources.FindObjectsOfTypeAll(Type)` 为当前代理的原生调用；模板构造不使用此前已发现会失败的 `Graphics.DrawTextureImpl`。
 
 卸载时面板先关闭自己的窗口并解绑。随后，仅当管理器字段仍指向本 Mod 填入的模板时才恢复原值；只销毁自有模板、管理器和事件系统，不销毁游戏 sprite、font 或 material。如果管理器仍有其他 Mod 的存活窗口，则保留正在共享的管理器及模板并记录原因，避免破坏其他窗口。原生素材与控件实际渲染、输入、拖动、裁切和中文覆盖仍需游戏实测。
+
+## 当日分时与日 K 线
+
+当日分时使用独立的 `NativeIntradayChart`，与 `NativeCandlestickChart` 互斥显示。所有当天真实结算样本按顺序连接，横轴表示采样次序，不使用现实时间冒充游戏分钟。开盘或接入基准、顾客成交结算、每日行情及事件变价形成各自的记录；隐藏事件沿用安全的“市场异动”原因，不通过图表公开事件标识或未购内幕。当天采样独立保存，不受 `HistoryLimit` 跨日价格历史裁剪影响。跨日只开始当天的新曲线；旧档恢复到的记录不完整时明确提示，不生成不存在的点。
+
+日 K 线周期固定为 7、14、30 个有记录的游戏日，继续使用保存的每日 OHLC。图表切换不改变行情或随机状态；关闭窗口释放两张图自身的对象，不销毁游戏字体与材质。

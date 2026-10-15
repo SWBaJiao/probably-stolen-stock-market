@@ -30,6 +30,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private readonly Dictionary<string, float> _minimumHeights = new(StringComparer.Ordinal);
     private readonly Dictionary<string, float> _measuredWidths = new(StringComparer.Ordinal);
     private NativeCandlestickChart? _chart;
+    private NativeIntradayChart? _intradayChart;
     private GameObject? _companyDetails;
     private int _chartDays = 30;
     private bool _showDetails;
@@ -164,10 +165,10 @@ public sealed class NativeStockMarketPanel : IDisposable
         Container(_builder.CurrentParent, -1);
         Label("company.title", "", 30, true);
         _builder.BeginRow(5);
-        Button("chart.1", "当日", "chart:1", -1, 28);
+        Button("chart.1", "当日分时", "chart:1", -1, 28);
         Button("chart.7", "近 7 日", "chart:7", -1, 28);
+        Button("chart.14", "近 14 日", "chart:14", -1, 28);
         Button("chart.30", "近 30 日", "chart:30", -1, 28);
-        Button("chart.60", "近 60 日", "chart:60", -1, 28);
         _builder.End();
         Button("company.toggle", "公司与商品关联 ▸", "details", -1, 28);
         _builder.BeginColumn(0);
@@ -177,6 +178,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (chartLayout != null) chartLayout.enabled = false;
         var font = _window.frame.titleText.font;
         _chart = new NativeCandlestickChart(chartRoot, font);
+        _intradayChart = new NativeIntradayChart(chartRoot, font);
         _builder.End();
 
         _builder.BeginColumn(4);
@@ -357,8 +359,13 @@ public sealed class NativeStockMarketPanel : IDisposable
         Text("company.sectors", "关联商品及成交影响分配：\n" + string.Join("  ·  ", sectors.Select(s => $"{s.Name} {s.Weights[company.Id]:0%}")));
         var peers = sectors.SelectMany(s => s.Weights.Keys).Where(id => id != company.Id).Distinct();
         Text("company.peers", "共同关联公司：\n" + string.Join("、", peers.Select(id => engine.Config.Companies.FirstOrDefault(c => c.Id == id)?.Name ?? id)));
-        _chart?.Render(stock.Candles, stock.Price, _chartDays, engine.State.LastDay);
-        foreach (var days in new[] { 1, 7, 30, 60 }) Tint("chart." + days, _chartDays == days);
+        var intraday = _chartDays == 1;
+        _chart?.SetVisible(!intraday);
+        _intradayChart?.SetVisible(intraday);
+        if (intraday)
+            _intradayChart?.Render(stock.IntradayDay == engine.State.LastDay ? stock.IntradayPoints : Array.Empty<PricePoint>(), stock.Price, engine.State.LastDay, stock.IntradayIsPartial);
+        else _chart?.Render(stock.Candles, stock.Price, _chartDays, engine.State.LastDay);
+        foreach (var days in new[] { 1, 7, 14, 30 }) Tint("chart." + days, _chartDays == days);
         Text("company.toggle", _showDetails ? "收起公司与商品关联 ▾" : "公司与商品关联 ▸");
         var news = engine.State.Ledger.Where(e => e.Kind == "event" && (string.IsNullOrEmpty(e.CompanyId) || e.CompanyId == company.Id)).TakeLast(4).Reverse();
         Text("company.news", "已公开事件：\n" + (news.Any() ? string.Join("\n\n", news.Select(e => $"第 {e.Day} 日  {e.Description}")) : "暂无已公开事件。"));
@@ -457,7 +464,7 @@ public sealed class NativeStockMarketPanel : IDisposable
             if (command.StartsWith("page:", StringComparison.Ordinal)) SetPage(int.Parse(command.Substring(5), CultureInfo.InvariantCulture));
             else if (command.StartsWith("company:", StringComparison.Ordinal)) { _companyId = command.Substring(8); SetPage(0); }
             else if (command.StartsWith("chart:", StringComparison.Ordinal))
-                _chartDays = command switch { "chart:1" => 1, "chart:7" => 7, "chart:60" => 60, _ => 30 };
+                _chartDays = command switch { "chart:1" => 1, "chart:7" => 7, "chart:14" => 14, _ => 30 };
             else if (command == "details") { _showDetails = !_showDetails; _companyDetails?.SetActive(_showDetails); }
             else if (command == "mode:buy") _buy = true;
             else if (command == "mode:sell") _buy = false;
@@ -607,7 +614,8 @@ public sealed class NativeStockMarketPanel : IDisposable
         foreach (var binding in _bindings)
             try { binding.Dispose(); }
             catch (Exception ex) { Warn("unbind", "原生控件监听器移除失败，窗口销毁后将释放控件。", ex); }
-        _chart?.Dispose(); _chart = null; _companyDetails = null;
+        _chart?.Dispose(); _chart = null;
+        _intradayChart?.Dispose(); _intradayChart = null; _companyDetails = null;
         _bindings.Clear(); _elements.Clear(); _pages.Clear(); _textCache.Clear(); _minimumHeights.Clear(); _measuredWidths.Clear(); _builder = null;
         _boundEngine = null; _saveIdentity = "";
         _displayedOfferId = null;

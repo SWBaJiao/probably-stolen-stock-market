@@ -68,6 +68,10 @@ public sealed class CompanyState
     public decimal DailyRetailImpact { get; set; }
     public List<PricePoint> History { get; set; } = new();
     public List<DailyCandle> Candles { get; set; } = new();
+    public int IntradayDay { get; set; } = -1;
+    // 当前日顺序样本独立保存，不受历史采样数量限制。
+    public List<PricePoint> IntradayPoints { get; set; } = new();
+    public bool IntradayIsPartial { get; set; }
 }
 public sealed class Position { public int Quantity { get; set; } public decimal Cost { get; set; } public decimal RealizedProfit { get; set; } }
 public sealed class LedgerEntry

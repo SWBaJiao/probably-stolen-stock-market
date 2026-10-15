@@ -256,6 +256,62 @@ try
 }
 catch (ArgumentException) { invalid = true; }
 Check(invalid, "日 K 线高价低于已知开收时拒绝损坏存档");
+
+var intraday = Engine();
+intraday.Config.DailyLimit = 0m;
+intraday.Config.Events.Add(new EventRule { EventId = "intraday-rise", Description = "公开上行消息", Impacts = new() { ["water"] = .1m } });
+intraday.Config.Events.Add(new EventRule { EventId = "intraday-secret", Description = "绝密下行消息", Impacts = new() { ["water"] = -.2m } });
+intraday.Config.Events.Add(new EventRule { EventId = "intraday-flat", Description = "同价结算", Impacts = new() { ["water"] = 0m } });
+Check(intraday.State.Companies.Values.All(c => c.IntradayDay == -1 && c.IntradayPoints.Count == 0), "未接入日期不创建虚构分时曲线");
+intraday.AdvanceDay(20);
+Check(intraday.State.Companies["water"].IntradayDay == 20 && intraday.State.Companies["water"].IntradayIsPartial && intraday.State.Companies["water"].IntradayPoints.Count == 2, "首次盘中接入仅记录基准和此后真实结算并标不完整");
+intraday.AdvanceDay(21);
+intraday.ActivateEvent("intraday-rise", "21/up", 21);
+intraday.RecordTrade("intra-session", "intra-trade", new[] { "WATER" }, 1000m);
+intraday.CloseCustomer("intra-session");
+var afterCustomer = intraday.State.Companies["water"].Price;
+intraday.ActivateEvent("intraday-secret", "21/secret", 21, false);
+var points = intraday.State.Companies["water"].IntradayPoints;
+Check(!intraday.State.Companies["water"].IntradayIsPartial && points.Select(p => p.Price).SequenceEqual(new[] { 100m, 100m, 110m, afterCustomer, intraday.State.Companies["water"].Price }) && points.Select(p => p.Reason).SequenceEqual(new[] { "开盘基准", "每日行情", "公开上行消息", "顾客成交结算", "市场异动" }), "当前日按实际顺序完整记录开盘、同价行情、公开事件、成交及隐事件");
+Check(points.All(p => p.Day == 21 && !p.Reason.Contains("绝密")) && intraday.State.Ledger.All(l => !l.Description.Contains("绝密")), "分时原因不泄露隐事件标题也不混入上一日");
+var orderedIntraday = intraday.Serialize();
+intraday.AdvanceDay(21); intraday.ActivateEvent("intraday-rise", "21/up", 21); intraday.CloseCustomer("intra-session");
+Check(intraday.Serialize() == orderedIntraday, "重复日行情事件和遣散不追加分时样本");
+var restoredIntraday = new MarketEngine(intraday.Config, MarketEngine.Deserialize(orderedIntraday, intraday.Config));
+Check(restoredIntraday.Serialize() == orderedIntraday && restoredIntraday.State.Companies["water"].IntradayPoints.Select(p => p.Price).SequenceEqual(points.Select(p => p.Price)), "分时顺序原因及完整性随存档准确恢复");
+var rollbackIntraday = restoredIntraday.Serialize();
+var attempts = 0;
+var intraWallet = new Wallet { Cash = 1000 };
+var rollbackOrder = restoredIntraday.PlaceOrder("water", OrderSide.Buy, 1, intraWallet, () => { if (attempts++ == 0) throw new IOException("模拟分时期间保存失败"); });
+Check(!rollbackOrder.Success && intraWallet.Cash == 1000 && restoredIntraday.Serialize() == rollbackIntraday, "资金失败回滚不丢失或重新生成当日分时样本");
+for (var i = 0; i < 260; i++) restoredIntraday.ActivateEvent("intraday-flat", "21/flat/" + i, 21);
+var longSeries = restoredIntraday.State.Companies["water"];
+Check(longSeries.History.Count == restoredIntraday.Config.HistoryLimit && longSeries.IntradayPoints.Count == 265 && longSeries.IntradayPoints[0].Reason == "开盘基准" && longSeries.IntradayPoints.Skip(5).All(p => p.Reason == "同价结算"), "超过历史采样上限仍保留当天全部分时点含同价结算");
+var longSaved = restoredIntraday.Serialize();
+var longReloaded = new MarketEngine(restoredIntraday.Config, MarketEngine.Deserialize(longSaved, restoredIntraday.Config));
+Check(longReloaded.State.Companies["water"].IntradayPoints.Count == 265 && longReloaded.Serialize() == longSaved, "超出历史上限的当日完整序列读档后保留");
+var previousClose = longReloaded.State.Companies["water"].Price;
+longReloaded.AdvanceDay(22);
+Check(longReloaded.State.Companies.Values.All(c => c.IntradayDay == 22 && c.IntradayPoints.Count == 2 && c.IntradayPoints.All(p => p.Day == 22) && !c.IntradayIsPartial) && longReloaded.State.Companies["water"].IntradayPoints[0].Price == previousClose && longReloaded.State.Companies["water"].Candles.Any(c => c.Day == 21), "跨日清除旧分时并用前收建立新日基准同时保留日 K 线");
+
+var oldIntradayJson = System.Text.Json.Nodes.JsonNode.Parse(oldJson.ToJsonString())!;
+var legacyCompany = oldIntradayJson["Companies"]!["water"]!.AsObject();
+legacyCompany.Remove("IntradayDay"); legacyCompany.Remove("IntradayPoints"); legacyCompany.Remove("IntradayIsPartial");
+var migratedIntraday = new MarketEngine(intraday.Config, MarketEngine.Deserialize(oldIntradayJson.ToJsonString(), intraday.Config));
+var partialSeries = migratedIntraday.State.Companies["water"];
+Check(partialSeries.IntradayIsPartial && partialSeries.IntradayDay == 4 && partialSeries.IntradayPoints.Select(p => p.Price).SequenceEqual(new[] { 120m, 130m }) && partialSeries.IntradayPoints.All(p => p.Day == 4), "旧 schema 仅按现存当日采样顺序迁移分时并明确标不完整");
+legacyCompany["History"] = System.Text.Json.Nodes.JsonNode.Parse("[{\"Day\":2,\"Price\":90,\"Reason\":\"旧日\"}]");
+var noHistoryIntraday = new MarketEngine(intraday.Config, MarketEngine.Deserialize(oldIntradayJson.ToJsonString(), intraday.Config)).State.Companies["water"];
+Check(noHistoryIntraday.IntradayIsPartial && noHistoryIntraday.IntradayPoints.Count == 1 && noHistoryIntraday.IntradayPoints[0].Day == 4 && noHistoryIntraday.IntradayPoints[0].Price == 130m, "旧档缺少当日采样只显示实际当前价基点不借用旧日曲线");
+invalid = false;
+try
+{
+    var corruptIntraday = System.Text.Json.Nodes.JsonNode.Parse(migratedIntraday.Serialize())!;
+    corruptIntraday["Companies"]!["water"]!["IntradayPoints"]![0]!["Day"] = 3;
+    MarketEngine.Deserialize(corruptIntraday.ToJsonString(), intraday.Config);
+}
+catch (ArgumentException) { invalid = true; }
+Check(invalid, "分时样本混入其他日期时拒绝损坏存档");
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet
