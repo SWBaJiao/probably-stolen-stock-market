@@ -164,10 +164,12 @@ public sealed class NativeStockMarketPanel : IDisposable
         Container(_builder.CurrentParent, -1);
         Label("company.title", "", 30, true);
         _builder.BeginRow(5);
-        Button("chart.30", "近 30 日", "chart:30", 100, 28);
-        Button("chart.60", "近 60 日", "chart:60", 100, 28);
-        Button("company.toggle", "公司与商品关联 ▸", "details", -1, 28);
+        Button("chart.1", "当日", "chart:1", -1, 28);
+        Button("chart.7", "近 7 日", "chart:7", -1, 28);
+        Button("chart.30", "近 30 日", "chart:30", -1, 28);
+        Button("chart.60", "近 60 日", "chart:60", -1, 28);
         _builder.End();
+        Button("company.toggle", "公司与商品关联 ▸", "details", -1, 28);
         _builder.BeginColumn(0);
         var chartRoot = _builder.CurrentParent;
         Container(chartRoot, -1, 230);
@@ -356,7 +358,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         var peers = sectors.SelectMany(s => s.Weights.Keys).Where(id => id != company.Id).Distinct();
         Text("company.peers", "共同关联公司：\n" + string.Join("、", peers.Select(id => engine.Config.Companies.FirstOrDefault(c => c.Id == id)?.Name ?? id)));
         _chart?.Render(stock.Candles, stock.Price, _chartDays, engine.State.LastDay);
-        Tint("chart.30", _chartDays == 30); Tint("chart.60", _chartDays == 60);
+        foreach (var days in new[] { 1, 7, 30, 60 }) Tint("chart." + days, _chartDays == days);
         Text("company.toggle", _showDetails ? "收起公司与商品关联 ▾" : "公司与商品关联 ▸");
         var news = engine.State.Ledger.Where(e => e.Kind == "event" && (string.IsNullOrEmpty(e.CompanyId) || e.CompanyId == company.Id)).TakeLast(4).Reverse();
         Text("company.news", "已公开事件：\n" + (news.Any() ? string.Join("\n\n", news.Select(e => $"第 {e.Day} 日  {e.Description}")) : "暂无已公开事件。"));
@@ -454,7 +456,8 @@ public sealed class NativeStockMarketPanel : IDisposable
             if (command == "close") { Hide(); return; }
             if (command.StartsWith("page:", StringComparison.Ordinal)) SetPage(int.Parse(command.Substring(5), CultureInfo.InvariantCulture));
             else if (command.StartsWith("company:", StringComparison.Ordinal)) { _companyId = command.Substring(8); SetPage(0); }
-            else if (command.StartsWith("chart:", StringComparison.Ordinal)) _chartDays = command == "chart:60" ? 60 : 30;
+            else if (command.StartsWith("chart:", StringComparison.Ordinal))
+                _chartDays = command switch { "chart:1" => 1, "chart:7" => 7, "chart:60" => 60, _ => 30 };
             else if (command == "details") { _showDetails = !_showDetails; _companyDetails?.SetActive(_showDetails); }
             else if (command == "mode:buy") _buy = true;
             else if (command == "mode:sell") _buy = false;

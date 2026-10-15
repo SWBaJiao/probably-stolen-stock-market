@@ -6,7 +6,7 @@
 - 独立窗口 ID 为 `MelonModTemplate.stock_market.native`，使用管理器提供的 overlay 画布和窗口、按钮、标签、输入、滚动预制件。沿用原生 sprite、TMP 字体及关闭/拖动组件，只调整本窗口实例的色调。没有复制交易按钮、背包窗口或任何原版业务组件。
 - 当前代理没有指南中部分较新的快捷接口，例如 `BeginTabs/AddFlexibleSpace/GetWindow/OnClose` 构建器方法。本实现使用四个独立原生列容器切换分页，窗口关闭字段 `onClose` 绑定具名回调。
 - 按钮和输入事件通过 `DelegateSupport.ConvertDelegate` 转换到 `UnityAction`、`UnityAction<string>`，保存原生委托和托管入口；关闭时以相同实例 `RemoveListener`，然后销毁自己的窗口。输入使用 `TMP_InputField` 的整数限制。
-- 行情显示较昨收、最新变化、30/60 日 K 线、商品交叉权重、共同关联公司及已公开事件。情报只读取 `IMarketHost` 安全报价和 `GetRumors()` 的已购投影，不显示未购买未来事件。
+- 行情显示较昨收、最新变化、当日及 7/30/60 日 K 线、商品交叉权重、共同关联公司及已公开事件。情报只读取 `IMarketHost` 安全报价和 `GetRumors()` 的已购投影，不显示未购买未来事件。
 - 委托和内幕购买仍受 `CanTrade` 门控。确认委托时重新读取资金并调用 `QuoteOrder`，随后才通过 `PlaceOrder` 执行；界面不直接改资金和存档。
 - 情报购买提交上一次实际展示的 `OfferId`，由适配层拒绝已经更换顾客的报价，避免半秒刷新间隔内购买到其他顾客的情报。
 - 所有控件回调与定时刷新均校验打开时的行情引擎对象和存档标识；切档以及同档重新载入都关闭并解绑旧控件。关闭与异常路径恢复此前光标状态。窗口创建失败只记录本阶段一次完整异常，不触碰玩家背包。

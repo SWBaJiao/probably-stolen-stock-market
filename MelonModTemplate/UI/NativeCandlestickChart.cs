@@ -83,8 +83,8 @@ public sealed class NativeCandlestickChart : IDisposable
         try
         {
             // 只展示真实记录，不为旧档补齐不存在的开、高、低或空缺游戏日。
-            var count = visibleDays > 30 ? 60 : 30;
-            var selected = (candles ?? Array.Empty<DailyCandle>()).Where(c => c != null && c.Close > 0)
+            var count = visibleDays switch { 1 => 1, 7 => 7, 60 => 60, _ => 30 };
+            var selected = (candles ?? Array.Empty<DailyCandle>()).Where(c => c != null && c.Close > 0 && (count != 1 || (currentDay.HasValue && c.Day == currentDay.Value)))
                 .OrderBy(c => c.Day).TakeLast(count)
                 .Select(c => new CandleSample(c.Day, c.Open, c.High, c.Low, c.Close, c.IsPartial)).ToArray();
             var width = _parent.rect.width;
@@ -93,7 +93,9 @@ public sealed class NativeCandlestickChart : IDisposable
             if (_hasRendered && Math.Abs(width - _previousWidth) < .5f && Math.Abs(height - _previousHeight) < .5f
                 && count == _previousDays && day == _previousCurrentDay && currentPrice == _previousPrice && selected.SequenceEqual(_previous)) return;
 
-            _title.Text!.text = $"日 K 线 · 最近 {selected.Length} 个有记录的游戏日";
+            _title.Text!.text = count == 1
+                ? "当日 K 线" + (currentDay.HasValue ? $" · 第 {currentDay.Value} 日" : "")
+                : $"日 K 线 · 最近 {selected.Length} 个有记录的游戏日";
             Place(_title, 8, Math.Max(0, height - 23), Math.Max(80, width - (width < 430 ? 16 : 200)), 22);
             Place(_legend, Math.Max(8, width - 202), Math.Max(0, height - 22), 194, 20);
             Visible(_legend, width >= 430);
@@ -106,7 +108,7 @@ public sealed class NativeCandlestickChart : IDisposable
             else if (selected.Length == 0)
             {
                 HidePlot();
-                _note.Text!.text = "暂无日行情记录；首次接入只记录可确认的收盘采样，不补造历史 K 线。";
+                _note.Text!.text = count == 1 ? "当日暂无行情记录，等待实际行情更新。" : "暂无日行情记录；首次接入只记录可确认的收盘采样，不补造历史 K 线。";
             }
             else Draw(selected, currentPrice, currentDay, width, height);
 
@@ -149,7 +151,7 @@ public sealed class NativeCandlestickChart : IDisposable
         }
         Place(_bottomAxis, left, bottom - 1, plotWidth, 1); Visible(_bottomAxis, true);
 
-        // 槽位宽度依容器的整个绘图区计算，30 日和 60 日都铺满可用横向空间。
+        // 槽位依实际记录数量分布，所有周期共用整个绘图区。
         var slotWidth = plotWidth / candles.Length;
         var bodyWidth = Math.Clamp(slotWidth * .56f, 1.5f, 22f);
         for (int i = 0; i < _pool.Length; i++)
