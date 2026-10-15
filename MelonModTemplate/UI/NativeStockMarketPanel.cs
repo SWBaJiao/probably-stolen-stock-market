@@ -43,7 +43,6 @@ public sealed class NativeStockMarketPanel : IDisposable
     private CustomUIBuilder? _builder;
     private MarketEngine? _boundEngine;
     private string _companyId = "", _quantity = "1", _feedback = "", _saveIdentity = "";
-    private string? _displayedOfferId;
     private bool _buy = true, _visible, _disposed, _cursorSaved, _oldCursorVisible;
     private CursorLockMode _oldCursorLock;
     private int _page;
@@ -143,7 +142,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         var navWidth = (_width - 66) / 4;
         Button("nav.market", "行情与委托", "page:0", navWidth);
         Button("nav.portfolio", "我的持仓", "page:1", navWidth);
-        Button("nav.rumors", "顾客内幕", "page:2", navWidth);
+        Button("nav.rumors", "内幕档案", "page:2", navWidth);
         Button("nav.ledger", "资金与行情流水", "page:3", navWidth);
         _builder.End();
 
@@ -224,11 +223,11 @@ public sealed class NativeStockMarketPanel : IDisposable
         EndPage();
 
         BeginPage();
-        Label("seller.title", "当前来访顾客", 32, true);
+        Label("seller.title", "行情掮客与消息来源", 32, true);
         Label("seller.identity", "", 58);
         Label("seller.reputation", "", 62);
         Label("seller.offer", "", 78);
-        Button("rumor.buy", "购买情报", "rumor", Math.Min(280, _width - 60), 38);
+        Label("rumors.flow", "购买请与上门的行情掮客交谈。成交后会收到署名便笺，并自动登记游戏日历。", 48);
         Label("rumors.title", "已购买情报簿", 34, true);
         Label("rumors.book", "", 180);
         EndPage();
@@ -401,21 +400,24 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     private void RefreshRumors(MarketEngine engine)
     {
-        // 记住本次实际展示的报价；点击时将此令牌交给适配层核对，不能临时替换成新顾客报价。
-        _displayedOfferId = _host.OfferId;
         Text("seller.identity", _host.SellerDescription);
         Text("seller.reputation", _host.SellerReputation, MutedColor);
         // 未购情报仅展示 host 的安全报价，不读取未来事件或 RumorOffer 内部字段。
         Text("seller.offer", _host.OfferDescription);
-        Text("rumor.buy", _host.OfferCost.HasValue ? $"购买情报 · {_host.OfferCost.Value} 游戏币" : "暂无可购买的情报");
-        Enabled("rumor.buy", _host.CanTrade && _host.CanBuyRumor && !string.IsNullOrEmpty(_displayedOfferId));
         var purchased = engine.GetRumors().Where(r => r.Purchased).Reverse().Take(30).ToArray();
+        var intel = engine.GetIntelRecords().ToDictionary(r => r.OfferId);
         var book = new StringBuilder();
         foreach (var rumor in purchased)
         {
             var resolution = rumor.Resolution switch { RumorResolution.True => "属实", RumorResolution.False => "失实", RumorResolution.Unverified => "未能验证", _ => "等待验证" };
-            book.AppendLine($"{rumor.SellerName} · {rumor.Identity} · {resolution}");
+            var source = rumor.SellerName == rumor.Identity ? rumor.SellerName : $"{rumor.SellerName} · {rumor.Identity}";
+            book.AppendLine($"{source} · {resolution}");
             book.AppendLine($"{(rumor.IsGroupIdentity ? "同类来源信誉" : "来源信誉")} {rumor.Reliability:0%} · 验证 {rumor.Correct + rumor.Incorrect} 次 · 观察至第 {rumor.DueDay} 日");
+            if (intel.TryGetValue(rumor.Id, out var record))
+            {
+                var delivery = record.PaperState switch { IntelPaperState.Delivered => "已交付", IntelPaperState.Uncertain => "位置待核实", _ => "待柜台交付" };
+                book.AppendLine($"第 {record.PurchaseDay} 日购买 · 日历第 {record.ObservationStartDay}～{record.ObservationEndDay} 日 · 纸条{delivery}");
+            }
             book.AppendLine(rumor.Content);
             book.AppendLine("关联公司：" + string.Join("、", rumor.CompanyIds.Select(id => engine.Config.Companies.FirstOrDefault(c => c.Id == id)?.Name ?? id)));
             book.AppendLine();
@@ -455,8 +457,8 @@ public sealed class NativeStockMarketPanel : IDisposable
             text.AppendLine($"资金变动 {SignedMoney(quote.CashDelta)} · 成交后余额 {(long)_host.Cash + quote.CashDelta}");
         }
         if (!valid) text.Append("请输入正整数股数。");
+        else if (!_host.CanTrade) text.Append(_host.Status);
         else if (!quote.Success) text.Append(quote.Message);
-        else if (!_host.CanTrade) text.Append("请先完成当前存档的资金与保存验证。");
         Text("order.preview", text.ToString());
         Text("order.submit", _buy ? "确认买入" : "确认卖出");
         Enabled("order.submit", valid && quote.Success && _host.CanTrade);
@@ -484,9 +486,6 @@ public sealed class NativeStockMarketPanel : IDisposable
                 _elements["quantity"].SetString(_quantity, false);
             }
             else if (command == "order") SubmitOrder();
-            else if (command == "rumor")
-                _feedback = _host.CanTrade && _host.CanBuyRumor && !string.IsNullOrEmpty(_displayedOfferId)
-                    ? _host.BuyRumor(_displayedOfferId) : "当前情报不可购买，已刷新顾客报价。";
             else if (command == "recover") _feedback = _host.RecoverTerminal();
             Refresh();
         }
@@ -504,9 +503,10 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     private void SubmitOrder()
     {
+        MelonLogger.Msg($"[原生股市委托] 点击{(_buy ? "买入" : "卖出")} company={_companyId} quantity={_quantity} canTrade={_host.CanTrade}");
         if (!IsCurrentContext()) { Hide(); return; }
         var engine = _host.Engine;
-        if (engine == null || !_host.CanTrade) { _feedback = "当前资金或存档尚未通过验证。"; return; }
+        if (engine == null || !_host.CanTrade) { _feedback = _host.Status; return; }
         if (!int.TryParse(_quantity, NumberStyles.None, CultureInfo.InvariantCulture, out var quantity) || quantity <= 0)
         { _feedback = "请输入正整数股数。"; return; }
         // 点击时重新读取资金与最新行情，不能依赖上一次定时刷新的报价。
@@ -628,7 +628,6 @@ public sealed class NativeStockMarketPanel : IDisposable
         _intradayChart?.Dispose(); _intradayChart = null; _companyDetails = null;
         _bindings.Clear(); _elements.Clear(); _pages.Clear(); _textCache.Clear(); _minimumHeights.Clear(); _measuredWidths.Clear(); _builder = null;
         _boundEngine = null; _saveIdentity = "";
-        _displayedOfferId = null;
         if (window != null)
         {
             try { window.onClose = null; if (close && window.IsAlive) window.Close(); }

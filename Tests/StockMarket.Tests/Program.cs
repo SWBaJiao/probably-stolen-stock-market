@@ -312,6 +312,27 @@ try
 }
 catch (ArgumentException) { invalid = true; }
 Check(invalid, "分时样本混入其他日期时拒绝损坏存档");
+BrokerTests.Run(Check);
+var openConfig = MarketConfig.CreateDefault();
+var openMarket = new MarketEngine(openConfig);
+openMarket.ApplyStorageAccess(false);
+var openWallet = new Wallet { Cash = 1000 };
+Check(!openConfig.RequireSaveReloadVerification && openMarket.State.StorageVerified && openMarket.PlaceOrder("water", OrderSide.Buy, 1, openWallet, () => { }).Success && openMarket.PlaceOrder("water", OrderSide.Sell, 1, openWallet, () => { }).Success && openWallet.Cash == 998 && openMarket.State.Positions["water"].Quantity == 0, "默认无需首次保存重读即可进行真实资金买卖且正确扣除手续费");
+Check(!openMarket.PlaceOrder("water", OrderSide.Sell, 1, openWallet, () => { }).Success && !openMarket.PlaceOrder("water", OrderSide.Buy, 100, openWallet, () => { }).Success && openWallet.Cash == 998, "默认开放交易仍拒绝超持仓卖出和余额不足买入");
+var openedSnapshot = openMarket.Serialize();
+var openWrites = 0;
+var openedFailure = openMarket.PlaceOrder("water", OrderSide.Buy, 1, openWallet, () => { if (openWrites++ == 0) throw new IOException("模拟开放交易后的保存失败"); });
+Check(!openedFailure.Success && openWallet.Cash == 998 && openMarket.Serialize() == openedSnapshot, "默认开放交易的资金与持仓失败回滚仍然生效");
+var strictConfig = MarketConfig.CreateDefault(); strictConfig.RequireSaveReloadVerification = true;
+var strictMarket = new MarketEngine(strictConfig);
+strictMarket.ApplyStorageAccess(false);
+Check(!strictMarket.State.StorageVerified && !strictMarket.PlaceOrder("water", OrderSide.Buy, 1, new Wallet { Cash = 1000 }, () => { }).Success, "严格模式未确认保存重读时继续拒绝交易");
+strictMarket.ApplyStorageAccess(true);
+Check(strictMarket.State.StorageVerified && strictMarket.PlaceOrder("water", OrderSide.Buy, 1, new Wallet { Cash = 1000 }, () => { }).Success, "严格模式确认保存重读后允许下单");
+openMarket.State.TradingFrozen = true; openMarket.State.FreezeReason = "资金异常冻结";
+openMarket.ApplyStorageAccess(true);
+Check(openMarket.State.TradingFrozen && openMarket.State.FreezeReason == "资金异常冻结" && !openMarket.PlaceOrder("water", OrderSide.Buy, 1, openWallet, () => { }).Success, "应用存档访问策略不会解除资金异常冻结");
+TradeAllocationTests.Run(Check);
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet

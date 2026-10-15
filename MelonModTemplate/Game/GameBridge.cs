@@ -18,6 +18,9 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private readonly MelonLogger.Instance _log;
     private readonly MarketConfig _config;
     private readonly TerminalVisual _terminalVisual;
+    private IntelBrokerAdapter? _broker;
+    private IntelDeliveryAdapter? _intelDelivery;
+    private IntelCalendarAdapter? _intelCalendar;
     private readonly int _threadId = Environment.CurrentManagedThreadId;
     private HarmonyLib.Harmony? _harmony;
     private PlayerStore? _store;
@@ -28,6 +31,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private bool _monetaryOperation;
     private bool _loadedPending;
     private bool _loading;
+    private bool _roundTripVerified;
     private bool _inMenu = true;
     private IntPtr _loadDictionaryPointer;
     private IntPtr _dismissPending;
@@ -45,13 +49,22 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     internal bool BlocksGameInput => IsPanelVisible?.Invoke() == true;
     public int Cash => _store?.GetCash() ?? 0;
     public bool CanTrade => !_disposed && !_inMenu && !_loading && Engine != null && Engine.State.StorageVerified && !Engine.State.TradingFrozen && _fault.Length == 0 && IsCurrentStore();
-    public string Status => _fault.Length > 0 ? _fault : Engine == null ? "请进入游戏存档。" : !Engine.State.StorageVerified ? "存档探针待验证：请正常保存并重新载入此存档，验证后开放现金交易。" : Engine.State.TradingFrozen ? Engine.State.FreezeReason : "原版存档读回及资金一致性已通过；可交易。";
-    public string SellerDescription { get; private set; } = "当前没有顾客";
+    public string Status => _fault.Length > 0 ? _fault : Engine == null ? "请进入游戏存档。" : Engine.State.TradingFrozen ? Engine.State.FreezeReason : !Engine.State.StorageVerified ? "已启用严格存档验证：请正常保存并重新载入此存档，验证后开放现金交易。" : _config.RequireSaveReloadVerification ? "原版存档读回及资金一致性已通过；可交易。" : "现货买卖已开放；使用原版资金，投资记录随游戏存档保存。";
+    public string SellerDescription { get; private set; } = "当前没有行情掮客";
     public string SellerReputation => _offer == null ? "暂无可验证情报记录" : $"{_offer.Identity} · {(_offer.IsGroupIdentity ? "该类来源" : "个人")}记录：属实 {_offer.Correct} / 失实 {_offer.Incorrect} · 参考可信度 {_offer.Reliability:P0}";
-    public string OfferDescription => _offer == null ? "当前顾客没有可出售的关联情报。" : _offer.Purchased ? _offer.Content : $"{_offer.Identity} 提供一条行业线索，当前顾客离开前可购买；购后查看时间和行业。";
+    public string OfferDescription => _offer == null ? "内幕由行情掮客上门售卖；有线索时每三个游戏日最多来访一次。" : _offer.Purchased ? _offer.Content : $"消息来源：{_offer.Identity}。请关闭股市面板，与行情掮客交谈购买；付款前仅展示商品类别。";
     public int? OfferCost => _offer?.Price;
     public string? OfferId => _offer?.Id;
-    public bool CanBuyRumor => CanTrade && _offer is { Purchased: false, Expired: false } && Cash >= _offer.Price;
+    public bool CanBuyRumor => false;
+    internal bool BrokerReady => !_disposed && !_inMenu && !_loading && Engine != null && IsCurrentStore();
+    internal bool CanBuyBrokerIntel => CanTrade && _roundTripVerified;
+    internal string BrokerTradeStatus => !_roundTripVerified ? "股市内幕付款仍需正常保存并重新载入，确认此存档恢复后开放。" : Status;
+    internal string BrokerSaveIdentity => _identity;
+    internal StoreClient? CurrentClient => Client;
+    internal PlayerStore? CurrentStore => _store;
+    internal IReadOnlyList<ScheduledEvent> GetBrokerScheduledEvents() => ScheduledEvents();
+    internal void PersistBrokerState() => Persist();
+    internal void GrantPurchasedTipOnce(string offerId) => _intelDelivery?.GrantPurchasedTipOnce(offerId);
 
     public GameBridge(MelonLogger.Instance logger, MarketConfig config) { _log = logger; _config = config; _terminalVisual = new TerminalVisual(logger); }
 
@@ -63,9 +76,15 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         {
             GamePatches.Install(harmony, _log);
             IconRenderPatches.Install(harmony, _log);
+            _intelDelivery = new IntelDeliveryAdapter(this, _log);
+            _intelCalendar = new IntelCalendarAdapter(this, _intelDelivery, _log);
+            _broker = new IntelBrokerAdapter(this, _log);
+            _broker.Initialize(harmony);
+            _intelCalendar.Initialize(harmony);
         }
         catch
         {
+            _broker?.Dispose(); _intelCalendar?.Dispose(); _intelDelivery?.Dispose();
             IconRenderPatches.Uninstall(harmony);
             GamePatches.Uninstall(harmony); Current = null; throw;
         }
@@ -92,6 +111,8 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             {
                 if (Engine.AdvanceDay(StoreStation.GetDayCounter())) Persist();
                 Engine.ResolveRumors(ScheduledEvents());
+                _broker?.Tick();
+                _intelDelivery?.Tick();
                 Persist();
                 if (Environment.TickCount64 >= _nextTerminalScan)
                 { _nextTerminalScan = Environment.TickCount64 + 10000; EnsureTerminal(false); }
@@ -102,6 +123,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
 
     private void Attach(PlayerStore store, string identity, bool actualLoad)
     {
+        ResetBrokerRuntime();
         _store = store; _identity = identity; _fault = ""; _offer = null;
         _terminalGrant = new TerminalGrantPolicy(); _trackedTerminal = null; _lastInventoryProbe = ""; _nextTerminalScan = 0;
         bool restored = false;
@@ -120,30 +142,38 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             Engine = new MarketEngine(MarketConfig.Deserialize(_config.Serialize()));
             Engine.State.SaveIdentity = identity;
         }
-        // 每次载入均重新核实现金，不能仅相信之前保存的解锁布尔值。
+        // 每次附加按本机配置决定访问权限，不信任存档中的旧解锁布尔值。
         Engine.Diagnostic += message => _log.Warning("[股市映射] " + message);
-        Engine.State.StorageVerified = restored;
+        _roundTripVerified = restored;
+        Engine.ApplyStorageAccess(restored);
         if (actualLoad && _save.WrittenBySave && _save.SavedCash != store.GetCash())
-            _log.Warning($"[股市探针] 读回现金不匹配：记录 {_save.SavedCash}，当前 {store.GetCash()}，继续关闭交易。");
+            _log.Warning($"[股市探针] 读回现金不匹配：记录 {_save.SavedCash}，当前 {store.GetCash()}，严格验证={_config.RequireSaveReloadVerification}。");
         Engine.AdvanceDay(StoreStation.GetDayCounter());
         var manager = StoreStation.Instance?.storeEventManager;
         if (manager != null) foreach (var active in manager.GetActiveEvents()) EventActivated(manager, active, false);
         _log.Msg("[股市背包探针] 发放入口改为 EmporiumEntry.Instance.invElement；PlayerStore.gridInv 不再用于发放。");
         _log.Msg($"[股市探针] 存档 {identity}，原版 LoadGame={actualLoad}，nonce={_save.ProbeNonce}，读回验证={restored}，cash={store.GetCash()}");
         Persist();
+        _log.Msg($"[股市交易] 严格读档验证={_config.RequireSaveReloadVerification}，可交易={CanTrade}，状态={Status}");
+    }
+
+    private void ResetBrokerRuntime()
+    {
+        _broker?.Reset(); _intelCalendar?.Reset(); _intelDelivery?.Reset();
     }
 
     internal void BeginLoad()
     {
+        ResetBrokerRuntime();
         _terminalVisual.ResetTracking();
         _trackedTerminal = null; _terminalGrant = new TerminalGrantPolicy();
         _loadDictionaryPointer = _store?.modData?.Pointer ?? IntPtr.Zero;
-        _loading = true; _offer = null; _store = null; Engine = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero;
+        _loading = true; _roundTripVerified = false; _offer = null; _store = null; Engine = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero;
     }
     public void OnSceneChanged(string sceneName)
     {
         _inMenu = sceneName.IndexOf("Menu", StringComparison.OrdinalIgnoreCase) >= 0;
-        if (_inMenu) { _terminalVisual.ResetTracking(); _trackedTerminal = null; _terminalGrant = new TerminalGrantPolicy(); _store = null; Engine = null; _offer = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero; }
+        if (_inMenu) { ResetBrokerRuntime(); _terminalVisual.ResetTracking(); _trackedTerminal = null; _terminalGrant = new TerminalGrantPolicy(); _store = null; Engine = null; _offer = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero; }
         _nextPoll = 0;
     }
     internal void EndLoad(bool success)
@@ -167,7 +197,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     {
         _terminalVisual.ResumeAfterSave();
         if (!success) { _save.WrittenBySave = false; _log.Error("[股市探针] 原版 SaveGame 抛出异常，本次保存不能用于解锁。"); }
-        else _log.Msg("[股市探针] 原版 SaveGame 无异常返回；需要随后 LoadGame 读回新的字典与相同现金，才开放交易。");
+        else _log.Msg(_config.RequireSaveReloadVerification ? "[股市探针] 原版 SaveGame 无异常返回；随后 LoadGame 读回新的字典与相同现金可完成严格验证。" : "[股市探针] 原版 SaveGame 无异常返回；现货交易已默认开放，仍记录读档验证结果。");
     }
 
     private void Persist()
@@ -180,16 +210,38 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         if (_store.modData[SaveKey] != json) throw new InvalidOperationException("modData 内存写回失败。");
     }
 
-    public string PlaceOrder(string companyId, int quantity, bool buy) => Monetary(() => Engine!.PlaceOrder(companyId, buy ? OrderSide.Buy : OrderSide.Sell, quantity, this, Persist).Message);
-    public string BuyRumor(string? expectedOfferId = null)
+    public string PlaceOrder(string companyId, int quantity, bool buy)
     {
-        if (!IsCurrentStore()) return "存档正在切换，请稍后重试。";
-        RefreshCustomer();
-        if (_offer == null) return "当前没有可购买的情报。";
-        if (string.IsNullOrEmpty(expectedOfferId) || expectedOfferId != _offer.Id)
-            return "顾客或情报报价已变化，请刷新面板后再购买。";
-        string result = Monetary(() => Engine!.BuyRumor(_offer.Id, this, Persist).Message);
-        RefreshOffer(); return result;
+        string result = Monetary(() => Engine!.PlaceOrder(companyId, buy ? OrderSide.Buy : OrderSide.Sell, quantity, this, Persist).Message);
+        _log.Msg($"[股市委托] {(buy ? "买入" : "卖出")} company={companyId} quantity={quantity} result={result}");
+        return result;
+    }
+    public string BuyRumor(string? expectedOfferId = null) => "请与行情掮客交谈，在原版情报界面购买。";
+
+    internal OperationResult PurchaseBrokerOffer(string visitId, string offerId)
+    {
+        if (!CanBuyBrokerIntel) return OperationResult.Fail(BrokerTradeStatus);
+        if (Environment.CurrentManagedThreadId != _threadId || _monetaryOperation) return OperationResult.Fail("操作繁忙，请稍后再试。");
+        if (Client?.identifier != IntelBrokerAdapter.NpcId) return OperationResult.Fail("当前接待对象已变化。");
+        var visit = Engine!.GetBrokerVisit();
+        if (visit == null || visit.VisitId != visitId || visit.OfferId != offerId || !visit.HasArrived || visit.Departed)
+            return OperationResult.Fail("当前内幕报价已变化。");
+        var engine = Engine;
+        _monetaryOperation = true;
+        int before = Cash;
+        try
+        {
+            var result = engine.BuyBrokerOffer(offerId, ScheduledEvents(), this, Persist);
+            _log.Msg($"[内幕购买探针] success={result.Success} visit={visitId} cash={before}->{Cash}");
+            RefreshOffer();
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Fault("内幕资金操作异常，交易已冻结", ex);
+            return OperationResult.Fail(Status);
+        }
+        finally { _monetaryOperation = false; }
     }
     private string Monetary(Func<string> action)
     {
@@ -224,7 +276,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         var pointer = _store?.currentClientInstance?.Pointer ?? IntPtr.Zero;
         if (_dismissPending != IntPtr.Zero && pointer != _dismissPending) { SettleSession(); _dismissPending = IntPtr.Zero; }
         if (_clientPointer != IntPtr.Zero && pointer != _clientPointer && !_save.SessionClosed) SettleSession();
-        if (client == null) { SellerDescription = "当前没有顾客"; _offer = null; _clientPointer = IntPtr.Zero; return; }
+        if (client == null) { SellerDescription = "当前没有行情掮客"; _offer = null; _clientPointer = IntPtr.Zero; return; }
         string key = $"{client.identifier}|{client.clientFaction}";
         if (_save.SessionId.Length == 0 || _save.ClientKey != key || _save.SessionClosed)
         {
@@ -233,26 +285,18 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             _log.Msg($"[股市顾客] session={_save.SessionId} id={client.identifier} faction={client.clientFaction} tags={string.Join(",", Strings(client.tag))}");
             Persist();
         }
-        SellerDescription = $"{client.displayName} · {client.identifier} · {client.clientFaction}";
+        SellerDescription = client.identifier == IntelBrokerAdapter.NpcId ? "行情掮客正在来访" : "当前没有行情掮客；普通顾客不再出售股市内幕。";
         _clientPointer = pointer;
         RefreshOffer();
     }
     private void RefreshOffer()
     {
-        var client = Client;
-        if (Engine == null || client == null || _save.SessionClosed) { _offer = null; return; }
-        var rule = _config.Sellers.FirstOrDefault(r => (!string.IsNullOrEmpty(r.Identifier) && r.Identifier == client.identifier) || (string.IsNullOrEmpty(r.Identifier) && !string.IsNullOrEmpty(r.Faction) && r.Faction == client.clientFaction));
-        var sectors = new List<string>();
-        var types = Strings(client.clientBuyingTagList).Concat(Strings(client.tag)).Append(client.attractedType ?? "").ToHashSet(StringComparer.OrdinalIgnoreCase);
-        foreach (var sector in _config.Sectors) if (sector.ItemTypes.Any(types.Contains)) sectors.Add(sector.Id);
-        var seller = new SellerProfile
-        {
-            Key = $"type:{client.identifier}|{client.clientFaction}", Name = client.displayName ?? client.identifier,
-            Identity = rule?.Identity ?? "普通顾客", BaseReliability = rule?.BaseReliability ?? .50m,
-            Sectors = rule?.Sectors?.Count > 0 ? rule.Sectors : sectors, IsGroupIdentity = true
-        };
-        var offer = Engine.CreateRumorOffer(_save.SessionId, seller, ScheduledEvents());
-        if (_offer?.Id != offer?.Id) { _offer = offer; Persist(); } else _offer = offer;
+        if (Engine == null || Client?.identifier != IntelBrokerAdapter.NpcId || _save.SessionClosed)
+        { _offer = null; return; }
+        var visit = Engine.GetBrokerVisit();
+        _offer = visit != null && visit.HasArrived && !visit.Departed
+            ? Engine.GetRumors().FirstOrDefault(r => r.Id == visit.OfferId) : null;
+        if (_offer != null) SellerDescription = "行情掮客 · 消息来源：" + _offer.Identity;
     }
     private IReadOnlyList<ScheduledEvent> ScheduledEvents()
     {
@@ -290,8 +334,9 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             EnsureEventRule(ev);
             // 隐藏事件可以影响价格，但公开界面仅显示市场异动。
             bool isPublic = !ev.isHidden && ev.IsKnown && !ev.isHiddenFromNewsPaper;
-            bool applied = Engine.ActivateEvent(ev.identifier, Occurrence(ev.identifier, ev.startDay > 0 ? ev.startDay : day), day, isPublic);
-            _log.Msg($"[股市事件] id={ev.identifier} day={day} applied={applied}"); Persist();
+            bool processed = Engine.ActivateEvent(ev.identifier, Occurrence(ev.identifier, ev.startDay > 0 ? ev.startDay : day), day, isPublic);
+            int impacts = Engine.Config.Events.FirstOrDefault(r => r.EventId == ev.identifier)?.Impacts.Count(p => p.Value != 0) ?? 0;
+            _log.Msg($"[股市事件] id={ev.identifier} day={day} processed={processed} mappedCompanies={impacts}"); Persist();
         }
         catch (Exception ex) { Fault("事件适配失败", ex); }
     }
@@ -456,6 +501,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             RefreshCustomer();
             if (Client == null || _save.SessionClosed) return null;
             var capture = new TradeCapture { Method = method, CashBefore = Cash, Buy = buy, Session = _save.SessionId };
+            if (method == "OnWholesaleClick") capture.ExpectedWholesaleCost = _store.GetWholesalePrice();
             if (item != null && !IsTerminal(item)) capture.Items.Add(ItemCapture.Of(item));
             return capture;
         }
@@ -469,14 +515,21 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             int delta = Cash - capture.CashBefore;
             if (capture.Items.Count == 0 || delta == 0 || (capture.Buy == true && delta >= 0) || (capture.Buy == false && delta <= 0))
             { _log.Msg($"[股市探针] {capture.Method} 未确认成交，现金变化={delta}，items={capture.Items.Count}"); return; }
-            if (capture.CallbackAmounts.Count > 0 && capture.CallbackAmounts.Values.Sum() != Math.Abs((decimal)delta))
-            { _log.Warning($"[股市探针] {capture.Method} 回调金额合计 {capture.CallbackAmounts.Values.Sum()} 与现金变化 {delta} 不一致；本次不计行情，避免混入退款、奖励或其他收支。"); return; }
+            Dictionary<int, decimal>? callbackAllocations = null;
+            if (capture.CallbackAmounts.Count > 0)
+            {
+                if (!TradeAllocationPolicy.TryAllocate(delta, capture.CallbackAmounts, capture.ExpectedWholesaleCost, out var allocated))
+                { _log.Warning($"[股市探针] {capture.Method} 回调金额合计 {capture.CallbackAmounts.Values.Sum()} 与现金变化 {delta} 无法核对；本次不计行情。"); return; }
+                callbackAllocations = allocated;
+                if (capture.CallbackAmounts.Values.Sum() != Math.Abs((decimal)delta))
+                    _log.Msg($"[股市探针] 批发整单与单件折扣取整差已核对；按实际现金变化 {delta} 分配商品信号。");
+            }
             // 用原版实际现金变化确定方向和总额，仅在明确商品交易调用范围内记账。
             decimal total = capture.Items.Sum(x => Math.Max(1m, x.Estimate));
             foreach (var item in capture.Items.Where(i => capture.CallbackAmounts.Count == 0 || capture.CallbackAmounts.ContainsKey(i.Id)))
             {
                 string tradeId = $"{capture.Session}:{++_save.TradeSequence}:{item.Id}:{delta}";
-                decimal signed = capture.CallbackAmounts.TryGetValue(item.Id, out decimal actualAmount) ? Math.Sign(delta) * actualAmount : delta * Math.Max(1m, item.Estimate) / total;
+                decimal signed = callbackAllocations != null ? callbackAllocations[item.Id] : delta * Math.Max(1m, item.Estimate) / total;
                 bool recorded = Engine.RecordTrade(capture.Session, tradeId, item.Types, signed);
                 _log.Msg($"[股市成交] {capture.Method} id={item.Id} types={string.Join(",",item.Types)} cashDelta={delta} allocated={signed} recorded={recorded}");
             }
@@ -499,6 +552,8 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     {
         if (_disposed) return; _disposed = true;
         if (Current == this) Current = null;
+        _broker?.Dispose(); _intelCalendar?.Dispose(); _intelDelivery?.Dispose();
+        _broker = null; _intelCalendar = null; _intelDelivery = null;
         GamePatches.Uninstall(_harmony); _terminalVisual.Dispose(); IconRenderPatches.Uninstall(_harmony);
         _trackedTerminal = null; _store = null; Engine = null; _offer = null; OpenPanelRequested = null;
     }
@@ -509,6 +564,7 @@ internal sealed class TradeCapture
     public string Method = "";
     public string Session = "";
     public int CashBefore;
+    public int? ExpectedWholesaleCost;
     public bool? Buy;
     public List<ItemCapture> Items = new();
     public Dictionary<int, decimal> CallbackAmounts = new();

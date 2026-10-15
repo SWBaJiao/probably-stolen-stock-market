@@ -34,7 +34,7 @@ public sealed class ModEntry : MelonMod
             _market.IsPanelVisible = () => _panel?.IsVisible == true;
             _market.OpenPanelRequested += HandleOpenPanel;
             _market.Initialize(_marketHarmony);
-            LoggerInstance.Msg("股市功能已初始化；进入存档后请检查 [股市探针]，保存并读档后验证交易解锁。");
+            LoggerInstance.Msg("股市功能已初始化；进入存档后请检查 [股市交易] 与 [股市探针]，交易权限按本机配置生效。");
         }
         catch (Exception ex)
         {

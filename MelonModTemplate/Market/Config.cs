@@ -7,6 +7,7 @@ namespace MelonModTemplate.Market;
 
 public sealed class MarketConfig
 {
+    public bool RequireSaveReloadVerification { get; set; }
     public decimal InitialPrice { get; set; } = 100m;
     public decimal DailyLimit { get; set; } = .03m;
     public decimal CustomerLimit { get; set; } = .02m;
@@ -16,6 +17,7 @@ public sealed class MarketConfig
     public int MinimumFee { get; set; } = 1;
     public int RumorPrice { get; set; } = 50;
     public int RumorHorizon { get; set; } = 3;
+    public int BrokerCooldownDays { get; set; } = 3;
     public int HistoryLimit { get; set; } = 240;
     public int LedgerLimit { get; set; } = 300;
     public bool EnableStructuredEventFallback { get; set; } = true;
@@ -69,6 +71,7 @@ public sealed class MarketConfig
     public static MarketConfig Deserialize(string json) { var c = JsonSerializer.Deserialize<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空"); c.Validate(); return c; }
     public void Validate()
     {
+        if (BrokerCooldownDays < 1 || BrokerCooldownDays > 100) throw new ArgumentException("情报商到访间隔无效");
         if (InitialPrice < .01m || InitialPrice > 10000000m || DailyLimit < 0 || DailyLimit > .2m || CustomerLimit < 0 || CustomerLimit > .2m || RetailDailyLimit < 0 || RetailDailyLimit > .5m || SignalScale <= 0 || FeeRate < 0 || FeeRate > .5m || MinimumFee < 0 || RumorPrice < 0 || RumorHorizon < 1 || HistoryLimit < 2 || LedgerLimit < 1 || StructuredEventScale < 0 || StructuredEventScale > 1 || StructuredEventLimit < 0 || StructuredEventLimit > .5m) throw new ArgumentException("行情参数超出允许范围");
         if (Companies == null || Sectors == null || Events == null || Sellers == null || Companies.Count == 0 || Companies.Any(x => x == null || string.IsNullOrWhiteSpace(x.Id) || string.IsNullOrWhiteSpace(x.Name)) || Companies.Select(x => x.Id).Distinct().Count() != Companies.Count) throw new ArgumentException("公司配置不完整或标识重复");
         var ids = Companies.Select(x => x.Id).ToHashSet();

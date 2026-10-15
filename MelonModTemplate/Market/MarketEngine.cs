@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace MelonModTemplate.Market;
 
-public sealed class MarketEngine
+public sealed partial class MarketEngine
 {
     public static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true, Converters = { new JsonStringEnumConverter() } };
     public MarketConfig Config { get; }
@@ -30,6 +30,8 @@ public sealed class MarketEngine
     }
 
     public string Serialize() => JsonSerializer.Serialize(State, JsonOptions);
+    // 由存档适配层接入时统一应用；启用交易不会清除已有的资金异常冻结。
+    public void ApplyStorageAccess(bool confirmedRoundTrip) => State.StorageVerified = confirmedRoundTrip || !Config.RequireSaveReloadVerification;
     public static MarketState Deserialize(string json, MarketConfig config)
     {
         var state = JsonSerializer.Deserialize<MarketState>(json, JsonOptions) ?? throw new ArgumentException("股市存档为空");
@@ -46,6 +48,7 @@ public sealed class MarketEngine
         if (state.Companies.Values.Any(c => c.Candles == null || c.Candles.Any(k => !IsValidCandle(k, state.LastDay)) || c.Candles.Select(k => k.Day).Distinct().Count() != c.Candles.Count || !c.Candles.Select(k => k.Day).SequenceEqual(c.Candles.Select(k => k.Day).OrderBy(d => d)))) throw new ArgumentException("股市存档日 K 线无效");
         if (state.Companies.Values.Any(c => c.IntradayDay < -1 || c.IntradayDay > state.LastDay || c.IntradayPoints == null || c.IntradayPoints.Any(p => p == null || p.Day != c.IntradayDay || p.Day < 0 || p.Price < .01m || p.Price > 10000000m))) throw new ArgumentException("股市存档当日分时样本无效");
         if (state.Sessions.Any(x => x.Value == null || x.Value.TradeIds == null || x.Value.Signals == null || x.Value.Signals.Keys.Any(k => !state.Companies.ContainsKey(k))) || state.Reputations.Any(x => x.Value == null || x.Value.Correct < 0 || x.Value.Incorrect < 0) || state.Rumors.Any(x => x.Value == null || x.Key != x.Value.Id || x.Value.Price < 0 || x.Value.Reliability < .2m || x.Value.Reliability > .9m || x.Value.CompanyIds == null)) throw new ArgumentException("股市存档成交或情报无效");
+        ValidateBrokerState(state);
         // 持仓公司不能被配置删除，否则无法出售已有股份。
         if (state.Positions.Any(x => x.Value.Quantity > 0 && !config.Companies.Any(c => c.Id == x.Key))) throw new ArgumentException("公司配置删除了仍有持仓的公司");
     }
@@ -167,6 +170,7 @@ public sealed class MarketEngine
         if (!State.ProcessedEvents.Add(key)) return false;
         State.OccurredEvents.Add(key);
         var rule = Config.Events.FirstOrDefault(x => x.EventId == eventId);
+        State.ObservedEventDirections[key] = rule == null ? new() : rule.Impacts.Where(p => p.Value != 0 && State.Companies.ContainsKey(p.Key)).ToDictionary(p => p.Key, p => Math.Sign(p.Value));
         if (rule != null)
         {
             foreach (var impact in rule.Impacts) MovePrice(impact.Key, impact.Value, isPublic ? rule.Description : "市场异动");
@@ -233,9 +237,19 @@ public sealed class MarketEngine
     {
         foreach (var rumor in State.Rumors.Values.Where(x => x.Purchased && x.Resolution == RumorResolution.Pending && State.OccurredEvents.Contains(EventKey(x.EventId, x.OccurrenceKey))))
         {
-            rumor.Resolution = rumor.PredictsOccurrence ? RumorResolution.True : RumorResolution.False;
+            var correct = rumor.PredictsOccurrence;
+            if (rumor.IsBrokerOffer)
+            {
+                if (!State.ObservedEventDirections.TryGetValue(EventKey(rumor.EventId, rumor.OccurrenceKey), out var observed) || rumor.CompanyDirections.Any(p => !observed.ContainsKey(p.Key)))
+                {
+                    rumor.Resolution = RumorResolution.Unverified;
+                    continue;
+                }
+                correct = rumor.CompanyDirections.All(p => observed[p.Key] == p.Value);
+            }
+            rumor.Resolution = correct ? RumorResolution.True : RumorResolution.False;
             var rep = Reputation(rumor.SellerKey);
-            if (rumor.PredictsOccurrence) rep.Correct++; else rep.Incorrect++;
+            if (correct) rep.Correct++; else rep.Incorrect++;
         }
     }
     private RumorView View(RumorOffer offer)
@@ -282,7 +296,7 @@ public sealed class MarketEngine
     public OperationResult BuyRumor(string id, IWallet wallet, Action persist)
     {
         if (!State.StorageVerified || State.TradingFrozen) return OperationResult.Fail("存档尚未验证，或交易已冻结。");
-        if (!State.Rumors.TryGetValue(id, out var offer) || offer.Purchased || offer.Expired) return OperationResult.Fail("该情报不可购买。");
+        if (!State.Rumors.TryGetValue(id, out var offer) || offer.IsBrokerOffer || offer.Purchased || offer.Expired) return OperationResult.Fail("该情报不可购买。");
         if (wallet.Cash < offer.Price) return OperationResult.Fail("余额不足。");
         return Transact(wallet, -offer.Price, persist, () => { offer.Purchased = true; Log("rumor", $"向 {offer.SellerName} 购买内幕", "", 0, -offer.Price); ResolveOccurredRumors(); });
     }

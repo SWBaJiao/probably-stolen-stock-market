@@ -1,0 +1,55 @@
+using System.Collections.Generic;
+
+namespace MelonModTemplate.Market;
+
+public enum IntelPaperState { Pending, Delivered, Uncertain }
+public sealed class BrokerVisitState
+{
+    public long Sequence { get; set; }
+    public int LastArrivalDay { get; set; } = -1;
+    public string VisitId { get; set; } = "";
+    public string OfferId { get; set; } = "";
+    public string AppearanceKey { get; set; } = "";
+    public int PlannedDay { get; set; } = -1;
+    public int ArrivalDay { get; set; } = -1;
+    public bool HasArrived { get; set; }
+    public bool Departed { get; set; }
+}
+// 报价投影只提供来源和产品类别，不提供未购买的公司与方向。
+public sealed class BrokerVisitView
+{
+    public string VisitId { get; set; } = "";
+    public string OfferId { get; set; } = "";
+    public string AppearanceKey { get; set; } = "";
+    public int PlannedDay { get; set; }
+    public int ArrivalDay { get; set; }
+    public bool HasArrived { get; set; }
+    public bool Departed { get; set; }
+    public string SourceName { get; set; } = "";
+    public string SourceIdentity { get; set; } = "";
+    public string ProductKind { get; set; } = "";
+    public int Price { get; set; }
+    public bool Purchased { get; set; }
+    public bool Expired { get; set; }
+}
+// 纸条、日历和投资面板只能读取已购投影，不接触真实事件与内部真假标记。
+public sealed class IntelRecord
+{
+    public string OfferId { get; set; } = "";
+    public string SourceName { get; set; } = "";
+    public string SourceIdentity { get; set; } = "";
+    public decimal Reliability { get; set; }
+    public bool IsGroupIdentity { get; set; }
+    public int Correct { get; set; }
+    public int Incorrect { get; set; }
+    public string Industry { get; set; } = "";
+    public string Content { get; set; } = "";
+    public Dictionary<string, int> CompanyDirections { get; set; } = new();
+    public int PurchaseDay { get; set; }
+    public int ObservationStartDay { get; set; }
+    public int ObservationEndDay { get; set; }
+    public RumorResolution Status { get; set; }
+    public IntelPaperState PaperState { get; set; }
+    public int PaperItemId { get; set; } = -1;
+    public bool CalendarEligible { get; set; }
+}

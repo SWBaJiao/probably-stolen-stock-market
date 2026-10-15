@@ -92,6 +92,15 @@ public sealed class CustomerSession
 public sealed class SellerReputation { public int Correct { get; set; } public int Incorrect { get; set; } }
 public sealed class RumorOffer
 {
+    public bool IsBrokerOffer { get; set; }
+    public bool CalendarEligible { get; set; }
+    public int PurchaseDay { get; set; } = -1;
+    public int ObservationStartDay { get; set; } = -1;
+    public string Industry { get; set; } = "";
+    public string ProductKind { get; set; } = "";
+    public Dictionary<string, int> CompanyDirections { get; set; } = new();
+    public IntelPaperState PaperState { get; set; }
+    public int PaperItemId { get; set; } = -1;
     public string Id { get; set; } = "";
     public string SessionId { get; set; } = "";
     public string SellerKey { get; set; } = "";
@@ -132,6 +141,7 @@ public sealed class RumorView
 }
 public sealed class MarketState
 {
+    public BrokerVisitState Broker { get; set; } = new();
     public int Version { get; set; } = 1;
     public string SaveIdentity { get; set; } = "";
     public int LastDay { get; set; } = -1;
@@ -145,6 +155,7 @@ public sealed class MarketState
     public Dictionary<string, CustomerSession> Sessions { get; set; } = new();
     public HashSet<string> ProcessedEvents { get; set; } = new();
     public HashSet<string> OccurredEvents { get; set; } = new();
+    public Dictionary<string, Dictionary<string, int>> ObservedEventDirections { get; set; } = new();
     public Dictionary<string, RumorOffer> Rumors { get; set; } = new();
     public HashSet<string> OfferedSessions { get; set; } = new();
     public Dictionary<string, SellerReputation> Reputations { get; set; } = new();

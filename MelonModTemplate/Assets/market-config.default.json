@@ -1,4 +1,5 @@
 {
+  "RequireSaveReloadVerification": false,
   "InitialPrice": 100,
   "DailyLimit": 0.03,
   "CustomerLimit": 0.02,
@@ -8,6 +9,7 @@
   "MinimumFee": 1,
   "RumorPrice": 50,
   "RumorHorizon": 3,
+  "BrokerCooldownDays": 3,
   "HistoryLimit": 240,
   "LedgerLimit": 300,
   "EnableStructuredEventFallback": true,

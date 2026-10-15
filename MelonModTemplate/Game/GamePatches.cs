@@ -20,6 +20,8 @@ internal static class GamePatches
         Patch(harmony, typeof(PlayerStore), "DismissCurrentClient", prefix: nameof(DismissPrefix), postfix: nameof(DismissPostfix));
         foreach (string name in new[] { "BuyItem", "SellItem", "BuyItemFromTable", "SellItemFromTable", "OnItemsSold" })
             Patch(harmony, typeof(PlayerStore), name, prefix: nameof(TradePrefix), finalizer: nameof(TradeFinalizer));
+        // 原版批发直接扣总款并逐件回调，绕过 PlayerStore.BuyItem；以整个批发方法捕捉现金差。
+        Patch(harmony, typeof(NegociationUIManager), "OnWholesaleClick", prefix: nameof(TradePrefix), finalizer: nameof(TradeFinalizer));
         Patch(harmony, typeof(PlayerStore), "OnItemBought", prefix: nameof(ObserveCallback));
         Patch(harmony, typeof(StoreClient), "OnItemBought", prefix: nameof(ObserveCallback));
         Patch(harmony, typeof(StoreClient), "OnItemSold", prefix: nameof(ObserveCallback));
@@ -70,9 +72,10 @@ internal static class GamePatches
         if (items.Any(i => bridge?.IsTerminal(i) == true)) return false;
         if (_tradeDepth == 0)
         {
-            bool? buy = __originalMethod.Name.StartsWith("Buy", StringComparison.Ordinal) ? true : __originalMethod.Name.StartsWith("Sell", StringComparison.Ordinal) ? false : null;
+            bool? buy = __originalMethod.Name == "OnWholesaleClick" || __originalMethod.Name.StartsWith("Buy", StringComparison.Ordinal) ? true : __originalMethod.Name.StartsWith("Sell", StringComparison.Ordinal) ? false : null;
             var store = PlayerStore.IsInstanceExist() ? PlayerStore.Instance : null;
-            _trade = bridge?.BeginTrade(__originalMethod.Name, items.FirstOrDefault() ?? store?.currentNegociatedItem, buy);
+            var snapshotItem = __originalMethod.Name == "OnWholesaleClick" ? null : items.FirstOrDefault() ?? store?.currentNegociatedItem;
+            _trade = bridge?.BeginTrade(__originalMethod.Name, snapshotItem, buy);
         }
         if (_trade != null)
         {
