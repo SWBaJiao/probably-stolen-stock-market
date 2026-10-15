@@ -154,6 +154,14 @@ public sealed partial class MarketEngine
         return true;
     }
 
+    public bool MarkBrokerIntroduced(string visitId)
+    {
+        var visit = State.Broker;
+        if (_busy || visit.VisitId != visitId || !visit.HasArrived || visit.Departed) return false;
+        visit.HasMetBroker = true;
+        return true;
+    }
+
     public bool SetBrokerAppearance(string visitId, string appearanceKey)
     {
         if (State.Broker.VisitId != visitId || State.Broker.Departed || string.IsNullOrWhiteSpace(appearanceKey) || appearanceKey.Length > 256) return false;

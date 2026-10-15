@@ -14,7 +14,7 @@ namespace MelonModTemplate.Game;
 internal sealed class IntelBrokerAdapter : IDisposable
 {
     internal const string NpcId = "probably_stolen_stock.intel_broker";
-    private const string NpcName = "股市情报掮客";
+    private const string NpcName = "闻舟";
     private readonly GameBridge _host;
     private readonly MelonLogger.Instance _log;
     private readonly List<object> _factoryRoots = new();
@@ -141,14 +141,14 @@ internal sealed class IntelBrokerAdapter : IDisposable
         int epoch = _epoch;
         var client = new StoreClient();
         StoreClientFactionSetup.InitBlackMarket(client);
-        client.identifier = NpcId; client.displayName = NpcName;
+        client.identifier = NpcId; client.displayName = NpcName + " · 行情掮客";
         client.spriteName = ResolveAppearance(visit.AppearanceKey);
         if (_host.Engine!.SetBrokerAppearance(visitId, client.spriteName)) _host.PersistBrokerState();
         client.clientIntent = StoreClient.ClientIntent.INFORMATION_DEALER;
         client.serviceCost = visit.Price;
         client.CompleteClientCreation(true);
         // 完成原版通用初始化后，仅重置此专属顾客的交易和对话行为。
-        client.identifier = NpcId; client.displayName = NpcName;
+        client.identifier = NpcId; client.displayName = NpcName + " · 行情掮客";
         client.clientIntent = StoreClient.ClientIntent.INFORMATION_DEALER;
         client.serviceCost = visit.Price; client.dismissable = true;
         client.arrestable = false; client.nonDismissableArrestable = false; client.nonShootable = true;
@@ -159,11 +159,19 @@ internal sealed class IntelBrokerAdapter : IDisposable
         client.OnArrival = RootAction(() => { if (epoch == _epoch && Valid(identity, visitId)) Arrived(client, visitId, identity); });
         client.OnDismiss = RootAction(() => { if (epoch == _epoch) Departed(identity, visitId); });
         string publicText = PublicOffer(visit);
-        client.mainDialogue = Text(publicText);
+        var offerDialogue = Text(publicText);
+        offerDialogue.endAction = RootAction(() => OpenOffer(client, identity, visitId, epoch));
+        if (!_host.Engine.State.Broker.HasMetBroker)
+        {
+            var introduction = Text("电话里联系过了，正式认识一下。我叫闻舟，做的是行情消息的生意。药剂师、矿工、维修工——各行都有我的消息来源。\n我只替他们传话，风声有真有假，消息值不值钱，还得你自己判断。");
+            introduction.SetNextDialogue(offerDialogue);
+            client.mainDialogue = introduction;
+            _visitRoots.Add(introduction);
+        }
+        else client.mainDialogue = offerDialogue;
         client.repeatDialogue = Text(publicText);
-        client.mainDialogue.endAction = RootAction(() => OpenOffer(client, identity, visitId, epoch));
         client.repeatDialogue.endAction = RootAction(() => OpenOffer(client, identity, visitId, epoch));
-        _visitRoots.Add(client.mainDialogue); _visitRoots.Add(client.repeatDialogue);
+        _visitRoots.Add(offerDialogue); _visitRoots.Add(client.repeatDialogue);
         client.allDoneDialogue = Text("这笔股市情报交易已经结束。已购线索会保存在你的情报记录中。");
         client.acceptDealDialogue = null; client.acceptDealDialogueLastLine = null;
         client.isMainDialogueStarted = false;
@@ -374,7 +382,24 @@ internal sealed class IntelBrokerAdapter : IDisposable
         }
         catch (Exception ex) { adapter.Report(ex); }
     }
-    private static void IntroducedPostfix(StoreClient __instance) { if (IsBroker(__instance)) InformationUiPostfix(); }
+    private static void IntroducedPostfix(StoreClient __instance)
+    {
+        var adapter = Current;
+        if (adapter == null || !IsBroker(__instance)) return;
+        try
+        {
+            var engine = adapter._host.Engine;
+            var visit = engine?.GetBrokerVisit();
+            if (__instance.isIntroduced && adapter._host.CurrentClient?.Pointer == __instance.Pointer && engine != null && visit != null
+                && !engine.State.Broker.HasMetBroker && engine.MarkBrokerIntroduced(visit.VisitId))
+            {
+                adapter._host.PersistBrokerState();
+                adapter._log.Msg("[股市掮客] 闻舟首次自我介绍已完成并记录。");
+            }
+            adapter.UpdateUi();
+        }
+        catch (Exception ex) { adapter.Report(ex); }
+    }
     private static void InformationUiPostfix()
     {
         var adapter = Current;

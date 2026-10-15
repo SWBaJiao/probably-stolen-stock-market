@@ -33,6 +33,7 @@ public sealed class BrokerVisitState
     public int PlannedDay { get; set; } = -1;
     public int ArrivalDay { get; set; } = -1;
     public bool HasArrived { get; set; }
+    public bool HasMetBroker { get; set; }
     public bool Departed { get; set; }
     public bool IsManual { get; set; }
     public bool IsPhoneBooking { get; set; }

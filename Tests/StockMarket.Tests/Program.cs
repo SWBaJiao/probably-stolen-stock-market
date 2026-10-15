@@ -334,6 +334,7 @@ openMarket.ApplyStorageAccess(true);
 Check(openMarket.State.TradingFrozen && openMarket.State.FreezeReason == "资金异常冻结" && !openMarket.PlaceOrder("water", OrderSide.Buy, 1, openWallet, () => { }).Success, "应用存档访问策略不会解除资金异常冻结");
 TradeAllocationTests.Run(Check);
 PhoneBookingTests.Run(Check);
+BrokerIntroductionTests.Run(Check);
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet

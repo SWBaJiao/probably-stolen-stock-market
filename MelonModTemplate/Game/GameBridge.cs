@@ -48,7 +48,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     public MarketEngine? Engine { get; private set; }
     public event Action? OpenPanelRequested;
     public Func<bool>? IsPanelVisible { get; set; }
-    internal bool BlocksGameInput => IsPanelVisible?.Invoke() == true;
+    internal bool BlocksGameInput => IsPanelVisible?.Invoke() == true || _intelPhone?.BlocksGameInput == true;
     public int Cash => _store?.GetCash() ?? 0;
     public bool CanTrade => !_disposed && !_inMenu && !_loading && Engine != null && Engine.State.StorageVerified && !Engine.State.TradingFrozen && _fault.Length == 0 && IsCurrentStore();
     public string Status => _fault.Length > 0 ? _fault : Engine == null ? "请进入游戏存档。" : Engine.State.TradingFrozen ? Engine.State.FreezeReason : !Engine.State.StorageVerified ? "已启用严格存档验证：请正常保存并重新载入此存档，验证后开放现金交易。" : _config.RequireSaveReloadVerification ? "原版存档读回及资金一致性已通过；可交易。" : "现货买卖已开放；使用原版资金，投资记录随游戏存档保存。";
@@ -69,7 +69,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
                 BrokerPhoneBookingStatus.Cancelled => "本次预约已取消，可拨电话查询。",
                 _ => "之前的预约已过期，可再拨电话查询。"
             };
-            return $"掮客电话：{IntelPhoneAdapter.PhoneNumber}\n{status}";
+            return $"闻舟 · 行情掮客：{IntelPhoneAdapter.PhoneNumber}（电话簿可快速拨号）\n{status}";
         }
     }
     public int? OfferCost => _offer?.Price;
@@ -356,7 +356,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             _log.Msg($"[股市顾客] session={_save.SessionId} id={client.identifier} faction={client.clientFaction} tags={string.Join(",", Strings(client.tag))}");
             Persist();
         }
-        SellerDescription = client.identifier == IntelBrokerAdapter.NpcId ? "行情掮客正在来访" : "当前没有行情掮客；普通顾客不再出售股市内幕。";
+        SellerDescription = client.identifier == IntelBrokerAdapter.NpcId ? "闻舟 · 行情掮客正在来访" : "当前没有行情掮客；普通顾客不再出售股市内幕。";
         _clientPointer = pointer;
         RefreshOffer();
     }
@@ -367,7 +367,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         var visit = Engine.GetBrokerVisit();
         _offer = visit != null && visit.HasArrived && !visit.Departed
             ? Engine.GetRumors().FirstOrDefault(r => r.Id == visit.OfferId) : null;
-        if (_offer != null) SellerDescription = "行情掮客 · 消息来源：" + _offer.Identity;
+        if (_offer != null) SellerDescription = "闻舟 · 行情掮客 · 消息来源：" + _offer.Identity;
     }
     private IReadOnlyList<ScheduledEvent> ScheduledEvents()
     {
