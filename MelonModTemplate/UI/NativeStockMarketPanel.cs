@@ -228,9 +228,8 @@ public sealed class NativeStockMarketPanel : IDisposable
         Label("seller.identity", "", 58);
         Label("seller.reputation", "", 62);
         Label("seller.offer", "", 78);
-        Label("rumors.flow", "购买请与上门的行情掮客交谈。成交后会收到署名便笺，并自动登记游戏日历。", 48);
-        Button("broker.invite", "邀请内幕掮客", "broker:invite", -1, 36);
-        Label("broker.invite.note", "营业时可手动邀请，绕过自动来访冷却；有可售线索才加入队尾，同日报价不刷新。", 44);
+        Label("rumors.flow", "持有股市面板后，可用游戏电话预约掮客次日到访。购买后会收到署名便笺，并登记游戏日历。", 48);
+        Label("broker.contact", "", 64);
         Label("rumors.title", "已购买情报簿", 34, true);
         Label("rumors.book", "", 180);
         EndPage();
@@ -432,6 +431,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         Text("seller.reputation", _host.SellerReputation, MutedColor);
         // 未购情报仅展示 host 的安全报价，不读取未来事件或 RumorOffer 内部字段。
         Text("seller.offer", _host.OfferDescription);
+        Text("broker.contact", _host.BrokerContactDescription);
         var purchased = engine.GetRumors().Where(r => r.Purchased).Reverse().Take(30).ToArray();
         var intel = engine.GetIntelRecords().ToDictionary(r => r.OfferId);
         var book = new StringBuilder();
@@ -515,11 +515,6 @@ public sealed class NativeStockMarketPanel : IDisposable
             }
             else if (command == "order") SubmitOrder();
             else if (command == "recover") _feedback = _host.RecoverTerminal();
-            else if (command == "broker:invite")
-            {
-                MelonLogger.Msg("[原生股市邀请] 收到邀请按钮点击，准备提交。");
-                _feedback = _host.InviteIntelBroker();
-            }
             Refresh();
         }
         catch (Exception ex) { _feedback = "操作未完成，请查看加载日志。"; Warn("command:" + command, "原生股市命令执行失败。", ex); }

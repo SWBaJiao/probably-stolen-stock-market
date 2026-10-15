@@ -21,6 +21,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private IntelBrokerAdapter? _broker;
     private IntelDeliveryAdapter? _intelDelivery;
     private IntelCalendarAdapter? _intelCalendar;
+    private IntelPhoneAdapter? _intelPhone;
     private readonly int _threadId = Environment.CurrentManagedThreadId;
     private HarmonyLib.Harmony? _harmony;
     private PlayerStore? _store;
@@ -53,7 +54,24 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     public string Status => _fault.Length > 0 ? _fault : Engine == null ? "请进入游戏存档。" : Engine.State.TradingFrozen ? Engine.State.FreezeReason : !Engine.State.StorageVerified ? "已启用严格存档验证：请正常保存并重新载入此存档，验证后开放现金交易。" : _config.RequireSaveReloadVerification ? "原版存档读回及资金一致性已通过；可交易。" : "现货买卖已开放；使用原版资金，投资记录随游戏存档保存。";
     public string SellerDescription { get; private set; } = "当前没有行情掮客";
     public string SellerReputation => _offer == null ? "暂无可验证情报记录" : $"{_offer.Identity} · {(_offer.IsGroupIdentity ? "该类来源" : "个人")}记录：属实 {_offer.Correct} / 失实 {_offer.Incorrect} · 参考可信度 {_offer.Reliability:P0}";
-    public string OfferDescription => _offer == null ? "内幕由行情掮客上门售卖；有线索时每三个游戏日最多来访一次。" : _offer.Purchased ? _offer.Content : $"消息来源：{_offer.Identity}。请关闭股市面板，与行情掮客交谈购买；付款前仅展示商品类别。";
+    public string OfferDescription => _offer == null ? "持有股市面板后，请用游戏电话预约行情掮客，次日开门后上门售卖。" : _offer.Purchased ? _offer.Content : $"消息来源：{_offer.Identity}。请关闭股市面板，与行情掮客交谈购买；付款前仅展示商品类别。";
+    public string BrokerContactDescription
+    {
+        get
+        {
+            if (!OwnsStockTerminal()) return "持有本存档的股市面板道具后，解锁掮客电话预约。";
+            var booking = Engine?.GetBrokerPhoneBooking();
+            string status = booking == null ? "暂无预约。" : booking.Status switch
+            {
+                BrokerPhoneBookingStatus.Booked => $"已约第 {booking.ArrivalDay} 日到访，开门后在队尾等待。",
+                BrokerPhoneBookingStatus.Arrived => "已预约的掮客正在来访。",
+                BrokerPhoneBookingStatus.Completed => "本次情报接待结束后，可再拨电话预约次日。",
+                BrokerPhoneBookingStatus.Cancelled => "本次预约已取消，可拨电话查询。",
+                _ => "之前的预约已过期，可再拨电话查询。"
+            };
+            return $"掮客电话：{IntelPhoneAdapter.PhoneNumber}\n{status}";
+        }
+    }
     public int? OfferCost => _offer?.Price;
     public string? OfferId => _offer?.Id;
     public bool CanBuyRumor => false;
@@ -80,12 +98,14 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             _intelDelivery = new IntelDeliveryAdapter(this, _log);
             _intelCalendar = new IntelCalendarAdapter(this, _intelDelivery, _log);
             _broker = new IntelBrokerAdapter(this, _log);
+            _intelPhone = new IntelPhoneAdapter(this, _log);
             _broker.Initialize(harmony);
             _intelCalendar.Initialize(harmony);
+            _intelPhone.Initialize(harmony);
         }
         catch
         {
-            _broker?.Dispose(); _intelCalendar?.Dispose(); _intelDelivery?.Dispose();
+            _intelPhone?.Dispose(); _broker?.Dispose(); _intelCalendar?.Dispose(); _intelDelivery?.Dispose();
             IconRenderPatches.Uninstall(harmony);
             GamePatches.Uninstall(harmony); Current = null; throw;
         }
@@ -162,7 +182,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
 
     private void ResetBrokerRuntime()
     {
-        _broker?.Reset(); _intelCalendar?.Reset(); _intelDelivery?.Reset();
+        _intelPhone?.Reset(); _broker?.Reset(); _intelCalendar?.Reset(); _intelDelivery?.Reset();
     }
 
     internal void BeginLoad()
@@ -221,19 +241,38 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     }
     public string BuyRumor(string? expectedOfferId = null) => "请与行情掮客交谈，在原版情报界面购买。";
 
-    public string InviteIntelBroker()
+    internal string BookBrokerByPhone()
     {
         if (!BrokerReady) return "请先进入游戏存档。";
-        if (Environment.CurrentManagedThreadId != _threadId || _monetaryOperation) return "操作繁忙，请稍后再试。";
+        if (Environment.CurrentManagedThreadId != _threadId || _monetaryOperation || BlocksGameInput) return "请先关闭股市面板，再使用游戏电话。";
+        if (!OwnsStockTerminal()) return "你需要持有本存档的股市面板道具，才能预约内幕掮客。";
+        if (Client?.identifier == IntelBrokerAdapter.NpcId) return "行情掮客正在接待中，请完成并遣散后再预约。";
         try
         {
-            _log.Msg("[股市手动邀请] 请求开始 " + BrokerQueueSnapshot());
+            _log.Msg("[股市电话预约] 请求开始 " + BrokerQueueSnapshot());
             Engine!.AdvanceDay(StoreStation.GetDayCounter());
-            string result = _broker?.RequestVisit() ?? "掮客功能尚未初始化。";
-            _log.Msg("[股市手动邀请] 请求结束 " + BrokerQueueSnapshot() + " result=" + result);
-            return result;
+            var result = Engine.BookBrokerByPhone(ScheduledEvents());
+            Persist();
+            _log.Msg("[股市电话预约] 请求结束 " + BrokerQueueSnapshot() + " result=" + result.Message);
+            return result.Message;
         }
-        catch (Exception ex) { _log.Warning("[股市掮客] 手动邀请失败：" + ex); return "邀请未完成，请查看加载日志。"; }
+        catch (Exception ex) { _log.Warning("[股市电话预约] 预约保存尚未确认：" + ex); return "预约尚未确认，请稍后重拨重试；已有报价不会重新抽取。"; }
+    }
+
+    internal bool OwnsStockTerminal()
+    {
+        if (!BrokerReady || _save.TerminalItemId < 0 || _save.TerminalPlacementPending) return false;
+        try
+        {
+            var entry = EmporiumEntry.Instance;
+            var owned = entry?.GetAllOwnedItems();
+            if (owned != null) foreach (var item in owned) if (IsTerminal(item) && item.parentInventory != null) return true;
+            var inventory = entry?.invElement;
+            if (inventory != null) foreach (var item in inventory.childItems)
+                if (IsTerminal(item) && item.parentInventory?.Pointer == inventory.Pointer) return true;
+        }
+        catch (Exception ex) { _log.Warning("[股市电话预约] 道具持有状态查询失败：" + ex.Message); }
+        return false;
     }
 
     private string BrokerQueueSnapshot() => $"day={StoreStation.GetDayCounter()} state={_store?.storeState} queue={_store?.storeClientManager?.clientStack?.Count ?? -1} current={(_store?.currentClientInstance != null)} panel={BlocksGameInput}";
@@ -584,8 +623,8 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     {
         if (_disposed) return; _disposed = true;
         if (Current == this) Current = null;
-        _broker?.Dispose(); _intelCalendar?.Dispose(); _intelDelivery?.Dispose();
-        _broker = null; _intelCalendar = null; _intelDelivery = null;
+        _intelPhone?.Dispose(); _broker?.Dispose(); _intelCalendar?.Dispose(); _intelDelivery?.Dispose();
+        _intelPhone = null; _broker = null; _intelCalendar = null; _intelDelivery = null;
         GamePatches.Uninstall(_harmony); _terminalVisual.Dispose(); IconRenderPatches.Uninstall(_harmony);
         _trackedTerminal = null; _store = null; Engine = null; _offer = null; OpenPanelRequested = null;
     }

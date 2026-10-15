@@ -3,6 +3,26 @@ using System.Collections.Generic;
 namespace MelonModTemplate.Market;
 
 public enum IntelPaperState { Pending, Delivered, Uncertain }
+public enum BrokerPhoneBookingStatus { Booked, Arrived, Completed, Cancelled, Expired }
+public sealed class BrokerPhoneBookingRecord
+{
+    public string VisitId { get; set; } = "";
+    public string OfferId { get; set; } = "";
+    public int RequestDay { get; set; }
+    public int ArrivalDay { get; set; }
+    public BrokerPhoneBookingStatus Status { get; set; }
+}
+public sealed class BrokerPhoneBookingView
+{
+    public string VisitId { get; set; } = "";
+    public string OfferId { get; set; } = "";
+    public int RequestDay { get; set; }
+    public int ArrivalDay { get; set; }
+    public BrokerPhoneBookingStatus Status { get; set; }
+    public string SourceName { get; set; } = "";
+    public string SourceIdentity { get; set; } = "";
+    public string ProductKind { get; set; } = "";
+}
 public sealed class BrokerVisitState
 {
     public long Sequence { get; set; }
@@ -15,6 +35,8 @@ public sealed class BrokerVisitState
     public bool HasArrived { get; set; }
     public bool Departed { get; set; }
     public bool IsManual { get; set; }
+    public bool IsPhoneBooking { get; set; }
+    public List<BrokerPhoneBookingRecord> PhoneBookings { get; set; } = new();
 }
 // 报价投影只提供来源和产品类别，不提供未购买的公司与方向。
 public sealed class BrokerVisitView
@@ -27,6 +49,7 @@ public sealed class BrokerVisitView
     public bool HasArrived { get; set; }
     public bool Departed { get; set; }
     public bool IsManual { get; set; }
+    public bool IsPhoneBooking { get; set; }
     public string SourceName { get; set; } = "";
     public string SourceIdentity { get; set; } = "";
     public string ProductKind { get; set; } = "";
