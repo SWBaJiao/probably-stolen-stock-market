@@ -32,6 +32,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private bool _loadedPending;
     private bool _loading;
     private bool _roundTripVerified;
+    private PlayerStore.StoreState? _observedStoreState;
     private bool _inMenu = true;
     private IntPtr _loadDictionaryPointer;
     private IntPtr _dismissPending;
@@ -106,6 +107,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
                 bool actualLoad = _loadedPending; _loadedPending = false;
                 Attach(store, identity, actualLoad);
             }
+            ObserveStoreState();
             RefreshCustomer();
             if (Engine != null)
             {
@@ -124,6 +126,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private void Attach(PlayerStore store, string identity, bool actualLoad)
     {
         ResetBrokerRuntime();
+        _observedStoreState = null;
         _store = store; _identity = identity; _fault = ""; _offer = null;
         _terminalGrant = new TerminalGrantPolicy(); _trackedTerminal = null; _lastInventoryProbe = ""; _nextTerminalScan = 0;
         bool restored = false;
@@ -224,10 +227,27 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         if (Environment.CurrentManagedThreadId != _threadId || _monetaryOperation) return "操作繁忙，请稍后再试。";
         try
         {
+            _log.Msg("[股市手动邀请] 请求开始 " + BrokerQueueSnapshot());
             Engine!.AdvanceDay(StoreStation.GetDayCounter());
-            return _broker?.RequestVisit() ?? "掮客功能尚未初始化。";
+            string result = _broker?.RequestVisit() ?? "掮客功能尚未初始化。";
+            _log.Msg("[股市手动邀请] 请求结束 " + BrokerQueueSnapshot() + " result=" + result);
+            return result;
         }
         catch (Exception ex) { _log.Warning("[股市掮客] 手动邀请失败：" + ex); return "邀请未完成，请查看加载日志。"; }
+    }
+
+    private string BrokerQueueSnapshot() => $"day={StoreStation.GetDayCounter()} state={_store?.storeState} queue={_store?.storeClientManager?.clientStack?.Count ?? -1} current={(_store?.currentClientInstance != null)} panel={BlocksGameInput}";
+    internal void TraceStoreAction(string action, bool blocked)
+    {
+        try { _log.Msg($"[股市输入隔离] action={action} blocked={blocked} " + BrokerQueueSnapshot()); }
+        catch (Exception ex) { _log.Warning("[股市输入隔离] 状态记录失败：" + ex.Message); }
+    }
+
+    private void ObserveStoreState()
+    {
+        if (_store == null || _observedStoreState == _store.storeState) return;
+        _log.Msg($"[股市营业状态] {_observedStoreState?.ToString() ?? "接入"}->{_store.storeState} " + BrokerQueueSnapshot());
+        _observedStoreState = _store.storeState;
     }
 
     internal OperationResult PurchaseBrokerOffer(string visitId, string offerId)

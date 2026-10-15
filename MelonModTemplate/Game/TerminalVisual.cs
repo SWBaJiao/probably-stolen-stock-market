@@ -127,7 +127,8 @@ internal sealed class TerminalVisual : IDisposable
             _texture = new Texture2D(width, height, TextureFormat.RGBA32, false) { name = SpriteKey, filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp };
             stage = "native texture upload";
             _texture.SetPixels32(resized);
-            _texture.Apply(false, true);
+            // 原版 Image 的透明像素命中检测仍会读取纹理；不能在上传后丢弃 CPU 像素。
+            _texture.Apply(false, false);
             stage = "native sprite creation";
             _sprite = Sprite.Create(_texture, new Rect(0, 0, width, height), new Vector2(.5f, .5f), native != null ? native.pixelsPerUnit : 100f);
             if (_sprite == null) throw new InvalidOperationException("原生精灵创建返回空值。");

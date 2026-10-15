@@ -33,7 +33,13 @@ internal static class GamePatches
         Patch(harmony, typeof(GameItem), "Target", prefix: nameof(ProtectTargetPrefix));
         Patch(harmony, typeof(GameItem), "MayRemove", prefix: nameof(MayRemovePrefix));
         Patch(harmony, typeof(ItemMouseDragHandler), "StartDrag", prefix: nameof(InputPrefix));
-        foreach (string name in new[] { "OpenShutter", "TryCallNextClient", "EndDay", "AcceptBarter", "PlacedItemForBuying", "PlacedItemForBarter" })
+        // 原版独立输入分发不受 UGUI 窗口遮挡影响，模态期间在入口暂停，EventSystem 仍处理股市控件。
+        Patch(harmony, typeof(InputActionManager), "Update", prefix: nameof(InputPrefix));
+        foreach (string name in new[] { "OnClick", "CloseShutter", "EndAndClose" })
+            Patch(harmony, typeof(StoreShutterButton), name, prefix: nameof(ShutterInputPrefix));
+        Patch(harmony, typeof(StoreBell), "RingBell", prefix: nameof(InputPrefix));
+        Patch(harmony, typeof(PlayerStore), "EndDay", prefix: nameof(DayEndPrefix));
+        foreach (string name in new[] { "OpenShutter", "TryCallNextClient", "AcceptBarter", "PlacedItemForBuying", "PlacedItemForBarter" })
             Patch(harmony, typeof(PlayerStore), name, prefix: nameof(InputPrefix));
         log.Msg($"[股市探针] 成功安装 {Patched.Count} 个原生方法补丁。");
     }
@@ -119,6 +125,18 @@ internal static class GamePatches
         __result = false; return false;
     }
     private static bool InputPrefix() => GameBridge.Current?.BlocksGameInput != true;
+    private static bool ShutterInputPrefix(MethodBase __originalMethod)
+    {
+        bool allowed = InputPrefix();
+        GameBridge.Current?.TraceStoreAction("StoreShutterButton." + __originalMethod.Name, !allowed);
+        return allowed;
+    }
+    private static bool DayEndPrefix()
+    {
+        bool allowed = InputPrefix();
+        GameBridge.Current?.TraceStoreAction("PlayerStore.EndDay", !allowed);
+        return allowed;
+    }
     private static bool ProtectItemPrefix(GameItem __0) => InputPrefix() && GameBridge.Current?.IsTerminal(__0) != true;
     private static bool ActivatePrefix(GameItem __instance) => InputPrefix() && GameBridge.Current?.IsTerminal(__instance) != true;
     private static bool ProtectTargetPrefix(GameItem __instance, GameItem __0) => InputPrefix() && GameBridge.Current?.IsTerminal(__instance) != true && GameBridge.Current?.IsTerminal(__0) != true;

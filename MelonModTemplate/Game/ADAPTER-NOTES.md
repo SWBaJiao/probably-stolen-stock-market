@@ -82,6 +82,16 @@
 
 0.5.1 在“内幕档案”增加“邀请内幕掮客”。营业时手动调用同一个队尾追加入口，可以绕过自动冷却；同日复用既定报价，已购、结束或失效后不能刷新。实际入队后读取同一 NPC 指针确认，重复点击扫描当前接待对象和队列，避免重复添加。手动计划标记随 modData 保存，读档后由原来恢复流程接续。验收时请分别检查营业前提示、无可售线索、冷却期间手动邀请、连续点击、排队中保存重载，以及接待中的再次邀请。
 
+## 0.5.3 邀请后营业状态异常排查
+
+用户反馈首次邀请提示需要开店，开店后再邀请出现人数空白、铃铛提示已打烊。当前日志没有工厂或入队记录，不能认定普通顾客已被邀请逻辑清除。原生 `StoreClientCounter.Update`（0x6BC240）在 OPEN 时直接显示 `clientStack.Count`，在 MORNING/CLOSED 时显示空字符串；`StoreBell` 同样按营业状态决定能否呼叫。`AddClient`（0x680980）直接追加队列，`TrackClient`（0x689990）仅写访问统计。
+
+静态调用链确认卷帘 `EndAndClose`（0x6C0970）在调用 `PlayerStore.EndDay` 前已经清柜台、加锁并打断对话。此前只保护 EndDay，无法完整阻止上层副作用。0.5.3 在窗口可见时暂停原版 `InputActionManager.Update` 独立输入分发，并保护 `StoreShutterButton.OnClick/CloseShutter/EndAndClose` 和 `StoreBell.RingBell`。Unity EventSystem 继续处理本 Mod 的原生 UGUI 控件；关闭窗口后恢复原版输入，不修改店铺状态或顾客计数。
+
+另确认 Unity 日志中有 406 次专用终端纹理不可读的 alphaHitTest 错误。终端纹理改为 `Apply(false,false)` 保留 CPU 像素，满足原版透明像素命中检测；它与营业状态变化的直接因果尚未证实。
+
+新增 `[原生股市邀请]`、`[股市手动邀请]`、`[股市营业状态]`、`[股市输入隔离]` 日志，记录请求前后 state/queue 与关店方法是否被拦截。重启后重新载入测试存档，开店后邀请并关闭面板，确认人数和铃铛正常；实际故障恢复仍需用户实机验证。
+
 ## 批发成交补录入口
 
 实机日志出现逐件 `PlayerStore.OnItemBought` 与 `StoreClient.OnItemSold`，但没有对应股市成交。静态扫描确认 `OnWholesaleClick`（RVA 0x724150）在 0x7242FB 先扣整单资金，随后在 0x724427 逐件调用 `OnItemBought`，绕过原有单件买入补丁。现在额外包裹整个批发方法，以调用前后现金差确认成功，沿用同一组逐件回调；不在底层另建第二笔成交。

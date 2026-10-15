@@ -1,6 +1,6 @@
 # 股市 Mod 开发与使用
 
-程序集保持 `MelonModTemplate.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.5.2`。覆盖旧模板 DLL 后只会加载一个入口；无需同时保留旧模板。
+程序集保持 `MelonModTemplate.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.5.3`。覆盖旧模板 DLL 后只会加载一个入口；无需同时保留旧模板。
 
 ## 安装与构建
 

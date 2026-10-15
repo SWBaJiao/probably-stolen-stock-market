@@ -515,7 +515,11 @@ public sealed class NativeStockMarketPanel : IDisposable
             }
             else if (command == "order") SubmitOrder();
             else if (command == "recover") _feedback = _host.RecoverTerminal();
-            else if (command == "broker:invite") _feedback = _host.InviteIntelBroker();
+            else if (command == "broker:invite")
+            {
+                MelonLogger.Msg("[原生股市邀请] 收到邀请按钮点击，准备提交。");
+                _feedback = _host.InviteIntelBroker();
+            }
             Refresh();
         }
         catch (Exception ex) { _feedback = "操作未完成，请查看加载日志。"; Warn("command:" + command, "原生股市命令执行失败。", ex); }
