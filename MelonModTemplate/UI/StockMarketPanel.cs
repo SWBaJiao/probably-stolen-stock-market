@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using MelonLoader;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MelonModTemplate.Contracts;
 using MelonModTemplate.Market;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace MelonModTemplate.UI;
 public sealed class StockMarketPanel : IDisposable
 {
     private readonly IMarketHost _host;
-    private GUIStyle? _label, _heading, _button, _box, _field, _muted;
+    private GUIStyle? _label, _heading, _button, _box, _field, _muted, _bar;
     private Font? _font;
     private bool _fontInitialized, _fontMissing, _disposed, _cursorSaved;
     private bool _previousCursorVisible;
@@ -21,6 +22,8 @@ public sealed class StockMarketPanel : IDisposable
     private int _tab;
     private string _selected = "", _quantity = "1", _feedback = "";
     private bool _buy = true;
+    private bool _quantityFocused, _replaceQuantity, _drawingContent, _contentPointerAllowed;
+    private int _pressedButton;
     private Vector2 _scroll;
     private float _contentHeight = 900;
     private string _lastDrawError = "";
@@ -45,6 +48,7 @@ public sealed class StockMarketPanel : IDisposable
     public void Hide()
     {
         IsVisible = false;
+        _quantityFocused = false; _pressedButton = 0;
         if (!_cursorSaved) return;
         Cursor.lockState = _previousCursorLock;
         Cursor.visible = _previousCursorVisible;
@@ -88,28 +92,48 @@ public sealed class StockMarketPanel : IDisposable
                 }
                 GUI.color = saved;
             }
-            var viewport = new Rect(x, top + 105, innerWidth, Math.Max(50, window.height - 215));
-            var contentWidth = Math.Max(250, viewport.width - 22);
-            _scroll = GUI.BeginScrollView(viewport, _scroll, new Rect(0, 0, contentWidth, _contentHeight));
+            var viewport = new Rect(x, top + 105, innerWidth - 26, Math.Max(50, window.height - 215));
+            var contentWidth = Math.Max(250, viewport.width);
+            var currentScrollEvent = Event.current;
+            _contentPointerAllowed = viewport.Contains(currentScrollEvent.mousePosition);
+            var maximumScroll = Math.Max(0, _contentHeight - viewport.height);
+            if (currentScrollEvent.type == EventType.ScrollWheel && _contentPointerAllowed)
+            {
+                _scroll.y = Math.Clamp(_scroll.y + currentScrollEvent.delta.y * 36, 0, maximumScroll);
+                currentScrollEvent.Use();
+            }
+            if (Button(viewport.xMax + 4, viewport.y, 22, 30, "↑"))
+                _scroll.y = Math.Max(0, _scroll.y - Math.Max(60, viewport.height * .7f));
+            if (Button(viewport.xMax + 4, viewport.yMax - 30, 22, 30, "↓"))
+                _scroll.y = Math.Min(maximumScroll, _scroll.y + Math.Max(60, viewport.height * .7f));
+            _scroll.y = Math.Clamp(_scroll.y, 0, maximumScroll);
+            // 当前代理的 ScrollView 链包含未还原方法；两层原生 Group 分别负责裁剪和内容平移。
+            GUI.BeginGroup(viewport);
             try
             {
-                if (engine == null)
+                GUI.BeginGroup(new Rect(0, -_scroll.y, contentWidth, Math.Max(_contentHeight, viewport.height)));
+                try
                 {
-                    Label(8, 8, contentWidth - 16, 80, "请先进入游戏存档。行情和顾客信息将在适配层就绪后显示。");
-                    _contentHeight = 110;
-                }
-                else
-                {
-                    _contentHeight = _tab switch
+                    _drawingContent = true;
+                    if (engine == null)
                     {
-                        0 => DrawMarket(engine, contentWidth),
-                        1 => DrawPortfolio(engine, contentWidth),
-                        2 => DrawRumors(engine, contentWidth),
-                        _ => DrawLedger(engine, contentWidth)
-                    };
+                        Label(8, 8, contentWidth - 16, 80, "请先进入游戏存档。行情和顾客信息将在适配层就绪后显示。");
+                        _contentHeight = 110;
+                    }
+                    else
+                    {
+                        _contentHeight = _tab switch
+                        {
+                            0 => DrawMarket(engine, contentWidth),
+                            1 => DrawPortfolio(engine, contentWidth),
+                            2 => DrawRumors(engine, contentWidth),
+                            _ => DrawLedger(engine, contentWidth)
+                        };
+                    }
                 }
+                finally { _drawingContent = false; GUI.EndGroup(); }
             }
-            finally { GUI.EndScrollView(); }
+            finally { GUI.EndGroup(); }
 
             var bottom = window.yMax - 94;
             Label(x, bottom, innerWidth - 164, 38, _host.Status, _muted!);
@@ -193,8 +217,7 @@ public sealed class StockMarketPanel : IDisposable
         if (width < 390) y += 35;
         var quantityX = width < 390 ? x : x + 184;
         Label(quantityX, y, 54, 29, "股数");
-        _quantity = GUI.TextField(new Rect(quantityX + 54, y, Math.Min(130, Math.Max(60, width - (quantityX - x) - 54)), 29), _quantity, 9, _field!);
-        _quantity = new string(_quantity.Where(c => c >= '0' && c <= '9').ToArray());
+        DrawQuantityField(new Rect(quantityX + 54, y, Math.Min(130, Math.Max(60, width - (quantityX - x) - 54)), 29));
         y += 36;
         var valid = int.TryParse(_quantity, NumberStyles.None, CultureInfo.InvariantCulture, out var quantity) && quantity > 0;
         var quote = engine.QuoteOrder(_selected, _buy ? OrderSide.Buy : OrderSide.Sell, valid ? quantity : 0, _host.Cash);
@@ -297,7 +320,9 @@ public sealed class StockMarketPanel : IDisposable
         {
             var h = 12 + (float)((points[i].Price - min) / span) * (rect.height - 43);
             GUI.color = i == 0 || points[i].Price >= points[i - 1].Price ? Positive : Negative;
-            GUI.DrawTexture(new Rect(rect.x + 8 + i * barWidth, rect.yMax - 23 - h, Math.Max(1, barWidth - 2), h), Texture2D.whiteTexture);
+            // 原生样式绘制不经过当前代理缺失的 DrawTexture 路径。
+            if (Event.current.type == EventType.Repaint)
+                _bar!.Draw(new Rect(rect.x + 8 + i * barWidth, rect.yMax - 23 - h, Math.Max(1, barWidth - 2), h), GUIContent.none, false, false, false, false);
         }
         GUI.color = old;
         Label(rect.x + 8, rect.yMax - 22, rect.width - 16, 22, $"{min:0.00} ~ {max:0.00}     第 {points[0].Day} 日 → 第 {points[^1].Day} 日", _muted!);
@@ -315,6 +340,8 @@ public sealed class StockMarketPanel : IDisposable
         _button = new GUIStyle(GUI.skin.button) { fontSize = 15, wordWrap = true };
         _field = new GUIStyle(GUI.skin.textField) { fontSize = 16 };
         _box = new GUIStyle(GUI.skin.box);
+        _bar = new GUIStyle();
+        _bar.normal.background = Texture2D.whiteTexture;
         if (_font != null)
             foreach (var style in new[] { _label, _heading, _muted, _button, _field, _box }) style.font = _font;
     }
@@ -326,7 +353,12 @@ public sealed class StockMarketPanel : IDisposable
         var custom = Path.Combine(ModPaths.AssetsDirectory, "Fonts", "StockMarket.ttf");
         if (File.Exists(custom))
         {
-            try { var fileFont = new Font(custom); if (AcceptFont(fileFont)) { _font = fileFont; return; } }
+            try
+            {
+                var fileFont = new Font();
+                Font.Internal_CreateFontFromPath(fileFont, custom);
+                if (AcceptFont(fileFont)) { _font = fileFont; return; }
+            }
             catch (Exception ex) { MelonLogger.Warning("自定义股市字体加载失败：" + ex.Message); }
         }
         var preferred = new[] { "Microsoft YaHei", "Microsoft YaHei UI", "Source Han Sans SC", "Source Han Sans CN", "Noto Sans CJK SC", "Noto Sans SC", "SimHei", "SimSun", "PingFang SC", "Arial Unicode MS" };
@@ -338,7 +370,9 @@ public sealed class StockMarketPanel : IDisposable
         {
             try
             {
-                var candidate = Font.CreateDynamicFontFromOSFont(name, 18);
+                // 单名称 factory 是未还原桩；显式调用已绑定的原生动态字体入口。
+                var candidate = new Font();
+                Font.Internal_CreateDynamicFont(candidate, new Il2CppStringArray(new[] { name }), 18);
                 if (!AcceptFont(candidate)) continue;
                 _font = candidate;
                 MelonLogger.Msg("股市面板中文字体：" + name);
@@ -362,7 +396,58 @@ public sealed class StockMarketPanel : IDisposable
         try { _feedback = action(); }
         catch (Exception ex) { _feedback = "操作未完成，请查看加载日志。"; MelonLogger.Error("股市面板命令失败：" + ex); }
     }
-    private bool Button(float x, float y, float width, float height, string text) => GUI.Button(new Rect(x, y, width, height), text, _button!);
+    private bool Button(float x, float y, float width, float height, string text)
+    {
+        var rect = new Rect(x, y, width, height);
+        var current = Event.current;
+        var id = GUIUtility.GetControlID(FocusType.Passive, rect);
+        var hover = (!_drawingContent || _contentPointerAllowed) && rect.Contains(current.mousePosition);
+        var enabled = GUI.enabled;
+        if (current.type == EventType.Repaint)
+            _button!.Draw(rect, new GUIContent(text), enabled && hover, enabled && _pressedButton == id, false, false);
+        if (current.type == EventType.MouseDown && current.button == 0 && enabled && hover)
+        {
+            _pressedButton = id; _quantityFocused = false; current.Use();
+        }
+        else if (current.type == EventType.MouseUp && current.button == 0 && _pressedButton == id)
+        {
+            _pressedButton = 0; current.Use();
+            return enabled && hover;
+        }
+        return false;
+    }
+
+    private void DrawQuantityField(Rect rect)
+    {
+        var current = Event.current;
+        if (current.type == EventType.MouseDown && current.button == 0)
+        {
+            _quantityFocused = _contentPointerAllowed && rect.Contains(current.mousePosition);
+            if (_quantityFocused) { _replaceQuantity = true; current.Use(); }
+        }
+        if (_quantityFocused && current.type == EventType.KeyDown)
+        {
+            // 仅处理整数股输入，避开 TextField -> GUIStateObjects 的未还原路径。
+            if ((current.control || current.command) && current.keyCode == KeyCode.A) _replaceQuantity = true;
+            else if (current.keyCode == KeyCode.Backspace || current.keyCode == KeyCode.Delete)
+            {
+                _quantity = _replaceQuantity || current.keyCode == KeyCode.Delete ? "" : _quantity.Length > 0 ? _quantity[..^1] : "";
+                _replaceQuantity = false;
+            }
+            else if (current.character >= '0' && current.character <= '9' && !current.control && !current.command && !current.alt)
+            {
+                if (_replaceQuantity) _quantity = "";
+                if (_quantity.Length < 9) _quantity += current.character;
+                _replaceQuantity = false;
+            }
+            else if (current.keyCode == KeyCode.Return || current.keyCode == KeyCode.KeypadEnter || current.keyCode == KeyCode.Tab)
+                _quantityFocused = false;
+            // Escape 留给外层统一关闭窗口。
+            if (current.keyCode != KeyCode.Escape) current.Use();
+        }
+        if (current.type == EventType.Repaint)
+            _field!.Draw(rect, new GUIContent(_quantity + (_quantityFocused ? "│" : "")), _contentPointerAllowed && rect.Contains(current.mousePosition), false, false, _quantityFocused);
+    }
     private void Label(float x, float y, float width, float height, string text, GUIStyle? style = null) => GUI.Label(new Rect(x, y, Math.Max(1, width), height), text ?? "", style ?? _label!);
     private static string Money(decimal value) => value.ToString("0.##", CultureInfo.InvariantCulture);
     private static string SignedMoney(decimal value) => (value > 0 ? "+" : "") + Money(value);

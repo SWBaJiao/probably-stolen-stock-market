@@ -12,6 +12,8 @@ internal sealed class AdapterSave
     public bool WrittenBySave { get; set; }
     public int SavedCash { get; set; }
     public int TerminalItemId { get; set; } = -1;
+    public bool TerminalPlacementPending { get; set; }
+    public string TerminalInventoryPath { get; set; } = "";
     public long SessionSequence { get; set; }
     public long TradeSequence { get; set; }
     public string SessionId { get; set; } = "";

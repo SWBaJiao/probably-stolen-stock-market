@@ -13,7 +13,7 @@
 - 实际存档中的原版 `postit` 保存 uniqueId、名称和标签。入口使用原生 postit，名称为“股市面板”，通过当前存档 envelope 中的唯一编号加原生标识识别，普通便笺不会被拦截。
 - 独立道具图片从 `Assets/Textures/Items/stock_market_terminal.png` 载入。当前代理的 `RenderHandler.atlasCache` 确认是图集到 Sprite 字典的缓存，`GameItem.SetSprite` 与 `SetSpriteAndShape` 是不同方法。适配器通过独立图集键注册图片、按原版便笺精灵尺寸缩放并保留原版形状；载入存档后重新注册。图片失败只记录警告，入口功能继续使用便笺图像。
 - PNG 在运行时以 Point 过滤等比缩放，剩余位置保持透明。原版 SaveGame 前恢复便笺图集字段，保存返回或异常后再恢复专用图像，使原版物品存档记录 native postit 图集；下次载入或卸载 Mod 时不依赖尚未注册的自定义图集。
-- `PlayerStore.gridInv` 在代理中可访问，但其与主背包的绑定仍需运行时确认。探针输出 identifier 和 childItems；赠送使用原版 `TryAcceptAllMid` 和插入后 parentInventory 验证。空间不足延后，每 10 秒扫描并补发一次缺失入口。
+- 0.1.0 实机日志确认 `PlayerStore.gridInv` 为空，不能用于玩家背包发放。0.1.1 改用 `EmporiumEntry.invElement`，要求 `invWindow.childElement` 指针一致且尺寸有效。插入必须同时确认 parentInventory 与直接 childItems；成功或结果不确定后锁定本次会话，不因空查询再次创建。完整扫描优先采用已知编号和旧版同名 postit；记录已有道具但查不到时停止自动补发，用户可按 Ctrl+F8 显式恢复。主背包实际显示仍待新版实机确认。
 
 ## 原版存档与交易解锁
 
@@ -28,7 +28,7 @@
 
 ## 用户实际验收步骤
 
-1. 进入测试存档，确认 `[股市背包探针]` 显示正确背包，`[股市道具]` 记录赠送编号；确认背包出现道具且双击打开。
+1. 进入测试存档，确认 `[股市背包探针]` 指向 EmporiumEntry.invElement，`[股市道具]` 记录“主背包直接成员已确认”；确认背包出现道具且双击打开。等待至少 30 秒，不应出现不同编号的重复赠送。旧记录找不到道具时按 Ctrl+F8。
 2. 首次面板应提示保存并读档，按钮不能花费现金。正常保存，返回菜单再载入，检查 nonce、现金一致以及“读回验证=True”。入口编号应保持一致。
 3. 先售出一件商品，检查成功回调、商品类型、实际现金变化和分配金额；遣散后确认相关公司涨价。买入同类商品后遣散应跌价。取消交易和无成交遣散不应产生商品影响。
 4. 检查批量成交总金额与现金变化一致、嵌套方法没有重复记账。出现“回调金额合计不一致”时保留日志，该交易暂不计行情。
@@ -39,3 +39,9 @@
 9. 背包满、道具丢失、不同存档切换、正常退回菜单均需要检查。入口禁止出售、普通消耗与拖出；普通 postit 保持原版行为。
 
 适配补丁仅由本模组 Harmony ID 安装和解绑。订单及情报费用使用独立货币操作标记，不会纳入商品信号。异常会写明原因并冻结交易，不会将打印成功日志等同于实际验收通过。
+
+## 0.1.1 图像及界面兼容修复
+
+当前生成代理中 Graphics.DrawTextureImpl 直接抛出 Method unstripping failed。图标改为已核实的原生 LoadImage/GetPixels32/SetPixels32/Apply/Sprite.Create 调用，加纯 C# 最近邻采样；不使用 Graphics、GL、RenderTexture 绘制路径。图片失败会记录阶段和完整异常，本次运行不重复分配失败资源。
+
+面板滚动、输入、柱图与字体创建也需要避开代理中的裁剪占位方法；具体替换见 [界面适配说明](../UI/ADAPTER-NOTES.md)。补领热键使用已核实的 Event.current/control/keyCode 绑定，只补领物品，不改变通过背包双击打开的主交互。

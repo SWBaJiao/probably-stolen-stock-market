@@ -63,7 +63,18 @@ public sealed class ModEntry : MelonMod
 
     public override void OnGUI()
     {
-        try { _panel?.Draw(); }
+        try
+        {
+            var input = UnityEngine.Event.current;
+            if (_market != null && input != null && input.type == UnityEngine.EventType.KeyDown
+                && input.keyCode == UnityEngine.KeyCode.F8 && input.control)
+            {
+                // 仅补领道具，保留通过背包双击打开股市的主要交互。
+                LoggerInstance.Msg("[股市道具] 手动补领：" + _market.RecoverTerminal());
+                input.Use();
+            }
+            _panel?.Draw();
+        }
         catch (Exception ex)
         {
             _panel?.Hide();
