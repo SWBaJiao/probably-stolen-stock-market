@@ -25,6 +25,7 @@ public sealed class MarketEngine
             if (!State.Positions.ContainsKey(c.Id)) State.Positions[c.Id] = new Position();
         }
         ValidateState(State, config);
+        MigrateCandles(State, config);
     }
 
     public string Serialize() => JsonSerializer.Serialize(State, JsonOptions);
@@ -32,6 +33,7 @@ public sealed class MarketEngine
     {
         var state = JsonSerializer.Deserialize<MarketState>(json, JsonOptions) ?? throw new ArgumentException("股市存档为空");
         ValidateState(state, config);
+        MigrateCandles(state, config);
         return state;
     }
 
@@ -39,9 +41,39 @@ public sealed class MarketEngine
     {
         if (state.Version != 1 || state.LastDay < -1 || state.RandomState == 0 || state.Companies == null || state.Positions == null || state.Sessions == null || state.ProcessedEvents == null || state.OccurredEvents == null || state.Rumors == null || state.OfferedSessions == null || state.Reputations == null || state.Ledger == null) throw new ArgumentException("股市存档版本或结构无效");
         if (state.Companies.Any(x => x.Value == null || x.Value.Price < .01m || x.Value.Price > 10000000m || x.Value.DailyRetailImpact < 0 || x.Value.DailyRetailImpact > 1m || x.Value.History == null || x.Value.History.Any(p => p == null || p.Price < .01m)) || state.Positions.Any(x => x.Value == null || x.Value.Quantity < 0 || x.Value.Cost < 0 || !state.Companies.ContainsKey(x.Key))) throw new ArgumentException("股市存档行情或持仓无效");
+        if (state.Companies.Values.Any(c => c.Candles == null || c.Candles.Any(k => !IsValidCandle(k, state.LastDay)) || c.Candles.Select(k => k.Day).Distinct().Count() != c.Candles.Count || !c.Candles.Select(k => k.Day).SequenceEqual(c.Candles.Select(k => k.Day).OrderBy(d => d)))) throw new ArgumentException("股市存档日 K 线无效");
         if (state.Sessions.Any(x => x.Value == null || x.Value.TradeIds == null || x.Value.Signals == null || x.Value.Signals.Keys.Any(k => !state.Companies.ContainsKey(k))) || state.Reputations.Any(x => x.Value == null || x.Value.Correct < 0 || x.Value.Incorrect < 0) || state.Rumors.Any(x => x.Value == null || x.Key != x.Value.Id || x.Value.Price < 0 || x.Value.Reliability < .2m || x.Value.Reliability > .9m || x.Value.CompanyIds == null)) throw new ArgumentException("股市存档成交或情报无效");
         // 持仓公司不能被配置删除，否则无法出售已有股份。
         if (state.Positions.Any(x => x.Value.Quantity > 0 && !config.Companies.Any(c => c.Id == x.Key))) throw new ArgumentException("公司配置删除了仍有持仓的公司");
+    }
+
+    private static bool IsValidCandle(DailyCandle? candle, int lastDay)
+    {
+        if (candle == null || candle.Day < 0 || candle.Day > lastDay || candle.Close < .01m || candle.Close > 10000000m) return false;
+        var known = new[] { candle.Open, candle.High, candle.Low }.Where(p => p.HasValue).Select(p => p!.Value).ToArray();
+        if (known.Any(p => p < .01m || p > 10000000m)) return false;
+        if (!candle.IsPartial && known.Length != 3) return false;
+        if (candle.High.HasValue && (candle.High.Value < candle.Close || candle.Open.HasValue && candle.High.Value < candle.Open.Value)) return false;
+        if (candle.Low.HasValue && (candle.Low.Value > candle.Close || candle.Open.HasValue && candle.Low.Value > candle.Open.Value)) return false;
+        return !candle.High.HasValue || !candle.Low.HasValue || candle.High.Value >= candle.Low.Value;
+    }
+
+    private static void MigrateCandles(MarketState state, MarketConfig config)
+    {
+        foreach (var company in state.Companies.Values)
+        {
+            if (company.Candles.Count > 0) continue;
+            // 旧采样没有变价前的开盘值，也不能证明日内极值；只迁移已知收盘样本。
+            foreach (var day in company.History.Where(p => p.Day >= 0 && p.Day <= state.LastDay).GroupBy(p => p.Day).OrderBy(g => g.Key))
+                company.Candles.Add(new DailyCandle { Day = day.Key, Close = day.Last().Price, IsPartial = true });
+            if (state.LastDay >= 0)
+            {
+                var current = company.Candles.LastOrDefault();
+                if (current == null || current.Day != state.LastDay) company.Candles.Add(new DailyCandle { Day = state.LastDay, Close = company.Price, IsPartial = true });
+                else current.Close = company.Price;
+            }
+            TrimCandles(company, config.HistoryLimit);
+        }
     }
 
     public Dictionary<string, decimal> GetWeights(IEnumerable<string> types)
@@ -88,7 +120,8 @@ public sealed class MarketEngine
     {
         if (day < 0 || day <= State.LastDay) return false;
         // 首次接入只对当前一天推进，不模拟接入前的历史。
-        var first = State.LastDay < 0 ? day : State.LastDay + 1;
+        var firstObservation = State.LastDay < 0;
+        var first = firstObservation ? day : State.LastDay + 1;
         if ((long)day - first > 10000) throw new ArgumentException("游戏日期跨度异常");
         for (var d = first; d <= day; d++)
         {
@@ -96,6 +129,7 @@ public sealed class MarketEngine
             foreach (var company in Config.Companies)
             {
                 var s = State.Companies[company.Id];
+                EnsureCandle(s, d, firstObservation);
                 s.DailyRetailImpact = 0;
                 var noise = (NextRandom() * 2m - 1m) * Config.DailyLimit * .75m;
                 var reversion = (Config.InitialPrice / s.Price - 1m) * .01m;
@@ -282,9 +316,29 @@ public sealed class MarketEngine
     private void MovePrice(string id, decimal change, string reason)
     {
         var c = State.Companies[id];
+        var candle = State.LastDay >= 0 ? EnsureCandle(c, State.LastDay, false) : null;
         c.Price = Math.Clamp(decimal.Round(c.Price * (1m + change), 2, MidpointRounding.AwayFromZero), .01m, 10000000m);
+        if (candle != null)
+        {
+            candle.Close = c.Price;
+            if (candle.High.HasValue) candle.High = Math.Max(candle.High.Value, c.Price);
+            if (candle.Low.HasValue) candle.Low = Math.Min(candle.Low.Value, c.Price);
+        }
         c.History.Add(new PricePoint { Day = State.LastDay, Price = c.Price, Reason = reason });
         if (c.History.Count > Config.HistoryLimit) c.History.RemoveRange(0, c.History.Count - Config.HistoryLimit);
+    }
+    private DailyCandle EnsureCandle(CompanyState company, int day, bool partial)
+    {
+        var existing = company.Candles.LastOrDefault();
+        if (existing != null && existing.Day == day) return existing;
+        var candle = new DailyCandle { Day = day, Close = company.Price, IsPartial = partial, Open = partial ? null : company.Price, High = partial ? null : company.Price, Low = partial ? null : company.Price };
+        company.Candles.Add(candle);
+        TrimCandles(company, Config.HistoryLimit);
+        return candle;
+    }
+    private static void TrimCandles(CompanyState company, int limit)
+    {
+        if (company.Candles.Count > limit) company.Candles.RemoveRange(0, company.Candles.Count - limit);
     }
     private void Log(string kind, string text, string company = "", int quantity = 0, int cashDelta = 0)
     {

@@ -204,6 +204,58 @@ var explicitRule = engine.Config.Events.Single(x => x.EventId == "test-water");
 var resolved = EventImpactResolver.EnsureRule(engine, "test-water", new[] { new CommodityPriceModifier { ItemType = "MEDICAL", Percent = 100 } });
 Check(ReferenceEquals(resolved, explicitRule) && resolved.Impacts["water"] == -.1m && !resolved.Impacts.ContainsKey("medical"), "显式事件规则优先于自动推导且不被覆盖");
 Check(EventImpactResolver.EnsureRule(engine, "unknown-type", new[] { new CommodityPriceModifier { ItemType = "not-real-type", Percent = 100 } }) == null && EventImpactResolver.EnsureRule(engine, "zero-change", new[] { new CommodityPriceModifier { ItemType = "MEDICAL", Percent = 0 } }) == null, "未知商品类型和零价格修正均不生成事件规则");
+
+engine = Engine();
+engine.Config.DailyLimit = 0m;
+engine.Config.Events.Add(new EventRule { EventId = "candle-rise", Description = "上行事件", Impacts = new() { ["water"] = .1m } });
+engine.Config.Events.Add(new EventRule { EventId = "candle-drop", Description = "下行事件", Impacts = new() { ["water"] = -.2m } });
+Check(engine.State.Companies.Values.All(c => c.Candles.Count == 0), "未接入游戏日期时不虚构前日 K 线");
+engine.AdvanceDay(7);
+var candles = engine.State.Companies["water"].Candles;
+Check(candles.Count == 1 && candles[0].Day == 7 && candles[0].IsPartial && candles[0].Open == null && candles[0].High == null && candles[0].Low == null, "首次盘中接入当天标记不完整且不伪造开高低");
+engine.AdvanceDay(8);
+var currentCandle = candles.Single(c => c.Day == 8);
+Check(!currentCandle.IsPartial && currentCandle.Open == 100m && currentCandle.High == 100m && currentCandle.Low == 100m && currentCandle.Close == 100m, "正常新日变价前用前收创建完整 OHLC");
+engine.ActivateEvent("candle-rise", "8/up", 8);
+engine.ActivateEvent("candle-drop", "8/down", 8);
+engine.RecordTrade("candle-customer", "candle-trade", new[] { "WATER" }, 1000m);
+engine.CloseCustomer("candle-customer");
+Check(currentCandle.Open == 100m && currentCandle.High == 110m && currentCandle.Low == 88m && currentCandle.Close == engine.State.Companies["water"].Price && currentCandle.Close > 88m && candles.Count == 2, "同日事件与顾客变价累积真实高低收且不重置开盘");
+var beforeDuplicate = engine.Serialize();
+engine.AdvanceDay(8); engine.ActivateEvent("candle-rise", "8/up", 8); engine.CloseCustomer("candle-customer");
+Check(engine.Serialize() == beforeDuplicate, "重复日事件和遣散回调不重复更新日 K 线");
+var closeDay8 = currentCandle.Close;
+engine.AdvanceDay(9);
+Check(candles.Single(c => c.Day == 9).Open == closeDay8 && candles.Single(c => c.Day == 8).Close == closeDay8, "跨日开盘承接前收且前日 K 线保持封存");
+var candleSaved = engine.Serialize();
+var reloadedCandles = new MarketEngine(engine.Config, MarketEngine.Deserialize(candleSaved, engine.Config));
+Check(reloadedCandles.Serialize() == candleSaved && !reloadedCandles.AdvanceDay(9), "完整日 K 线存档恢复后不重新结算当天");
+reloadedCandles.ActivateEvent("candle-rise", "9/up", 9);
+var continuedCandle = reloadedCandles.State.Companies["water"].Candles.Single(c => c.Day == 9);
+Check(continuedCandle.Open == closeDay8 && continuedCandle.High == continuedCandle.Close && continuedCandle.Low == closeDay8 && reloadedCandles.State.Companies["water"].Candles.Count == 3, "读档后当日价格继续更新原有 OHLC");
+reloadedCandles.Config.HistoryLimit = 2;
+reloadedCandles.AdvanceDay(10);
+Check(reloadedCandles.State.Companies.Values.All(c => c.Candles.Count == 2 && c.Candles[0].Day == 9 && c.Candles[1].Day == 10), "日 K 线按日期保留有限数量");
+
+var legacy = new MarketState { LastDay = 4, Companies = new() { ["water"] = new CompanyState { Price = 130m, History = new() { new PricePoint { Day = 2, Price = 110m }, new PricePoint { Day = 2, Price = 90m }, new PricePoint { Day = 4, Price = 120m }, new PricePoint { Day = 4, Price = 130m } } } } };
+var oldJson = System.Text.Json.Nodes.JsonNode.Parse(System.Text.Json.JsonSerializer.Serialize(legacy, MarketEngine.JsonOptions))!;
+oldJson["Companies"]!["water"]!.AsObject().Remove("Candles");
+var migrated = new MarketEngine(engine.Config, MarketEngine.Deserialize(oldJson.ToJsonString(), engine.Config));
+var oldCandles = migrated.State.Companies["water"].Candles;
+Check(migrated.State.Version == 1 && oldCandles.Count == 2 && oldCandles[0].Day == 2 && oldCandles[0].Close == 90m && oldCandles[1].Day == 4 && oldCandles[1].Close == 130m && oldCandles.All(c => c.IsPartial && c.Open == null && c.High == null && c.Low == null), "旧 schema 按已知日末采样迁移且缺日开高低保持未知");
+var migratedSnapshot = migrated.Serialize();
+Check(new MarketEngine(engine.Config, MarketEngine.Deserialize(migratedSnapshot, engine.Config)).Serialize() == migratedSnapshot, "旧档迁移保存后再次读取不重复生成 K 线");
+migrated.AdvanceDay(5);
+Check(oldCandles.Last().Day == 5 && oldCandles.Last().Open == 130m && !oldCandles.Last().IsPartial && oldCandles.Take(oldCandles.Count - 1).All(c => c.IsPartial), "迁移后下一正常日开始完整记录且不将旧样本冒充完整数据");
+invalid = false;
+try
+{
+    var corrupt = System.Text.Json.Nodes.JsonNode.Parse(migrated.Serialize())!;
+    corrupt["Companies"]!["water"]!["Candles"]!.AsArray().Last()!["High"] = .01m;
+    MarketEngine.Deserialize(corrupt.ToJsonString(), engine.Config);
+}
+catch (ArgumentException) { invalid = true; }
+Check(invalid, "日 K 线高价低于已知开收时拒绝损坏存档");
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet

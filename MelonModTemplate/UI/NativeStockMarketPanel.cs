@@ -28,6 +28,11 @@ public sealed class NativeStockMarketPanel : IDisposable
     private readonly Dictionary<string, CustomUIElement> _elements = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _textCache = new(StringComparer.Ordinal);
     private readonly Dictionary<string, float> _minimumHeights = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, float> _measuredWidths = new(StringComparer.Ordinal);
+    private NativeCandlestickChart? _chart;
+    private GameObject? _companyDetails;
+    private int _chartDays = 30;
+    private bool _showDetails;
     private readonly List<IDisposable> _bindings = new();
     private readonly List<GameObject> _pages = new();
     private readonly HashSet<string> _warned = new(StringComparer.Ordinal);
@@ -137,43 +142,73 @@ public sealed class NativeStockMarketPanel : IDisposable
         _builder.End();
 
         BeginPage();
-        Label("market.guide", "选择公司，查看共同关联商品及行情。顾客遣散后结算实际成交影响。", 38);
-        var columns = _width >= 700 ? 2 : 1;
-        _builder.BeginGrid(columns, (_width - 62) / columns - 5, 38, 5);
-        foreach (var company in engine.Config.Companies)
-            Button("company." + company.Id, company.Name, "company:" + company.Id, (_width - 62) / columns - 5, 38);
-        _builder.End();
-        Label("company.title", "", 36, true);
-        Label("company.description", "", 40);
-        Label("company.sectors", "", 88);
-        Label("company.peers", "", 70);
-        Label("company.history", "", 172);
-        if (manager.progressBarPrefab != null)
+        _builder.BeginRow(12);
+        // 宽屏并排显示自选公司与图表，窄屏保持纵向可滚动。
+        var wide = _width >= 820;
+        if (!wide)
         {
-            _builder.AddProgressBar(0, "company.retail");
-            Remember("company.retail", _builder.Last, 28);
+            _builder.End();
+            _builder.BeginColumn(8);
         }
-        Label("order.title", "现货委托 · 整数股", 32, true);
-        _builder.BeginRow(5);
-        var unit = (_width - 86) / 5;
-        Button("mode.buy", "买入", "mode:buy", unit);
-        Button("mode.sell", "卖出", "mode:sell", unit);
-        Button("quantity.minus", "− 1 股", "quantity:-1", unit);
-        _builder.AddInput("正整数股数", _quantity, null, "quantity");
-        var input = Remember("quantity", _builder.Last, 36, unit);
-        _bindings.Add(new NativeQuantityBinding(input, this));
-        Button("quantity.plus", "+ 1 股", "quantity:1", unit);
+        _builder.BeginColumn(4);
+        Container(_builder.CurrentParent, wide ? 218 : -1);
+        Label("market.guide", "公司行情 · 点击切换", 28, true);
+        if (!wide) _builder.BeginGrid(2, (_width - 84) / 2, 38, 4);
+        foreach (var company in engine.Config.Companies)
+            Button("company." + company.Id, company.Name, "company:" + company.Id, -1, 38);
+        if (!wide) _builder.End();
+        Label("market.legend", "涨红 / 跌绿 · 较昨收\n成交信号在顾客遣散后结算", 54);
         _builder.End();
-        Label("order.preview", "", 98);
-        Button("order.submit", "确认委托", "order", Math.Min(280, _width - 60), 38);
-        Label("company.news", "", 220);
+
+        _builder.BeginColumn(5);
+        Container(_builder.CurrentParent, -1);
+        Label("company.title", "", 30, true);
+        _builder.BeginRow(5);
+        Button("chart.30", "近 30 日", "chart:30", 100, 28);
+        Button("chart.60", "近 60 日", "chart:60", 100, 28);
+        Button("company.toggle", "公司与商品关联 ▸", "details", -1, 28);
+        _builder.End();
+        _builder.BeginColumn(0);
+        var chartRoot = _builder.CurrentParent;
+        Container(chartRoot, -1, 230);
+        var chartLayout = Get<VerticalLayoutGroup>(chartRoot.gameObject);
+        if (chartLayout != null) chartLayout.enabled = false;
+        var font = _window.frame.titleText.font;
+        _chart = new NativeCandlestickChart(chartRoot, font);
+        _builder.End();
+
+        _builder.BeginColumn(4);
+        _companyDetails = _builder.CurrentParent.gameObject;
+        Label("company.description", "", 36);
+        Label("company.sectors", "", 58);
+        Label("company.peers", "", 44);
+        Label("company.news", "", 60);
+        _builder.End();
+        _companyDetails.SetActive(_showDetails);
+        Label("order.title", "现货委托 · 整数股", 26, true);
+        _builder.BeginRow(5);
+        Button("mode.buy", "买入", "mode:buy", 72, 32);
+        Button("mode.sell", "卖出", "mode:sell", 72, 32);
+        Button("quantity.minus", "−", "quantity:-1", 32, 32);
+        _builder.AddInput("股数", _quantity, null, "quantity");
+        var input = Remember("quantity", _builder.Last, 32, -1);
+        _bindings.Add(new NativeQuantityBinding(input, this));
+        Button("quantity.plus", "+", "quantity:1", 32, 32);
+        _builder.End();
+        Label("order.preview", "", 48);
+        Button("order.submit", "确认委托", "order", -1, 34);
+        _builder.End();
+        _builder.End();
         EndPage();
 
         BeginPage();
-        Label("portfolio.total", "", 82, true);
+        Label("portfolio.total", "", 62, true);
+        var positionColumns = _width >= 760 ? 2 : 1;
+        _builder.BeginGrid(positionColumns, (_width - 72) / positionColumns - 5, 92, 8);
         foreach (var company in engine.Config.Companies)
-            Button("position." + company.Id, company.Name, "company:" + company.Id, -1, 74);
-        Label("portfolio.note", "持仓成本包含买入手续费；已实现盈亏计入卖出手续费。", 48);
+            Button("position." + company.Id, company.Name, "company:" + company.Id, -1, 92);
+        _builder.End();
+        Label("portfolio.note", "点击持仓卡片查看 K 线并委托。持仓成本与已实现盈亏均包含手续费。", 36);
         EndPage();
 
         BeginPage();
@@ -191,13 +226,14 @@ public sealed class NativeStockMarketPanel : IDisposable
         Label("ledger.entries", "", 150);
         EndPage();
 
-        Label("status", "", 46);
-        Label("feedback", "", 38);
+        Label("status", "", 32);
+        Label("feedback", "", 26);
         _builder.BeginRow(6);
         Button("terminal.recover", "补领股市面板道具", "recover", (_width - 72) / 3);
         Button("refresh", "刷新当前数据", "refresh", (_width - 72) / 3);
         Button("close", "关闭", "close", (_width - 72) / 3);
         _builder.End();
+        NormalizeLayout(_window.frame.contentRoot);
         SetPage(_page);
         if (!engine.Config.Companies.Any(c => c.Id == _companyId)) _companyId = engine.Config.Companies[0].Id;
         _window = _builder.Show();
@@ -208,8 +244,16 @@ public sealed class NativeStockMarketPanel : IDisposable
     private void BeginPage()
     {
         _builder!.BeginColumn(4);
-        _pages.Add(_builder.CurrentParent.gameObject);
-        _builder.BeginScroll(Math.Max(100, _height - 292));
+        var page = _builder.CurrentParent;
+        _pages.Add(page.gameObject);
+        Container(page, -1);
+        FillHeight(page);
+        _builder.BeginScroll(Math.Max(100, _height - 248));
+        Container(_builder.CurrentParent, -1);
+        // 页面吃掉标题与页脚以外的剩余高度；缩小窗口时只缩滚动区域。
+        for (Transform? ancestor = _builder.CurrentParent; ancestor != null && ancestor.Pointer != page.Pointer; ancestor = ancestor.parent)
+            if (Get<ScrollRect>(ancestor.gameObject) is { } scroll)
+            { FillHeight(scroll.transform.Cast<RectTransform>()); break; }
     }
 
     private void EndPage() { _builder!.End(); _builder.End(); }
@@ -235,8 +279,8 @@ public sealed class NativeStockMarketPanel : IDisposable
         // 由游戏工厂生成全新通用按钮，绝不复制带有成交逻辑的商店按钮。
         _builder!.AddButton(text, null, id);
         var element = Remember(id, _builder.Last, height, width);
-        if (id.StartsWith("position.", StringComparison.Ordinal)) _minimumHeights[id] = height;
-        if (element.text != null) { element.text.color = TextColor; element.text.fontSize = 16; element.text.richText = false; }
+
+        if (element.text != null) { element.text.color = TextColor; element.text.fontSize = 16; element.text.richText = false; element.text.enableWordWrapping = true; }
         if (element.image != null) element.image.color = ButtonColor;
         _bindings.Add(new NativeButtonBinding(element, this, command));
         return element;
@@ -245,7 +289,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private CustomUIElement Remember(string id, CustomUIElement element, float height, float width = -1)
     {
         _elements.Add(id, element);
-        element.SetPreferredSize(width, height);
+        Container(element.root.transform.Cast<RectTransform>(), width, height);
         return element;
     }
 
@@ -284,8 +328,9 @@ public sealed class NativeStockMarketPanel : IDisposable
                 if (!engine.State.Companies.TryGetValue(company.Id, out var stock)) continue;
                 var close = PreviousClose(engine, stock);
                 var change = close == 0 ? 0 : stock.Price / close - 1;
-                Text("company." + company.Id, $"{company.Name}    {stock.Price:0.00}    较昨收 {SignedPercent(change)}");
+                Text("company." + company.Id, $"{company.Name}  {stock.Price:0.00}  {SignedPercent(change)}");
                 Tint("company." + company.Id, company.Id == _companyId);
+                if (_elements["company." + company.Id].text != null) _elements["company." + company.Id].text.color = change > 0 ? new Color(.96f, .43f, .40f, 1) : change < 0 ? new Color(.37f, .81f, .58f, 1) : TextColor;
             }
             RefreshCompany(engine);
             RefreshPortfolio(engine);
@@ -310,20 +355,9 @@ public sealed class NativeStockMarketPanel : IDisposable
         Text("company.sectors", "关联商品及成交影响分配：\n" + string.Join("  ·  ", sectors.Select(s => $"{s.Name} {s.Weights[company.Id]:0%}")));
         var peers = sectors.SelectMany(s => s.Weights.Keys).Where(id => id != company.Id).Distinct();
         Text("company.peers", "共同关联公司：\n" + string.Join("、", peers.Select(id => engine.Config.Companies.FirstOrDefault(c => c.Id == id)?.Name ?? id)));
-        var points = stock.History.TakeLast(24).ToArray();
-        var history = new StringBuilder("近期价格记录（最近 24 次变化，依发生顺序）：\n");
-        if (points.Length == 0) history.Append("暂无价格变化记录。");
-        for (int index = 0; index < points.Length; index++)
-        {
-            history.Append($"第{points[index].Day}日 {points[index].Price:0.00}");
-            history.Append((index + 1) % 4 == 0 ? "\n" : "   →   ");
-        }
-        Text("company.history", history.ToString());
-        if (_elements.TryGetValue("company.retail", out var progress))
-        {
-            var used = engine.Config.RetailDailyLimit > 0 ? Math.Clamp(stock.DailyRetailImpact / engine.Config.RetailDailyLimit, 0, 1) : 0;
-            progress.SetProgress((float)used, $"当日经营影响额度：{used:0%}");
-        }
+        _chart?.Render(stock.Candles, stock.Price, _chartDays, engine.State.LastDay);
+        Tint("chart.30", _chartDays == 30); Tint("chart.60", _chartDays == 60);
+        Text("company.toggle", _showDetails ? "收起公司与商品关联 ▾" : "公司与商品关联 ▸");
         var news = engine.State.Ledger.Where(e => e.Kind == "event" && (string.IsNullOrEmpty(e.CompanyId) || e.CompanyId == company.Id)).TakeLast(4).Reverse();
         Text("company.news", "已公开事件：\n" + (news.Any() ? string.Join("\n\n", news.Select(e => $"第 {e.Day} 日  {e.Description}")) : "暂无已公开事件。"));
     }
@@ -420,6 +454,8 @@ public sealed class NativeStockMarketPanel : IDisposable
             if (command == "close") { Hide(); return; }
             if (command.StartsWith("page:", StringComparison.Ordinal)) SetPage(int.Parse(command.Substring(5), CultureInfo.InvariantCulture));
             else if (command.StartsWith("company:", StringComparison.Ordinal)) { _companyId = command.Substring(8); SetPage(0); }
+            else if (command.StartsWith("chart:", StringComparison.Ordinal)) _chartDays = command == "chart:60" ? 60 : 30;
+            else if (command == "details") { _showDetails = !_showDetails; _companyDetails?.SetActive(_showDetails); }
             else if (command == "mode:buy") _buy = true;
             else if (command == "mode:sell") _buy = false;
             else if (command.StartsWith("quantity:", StringComparison.Ordinal))
@@ -469,15 +505,21 @@ public sealed class NativeStockMarketPanel : IDisposable
     private void Text(string id, string value, Color? color = null)
     {
         if (!_elements.TryGetValue(id, out var element)) return;
-        if (!_textCache.TryGetValue(id, out var previous) || previous != value)
+        if (id == "feedback") element.root.SetActive(!string.IsNullOrWhiteSpace(value));
+        bool changed = !_textCache.TryGetValue(id, out var previous) || previous != value;
+        if (changed) { element.SetText(value); _textCache[id] = value; }
+        if (_minimumHeights.TryGetValue(id, out var minimum) && element.text != null)
         {
-            element.SetText(value); _textCache[id] = value;
-            if (_minimumHeights.TryGetValue(id, out var minimum) && element.text != null)
+            var actualWidth = element.root.transform.Cast<RectTransform>().rect.width;
+            var available = Math.Max(100, actualWidth > 20 ? actualWidth - 12 : _width - 90);
+            if (changed || !_measuredWidths.TryGetValue(id, out var lastWidth) || Math.Abs(lastWidth - available) > 1)
             {
                 try
                 {
-                    var preferred = element.text.GetPreferredValues(value, Math.Max(120, _width - 90), float.PositiveInfinity);
-                    Height(id, Math.Max(minimum, preferred.y + 12));
+                    var preferred = element.text.GetPreferredValues(value, available, float.PositiveInfinity);
+                    var layout = Get<LayoutElement>(element.root);
+                    if (layout != null) { layout.preferredHeight = Math.Max(minimum, preferred.y + 8); layout.minHeight = minimum; }
+                    _measuredWidths[id] = available;
                 }
                 catch (Exception ex) { Warn("measure:" + id, "原生文本高度计算失败，将使用初始高度。", ex); }
             }
@@ -485,13 +527,42 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (color.HasValue && element.text != null) element.text.color = color.Value;
     }
 
-    private void Height(string id, float height)
+    private static void Container(RectTransform root, float width, float height = -1)
     {
-        if (!_elements.TryGetValue(id, out var element)) return;
-        var key = "height:" + id;
-        var value = height.ToString(CultureInfo.InvariantCulture);
-        if (_textCache.TryGetValue(key, out var old) && old == value) return;
-        element.SetPreferredSize(-1, height); _textCache[key] = value;
+        var layout = Get<LayoutElement>(root.gameObject) ?? root.gameObject.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
+        // 清除模板遗留的固定宽度；负值表示填充所在列。
+        layout.minWidth = width < 0 ? 0 : width;
+        layout.preferredWidth = width < 0 ? 0 : width;
+        layout.flexibleWidth = width < 0 ? 1 : 0;
+        if (height >= 0) { layout.minHeight = height; layout.preferredHeight = height; layout.flexibleHeight = 0; }
+    }
+
+    private static T? Get<T>(GameObject root) where T : Component => root.GetComponent(Il2CppType.Of<T>())?.TryCast<T>();
+
+    private static void FillHeight(RectTransform root)
+    {
+        var layout = Get<LayoutElement>(root.gameObject) ?? root.gameObject.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
+        layout.minHeight = 0; layout.preferredHeight = 0; layout.flexibleHeight = 1;
+        var fitter = Get<ContentSizeFitter>(root.gameObject);
+        if (fitter != null) fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+    }
+
+    private static void NormalizeLayout(RectTransform root)
+    {
+        foreach (var component in root.gameObject.GetComponentsInChildren(Il2CppType.Of<VerticalLayoutGroup>(), true))
+        {
+            var group = component.Cast<VerticalLayoutGroup>();
+            group.childControlWidth = true; group.childForceExpandWidth = true;
+            group.childControlHeight = true; group.childForceExpandHeight = false;
+        }
+        foreach (var component in root.gameObject.GetComponentsInChildren(Il2CppType.Of<HorizontalLayoutGroup>(), true))
+        {
+            var group = component.Cast<HorizontalLayoutGroup>();
+            group.childControlWidth = true; group.childForceExpandWidth = false;
+            group.childControlHeight = true; group.childForceExpandHeight = false;
+        }
+        foreach (var component in root.gameObject.GetComponentsInChildren(Il2CppType.Of<ContentSizeFitter>(), true))
+            component.Cast<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
     }
 
     private void Enabled(string id, bool enabled)
@@ -533,7 +604,8 @@ public sealed class NativeStockMarketPanel : IDisposable
         foreach (var binding in _bindings)
             try { binding.Dispose(); }
             catch (Exception ex) { Warn("unbind", "原生控件监听器移除失败，窗口销毁后将释放控件。", ex); }
-        _bindings.Clear(); _elements.Clear(); _pages.Clear(); _textCache.Clear(); _minimumHeights.Clear(); _builder = null;
+        _chart?.Dispose(); _chart = null; _companyDetails = null;
+        _bindings.Clear(); _elements.Clear(); _pages.Clear(); _textCache.Clear(); _minimumHeights.Clear(); _measuredWidths.Clear(); _builder = null;
         _boundEngine = null; _saveIdentity = "";
         _displayedOfferId = null;
         if (window != null)
@@ -566,7 +638,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         MelonLogger.Warning("[原生股市] " + stage + ": " + text + (exception == null ? "" : Environment.NewLine + exception));
     }
 
-    private static decimal PreviousClose(MarketEngine engine, CompanyState stock) => stock.History.LastOrDefault(p => p.Day < engine.State.LastDay)?.Price ?? engine.Config.InitialPrice;
+    private static decimal PreviousClose(MarketEngine engine, CompanyState stock) => stock.Candles.LastOrDefault(p => p.Day < engine.State.LastDay)?.Close ?? stock.History.LastOrDefault(p => p.Day < engine.State.LastDay)?.Price ?? engine.Config.InitialPrice;
     private static string Money(decimal value) => value.ToString("0.##", CultureInfo.InvariantCulture);
     private static string SignedMoney(decimal value) => (value > 0 ? "+" : "") + Money(value);
     private static string SignedPercent(decimal value) => (value > 0 ? "+" : "") + value.ToString("0.00%", CultureInfo.InvariantCulture);

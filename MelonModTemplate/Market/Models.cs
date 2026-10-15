@@ -52,11 +52,22 @@ public sealed class ScheduledEvent
     public int Day { get; set; }
 }
 public sealed class PricePoint { public int Day { get; set; } public decimal Price { get; set; } public string Reason { get; set; } = ""; }
+public sealed class DailyCandle
+{
+    public int Day { get; set; }
+    // 旧档和首次接入当天缺少完整日内记录，未知的开高低保持为空。
+    public decimal? Open { get; set; }
+    public decimal? High { get; set; }
+    public decimal? Low { get; set; }
+    public decimal Close { get; set; }
+    public bool IsPartial { get; set; }
+}
 public sealed class CompanyState
 {
     public decimal Price { get; set; } = 100m;
     public decimal DailyRetailImpact { get; set; }
     public List<PricePoint> History { get; set; } = new();
+    public List<DailyCandle> Candles { get; set; } = new();
 }
 public sealed class Position { public int Quantity { get; set; } public decimal Cost { get; set; } public decimal RealizedProfit { get; set; } }
 public sealed class LedgerEntry
