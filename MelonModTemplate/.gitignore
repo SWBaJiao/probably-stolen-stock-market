@@ -1,0 +1,7 @@
+bin/
+obj/
+Game.local.props
+.DS_Store
+*.user
+*.suo
+.vs/

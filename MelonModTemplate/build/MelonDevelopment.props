@@ -1,0 +1,14 @@
+<Project>
+  <Import Project="$(MSBuildProjectDirectory)/Game.local.props"
+          Condition="Exists('$(MSBuildProjectDirectory)/Game.local.props')" />
+  <PropertyGroup>
+    <MelonLoaderDirectory Condition="'$(MelonLoaderDirectory)' == '' and '$(GameDirectory)' != ''">$(GameDirectory)/MelonLoader</MelonLoaderDirectory>
+    <MelonRuntimeDirectory Condition="'$(MelonRuntimeDirectory)' == '' and '$(MelonLoaderDirectory)' != ''">$(MelonLoaderDirectory)/net6</MelonRuntimeDirectory>
+    <MelonLoaderAssembly Condition="'$(MelonLoaderAssembly)' == '' and '$(MelonRuntimeDirectory)' != ''">$(MelonRuntimeDirectory)/MelonLoader.dll</MelonLoaderAssembly>
+    <Il2CppAssembliesDirectory Condition="'$(Il2CppAssembliesDirectory)' == '' and '$(MelonLoaderDirectory)' != ''">$(MelonLoaderDirectory)/Il2CppAssemblies</Il2CppAssembliesDirectory>
+    <ModAssetsDirectory>$(MSBuildProjectDirectory)/Assets</ModAssetsDirectory>
+    <DeployOnBuild Condition="'$(DeployOnBuild)' == ''">true</DeployOnBuild>
+    <DeployDebugSymbols Condition="'$(DeployDebugSymbols)' == ''">false</DeployDebugSymbols>
+    <UseGameInterop Condition="'$(UseGameInterop)' == ''">true</UseGameInterop>
+  </PropertyGroup>
+</Project>

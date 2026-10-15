@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/Game.local.props
+**/.DS_Store
+**/*.user
+**/*.suo
+**/.vs/
+/ModTemplate/
+/probably-stolen-modding/
+/work/
+# 旧 LearnerMod 示例资源只作本地风格参考，不包含在股市 Mod 发布中。
+/MelonModTemplate/Assets/Textures/Items/health_pack.png

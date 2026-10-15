@@ -1,0 +1,390 @@
+{
+  "InitialPrice": 100,
+  "DailyLimit": 0.03,
+  "CustomerLimit": 0.02,
+  "RetailDailyLimit": 0.08,
+  "SignalScale": 1000,
+  "FeeRate": 0.005,
+  "MinimumFee": 1,
+  "RumorPrice": 50,
+  "RumorHorizon": 3,
+  "HistoryLimit": 240,
+  "LedgerLimit": 300,
+  "EnableStructuredEventFallback": true,
+  "StructuredEventScale": 0.5,
+  "StructuredEventLimit": 0.15,
+  "Companies": [
+    {
+      "Id": "harvest",
+      "Name": "\u4E30\u79BE\u4F9B\u7ED9",
+      "Description": "\u98DF\u54C1\u3001\u519C\u4EA7\u54C1\u4E0E\u4F9B\u5E94"
+    },
+    {
+      "Id": "water",
+      "Name": "\u6E05\u6CC9\u5FAA\u73AF",
+      "Description": "\u996E\u6C34\u3001\u51C0\u5316\u4E0E\u5FAA\u73AF"
+    },
+    {
+      "Id": "medical",
+      "Name": "\u767D\u5854\u533B\u7597",
+      "Description": "\u836F\u54C1\u4E0E\u533B\u7597\u8BBE\u5907"
+    },
+    {
+      "Id": "industrial",
+      "Name": "\u661F\u953B\u5DE5\u4E1A",
+      "Description": "\u673A\u68B0\u3001\u5DE5\u5177\u4E0E\u77FF\u4EA7"
+    },
+    {
+      "Id": "technology",
+      "Name": "\u8FDC\u661F\u79D1\u6280",
+      "Description": "\u7535\u5B50\u3001\u6A21\u5757\u4E0E\u79D1\u7814"
+    },
+    {
+      "Id": "commerce",
+      "Name": "\u73AF\u5B87\u5546\u8D38",
+      "Description": "\u7EFC\u5408\u8D38\u6613\u4E0E\u5962\u4F88\u54C1"
+    },
+    {
+      "Id": "energy",
+      "Name": "\u9706\u5149\u80FD\u6E90",
+      "Description": "\u71C3\u6599\u3001\u7535\u6C60\u4E0E\u4F9B\u7535"
+    },
+    {
+      "Id": "logistics",
+      "Name": "\u6668\u661F\u7269\u6D41",
+      "Description": "\u8FD0\u8F93\u3001\u4ED3\u50A8\u4E0E\u4F9B\u5E94\u94FE"
+    },
+    {
+      "Id": "defense",
+      "Name": "\u5B89\u76FE\u9632\u52A1",
+      "Description": "\u6B66\u5668\u3001\u9632\u62A4\u4E0E\u5B89\u5168"
+    },
+    {
+      "Id": "materials",
+      "Name": "\u805A\u5408\u6750\u6599",
+      "Description": "\u5316\u5B66\u54C1\u4E0E\u5DE5\u4E1A\u6750\u6599"
+    }
+  ],
+  "Sectors": [
+    {
+      "Id": "food",
+      "Name": "\u98DF\u54C1\u3001\u519C\u4EA7\u54C1",
+      "ItemTypes": [
+        "food",
+        "agriculture"
+      ],
+      "Weights": {
+        "harvest": 0.65,
+        "commerce": 0.20,
+        "logistics": 0.15
+      }
+    },
+    {
+      "Id": "water",
+      "Name": "\u996E\u7528\u6C34\u3001\u6C34\u5904\u7406\u7528\u54C1",
+      "ItemTypes": [
+        "water",
+        "WATER_PURIFICATION_SUPPLY",
+        "FILTER"
+      ],
+      "Weights": {
+        "water": 0.65,
+        "harvest": 0.20,
+        "logistics": 0.15
+      }
+    },
+    {
+      "Id": "medical",
+      "Name": "\u836F\u54C1\u3001\u533B\u7597\u8017\u6750",
+      "ItemTypes": [
+        "medical",
+        "medicine"
+      ],
+      "Weights": {
+        "medical": 0.70,
+        "commerce": 0.20,
+        "logistics": 0.10
+      }
+    },
+    {
+      "Id": "tools",
+      "Name": "\u5DE5\u5177\u3001\u673A\u68B0",
+      "ItemTypes": [
+        "tool",
+        "tools",
+        "machine"
+      ],
+      "Weights": {
+        "industrial": 0.60,
+        "materials": 0.20,
+        "defense": 0.10,
+        "logistics": 0.10
+      }
+    },
+    {
+      "Id": "minerals",
+      "Name": "\u77FF\u77F3\u3001\u91D1\u5C5E\u3001\u5DE5\u4E1A\u6750\u6599",
+      "ItemTypes": [
+        "mineral",
+        "ore",
+        "metal",
+        "MATERIAL",
+        "BASIC_MATERIAL"
+      ],
+      "Weights": {
+        "industrial": 0.55,
+        "energy": 0.20,
+        "defense": 0.15,
+        "logistics": 0.10
+      }
+    },
+    {
+      "Id": "electronics",
+      "Name": "\u7535\u5B50\u3001\u6A21\u5757",
+      "ItemTypes": [
+        "electronic",
+        "electronics",
+        "module"
+      ],
+      "Weights": {
+        "technology": 0.50,
+        "energy": 0.20,
+        "industrial": 0.20,
+        "commerce": 0.10
+      }
+    },
+    {
+      "Id": "energy",
+      "Name": "\u71C3\u6599\u3001\u7535\u6C60",
+      "ItemTypes": [
+        "fuel",
+        "battery",
+        "energy",
+        "ENERGY_CELL"
+      ],
+      "Weights": {
+        "energy": 0.65,
+        "industrial": 0.20,
+        "logistics": 0.15
+      }
+    },
+    {
+      "Id": "materials",
+      "Name": "\u5316\u5B66\u54C1",
+      "ItemTypes": [
+        "chemical",
+        "substance",
+        "CHEMICAL_SUPPLIES"
+      ],
+      "Weights": {
+        "materials": 0.50,
+        "medical": 0.20,
+        "technology": 0.20,
+        "water": 0.10
+      }
+    },
+    {
+      "Id": "weapons",
+      "Name": "\u6B66\u5668\u3001\u9632\u62A4\u88C5\u5907",
+      "ItemTypes": [
+        "weapon",
+        "armor",
+        "protection"
+      ],
+      "Weights": {
+        "defense": 0.65,
+        "commerce": 0.20,
+        "technology": 0.15
+      }
+    },
+    {
+      "Id": "luxury",
+      "Name": "\u5962\u4F88\u54C1",
+      "ItemTypes": [
+        "luxury",
+        "LUXURY_ITEM"
+      ],
+      "Weights": {
+        "commerce": 0.75,
+        "logistics": 0.15,
+        "technology": 0.10
+      }
+    }
+  ],
+  "Events": [
+    {
+      "EventId": "badNutrifruitHarvest",
+      "Description": "\u8425\u517B\u679C\u6B49\u6536\uFF0C\u98DF\u54C1\u4F9B\u5E94\u627F\u538B",
+      "TrueHint": "\u98DF\u54C1\u4F9B\u5E94\u53EF\u80FD\u6536\u7D27\uFF0C\u76F8\u5173\u5546\u5BB6\u7684\u8FDB\u8D27\u538B\u529B\u6B63\u5728\u589E\u52A0",
+      "FalseHint": "\u98DF\u54C1\u4F9B\u5E94\u53EF\u80FD\u589E\u52A0\uFF0C\u76F8\u5173\u5546\u5BB6\u7684\u8FDB\u8D27\u538B\u529B\u6B63\u5728\u7F13\u89E3",
+      "Impacts": {
+        "harvest": -0.12,
+        "commerce": -0.05,
+        "logistics": -0.05
+      },
+      "Sectors": [
+        "food"
+      ]
+    },
+    {
+      "EventId": "bm_illegal_weapon_shipment",
+      "Description": "\u975E\u6CD5\u6B66\u5668\u8D27\u7269\u5230\u6E2F\uFF0C\u9632\u52A1\u5E02\u573A\u51FA\u73B0\u6CE2\u52A8",
+      "TrueHint": "\u4E00\u6279\u9632\u52A1\u7269\u8D44\u53EF\u80FD\u6D41\u5165\u5E02\u573A\uFF0C\u4F9B\u5E94\u6E20\u9053\u6B63\u5728\u6269\u5F20",
+      "FalseHint": "\u9632\u52A1\u7269\u8D44\u6D41\u901A\u53EF\u80FD\u6536\u7D27\uFF0C\u4F9B\u5E94\u6E20\u9053\u6B63\u5728\u6536\u7F29",
+      "Impacts": {
+        "defense": 0.10,
+        "commerce": 0.06,
+        "technology": 0.05
+      },
+      "Sectors": [
+        "weapons",
+        "electronics"
+      ]
+    },
+    {
+      "EventId": "rev_mobilization_secret",
+      "Description": "\u6B66\u5668\u9700\u6C42\u589E\u52A0",
+      "TrueHint": "\u6709\u7EC4\u7EC7\u6B63\u5728\u7B79\u96C6\u88C5\u5907\uFF0C\u76F8\u5173\u91C7\u8D2D\u89C4\u6A21\u53EF\u80FD\u6269\u5927",
+      "FalseHint": "\u6709\u7EC4\u7EC7\u6B63\u5728\u7F29\u51CF\u88C5\u5907\u91C7\u8D2D\uFF0C\u76F8\u5173\u8BA2\u5355\u89C4\u6A21\u53EF\u80FD\u56DE\u843D",
+      "Impacts": {
+        "defense": 0.12,
+        "industrial": 0.07,
+        "technology": 0.05
+      },
+      "Sectors": [
+        "weapons",
+        "minerals",
+        "electronics"
+      ]
+    }
+  ],
+  "Sellers": [
+    {
+      "Identifier": "shadyCustomerInformation",
+      "Faction": "",
+      "Identity": "\u60C5\u62A5\u5546",
+      "BaseReliability": 0.65,
+      "Sectors": []
+    },
+    {
+      "Identifier": "pharmacist",
+      "Faction": "",
+      "Identity": "\u836F\u5242\u5E08",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "medical",
+        "materials"
+      ]
+    },
+    {
+      "Identifier": "hospitalAdmin",
+      "Faction": "",
+      "Identity": "\u533B\u9662\u7BA1\u7406\u8005",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "medical"
+      ]
+    },
+    {
+      "Identifier": "clinicNurse",
+      "Faction": "",
+      "Identity": "\u8BCA\u6240\u62A4\u58EB",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "medical"
+      ]
+    },
+    {
+      "Identifier": "lowerLevelChemist",
+      "Faction": "",
+      "Identity": "\u5316\u5B66\u4ECE\u4E1A\u8005",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "materials"
+      ]
+    },
+    {
+      "Identifier": "farmerMinor",
+      "Faction": "",
+      "Identity": "\u519C\u4E1A\u4ECE\u4E1A\u8005",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "food"
+      ]
+    },
+    {
+      "Identifier": "miner",
+      "Faction": "",
+      "Identity": "\u77FF\u4E1A\u4ECE\u4E1A\u8005",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "minerals",
+        "energy"
+      ]
+    },
+    {
+      "Identifier": "minerMinor",
+      "Faction": "",
+      "Identity": "\u77FF\u4E1A\u4ECE\u4E1A\u8005",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "minerals"
+      ]
+    },
+    {
+      "Identifier": "iceMiner",
+      "Faction": "",
+      "Identity": "\u51B0\u77FF\u4ECE\u4E1A\u8005",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "water",
+        "minerals"
+      ]
+    },
+    {
+      "Identifier": "maintenanceWorker",
+      "Faction": "",
+      "Identity": "\u7EF4\u4FEE\u4ECE\u4E1A\u8005",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "tools",
+        "electronics",
+        "energy"
+      ]
+    },
+    {
+      "Identifier": "retired_water_merchant",
+      "Faction": "",
+      "Identity": "\u9000\u4F11\u6C34\u5546",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "water"
+      ]
+    },
+    {
+      "Identifier": "patrolOfficer",
+      "Faction": "",
+      "Identity": "\u5DE1\u903B\u8B66\u5458",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "weapons"
+      ]
+    },
+    {
+      "Identifier": "securityInspector",
+      "Faction": "",
+      "Identity": "\u5B89\u4FDD\u68C0\u67E5\u5458",
+      "BaseReliability": 0.75,
+      "Sectors": [
+        "weapons"
+      ]
+    },
+    {
+      "Identifier": "thief",
+      "Faction": "",
+      "Identity": "\u53EF\u7591\u6765\u6E90",
+      "BaseReliability": 0.30,
+      "Sectors": []
+    }
+  ]
+}

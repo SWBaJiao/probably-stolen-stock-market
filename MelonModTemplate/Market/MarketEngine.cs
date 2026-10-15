@@ -1,0 +1,303 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace MelonModTemplate.Market;
+
+public sealed class MarketEngine
+{
+    public static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true, Converters = { new JsonStringEnumConverter() } };
+    public MarketConfig Config { get; }
+    public MarketState State { get; private set; }
+    private bool _busy;
+    public Action<string>? Diagnostic { get; set; }
+
+    public MarketEngine(MarketConfig config, MarketState? state = null)
+    {
+        config.Validate();
+        Config = config;
+        State = state ?? new MarketState();
+        foreach (var c in config.Companies)
+        {
+            if (!State.Companies.ContainsKey(c.Id)) State.Companies[c.Id] = new CompanyState { Price = config.InitialPrice };
+            if (!State.Positions.ContainsKey(c.Id)) State.Positions[c.Id] = new Position();
+        }
+        ValidateState(State, config);
+    }
+
+    public string Serialize() => JsonSerializer.Serialize(State, JsonOptions);
+    public static MarketState Deserialize(string json, MarketConfig config)
+    {
+        var state = JsonSerializer.Deserialize<MarketState>(json, JsonOptions) ?? throw new ArgumentException("股市存档为空");
+        ValidateState(state, config);
+        return state;
+    }
+
+    private static void ValidateState(MarketState state, MarketConfig config)
+    {
+        if (state.Version != 1 || state.LastDay < -1 || state.RandomState == 0 || state.Companies == null || state.Positions == null || state.Sessions == null || state.ProcessedEvents == null || state.OccurredEvents == null || state.Rumors == null || state.OfferedSessions == null || state.Reputations == null || state.Ledger == null) throw new ArgumentException("股市存档版本或结构无效");
+        if (state.Companies.Any(x => x.Value == null || x.Value.Price < .01m || x.Value.Price > 10000000m || x.Value.DailyRetailImpact < 0 || x.Value.DailyRetailImpact > 1m || x.Value.History == null || x.Value.History.Any(p => p == null || p.Price < .01m)) || state.Positions.Any(x => x.Value == null || x.Value.Quantity < 0 || x.Value.Cost < 0 || !state.Companies.ContainsKey(x.Key))) throw new ArgumentException("股市存档行情或持仓无效");
+        if (state.Sessions.Any(x => x.Value == null || x.Value.TradeIds == null || x.Value.Signals == null || x.Value.Signals.Keys.Any(k => !state.Companies.ContainsKey(k))) || state.Reputations.Any(x => x.Value == null || x.Value.Correct < 0 || x.Value.Incorrect < 0) || state.Rumors.Any(x => x.Value == null || x.Key != x.Value.Id || x.Value.Price < 0 || x.Value.Reliability < .2m || x.Value.Reliability > .9m || x.Value.CompanyIds == null)) throw new ArgumentException("股市存档成交或情报无效");
+        // 持仓公司不能被配置删除，否则无法出售已有股份。
+        if (state.Positions.Any(x => x.Value.Quantity > 0 && !config.Companies.Any(c => c.Id == x.Key))) throw new ArgumentException("公司配置删除了仍有持仓的公司");
+    }
+
+    public Dictionary<string, decimal> GetWeights(IEnumerable<string> types)
+    {
+        var tags = types.Where(x => !string.IsNullOrWhiteSpace(x)).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var matches = Config.Sectors.Where(s => s.ItemTypes.Any(tags.Contains)).ToList();
+        var result = new Dictionary<string, decimal>();
+        foreach (var sector in matches)
+            foreach (var w in sector.Weights) result[w.Key] = result.GetValueOrDefault(w.Key) + w.Value / matches.Count;
+        if (matches.Count == 0) Diagnostic?.Invoke("未映射商品类型：" + string.Join(",", tags));
+        return result;
+    }
+
+    public bool RecordTrade(string sessionId, string tradeId, IEnumerable<string> types, decimal signedValue)
+    {
+        if (string.IsNullOrWhiteSpace(sessionId) || string.IsNullOrWhiteSpace(tradeId) || signedValue == 0) return false;
+        if (!State.Sessions.TryGetValue(sessionId, out var session)) State.Sessions[sessionId] = session = new CustomerSession();
+        if (session.Closed || !session.TradeIds.Add(tradeId)) return false;
+        foreach (var w in GetWeights(types)) session.Signals[w.Key] = session.Signals.GetValueOrDefault(w.Key) + Math.Clamp(signedValue, -int.MaxValue, int.MaxValue) * w.Value;
+        return true;
+    }
+
+    public bool CloseCustomer(string sessionId)
+    {
+        if (string.IsNullOrWhiteSpace(sessionId)) return false;
+        if (!State.Sessions.TryGetValue(sessionId, out var session)) State.Sessions[sessionId] = session = new CustomerSession();
+        if (session.Closed) return false;
+        session.Closed = true;
+        foreach (var signal in session.Signals)
+        {
+            var company = State.Companies[signal.Key];
+            var impact = Config.CustomerLimit * signal.Value / (Config.SignalScale + Math.Abs(signal.Value));
+            var remaining = Math.Max(0, Config.RetailDailyLimit - company.DailyRetailImpact);
+            impact = Math.Clamp(impact, -remaining, remaining);
+            company.DailyRetailImpact += Math.Abs(impact);
+            MovePrice(signal.Key, impact, "顾客成交结算");
+        }
+        foreach (var rumor in State.Rumors.Values.Where(x => x.SessionId == sessionId && !x.Purchased)) rumor.Expired = true;
+        if (session.Signals.Any(x => x.Value != 0)) Log("customer", "顾客遣散，已按商品交叉权重结算行情。");
+        return true;
+    }
+
+    public bool AdvanceDay(int day)
+    {
+        if (day < 0 || day <= State.LastDay) return false;
+        // 首次接入只对当前一天推进，不模拟接入前的历史。
+        var first = State.LastDay < 0 ? day : State.LastDay + 1;
+        if ((long)day - first > 10000) throw new ArgumentException("游戏日期跨度异常");
+        for (var d = first; d <= day; d++)
+        {
+            State.LastDay = d;
+            foreach (var company in Config.Companies)
+            {
+                var s = State.Companies[company.Id];
+                s.DailyRetailImpact = 0;
+                var noise = (NextRandom() * 2m - 1m) * Config.DailyLimit * .75m;
+                var reversion = (Config.InitialPrice / s.Price - 1m) * .01m;
+                MovePrice(company.Id, Math.Clamp(noise + reversion, -Config.DailyLimit, Config.DailyLimit), "每日行情");
+            }
+        }
+        Log("day", $"第 {day} 日行情已更新。");
+        return true;
+    }
+
+    public bool ActivateEvent(string eventId, string occurrenceKey, int day, bool isPublic = true)
+    {
+        if (string.IsNullOrWhiteSpace(eventId) || string.IsNullOrWhiteSpace(occurrenceKey)) return false;
+        var key = EventKey(eventId, occurrenceKey);
+        if (!State.ProcessedEvents.Add(key)) return false;
+        State.OccurredEvents.Add(key);
+        var rule = Config.Events.FirstOrDefault(x => x.EventId == eventId);
+        if (rule != null)
+        {
+            foreach (var impact in rule.Impacts) MovePrice(impact.Key, impact.Value, isPublic ? rule.Description : "市场异动");
+            if (isPublic) Log("event", string.IsNullOrEmpty(rule.Description) ? "公开事件已影响关联公司。" : rule.Description);
+        }
+        else Diagnostic?.Invoke("未映射事件标识：" + eventId);
+        ResolveOccurredRumors();
+        return true;
+    }
+
+    public SellerProfile MatchSeller(string identifier, string faction, string name, bool personalIdentity = false)
+    {
+        var rule = Config.Sellers.FirstOrDefault(x => x.Identifier == identifier && x.Identifier.Length > 0) ?? Config.Sellers.FirstOrDefault(x => x.Identifier.Length == 0 && x.Faction == faction && faction.Length > 0);
+        return new SellerProfile { Key = personalIdentity ? "person:" + identifier : "type:" + identifier + ":" + faction, Name = name, Identity = rule?.Identity ?? "普通顾客", BaseReliability = rule?.BaseReliability ?? .5m, Sectors = rule?.Sectors.ToList() ?? new(), IsGroupIdentity = !personalIdentity };
+    }
+
+    public RumorView? CreateRumorOffer(string sessionId, SellerProfile seller, IReadOnlyList<ScheduledEvent> scheduled)
+    {
+        if (State.Rumors.TryGetValue(sessionId, out var existing)) return View(existing);
+        if (string.IsNullOrWhiteSpace(sessionId) || string.IsNullOrWhiteSpace(seller.Key) || State.Sessions.TryGetValue(sessionId, out var session) && session.Closed || !State.OfferedSessions.Add(sessionId)) return null;
+        var candidates = scheduled.Where(e => e.Day > State.LastDay && e.Day <= State.LastDay + Config.RumorHorizon && !State.OccurredEvents.Contains(EventKey(e.EventId, e.OccurrenceKey)))
+            .Select(e => (scheduled: e, rule: Config.Events.FirstOrDefault(x => x.EventId == e.EventId)))
+            .Where(x => x.rule != null && x.rule.Impacts.Count > 0 && (seller.Sectors.Count == 0 || x.rule.Sectors.Any(seller.Sectors.Contains)))
+            .OrderBy(x => x.scheduled.Day).ThenBy(x => x.scheduled.EventId, StringComparer.Ordinal).ToList();
+        if (candidates.Count == 0) return null;
+        var selected = candidates[(int)(NextRandom() * candidates.Count)];
+        var related = selected.rule!.Sectors.Any(seller.Sectors.Contains);
+        var prior = Math.Clamp(seller.BaseReliability + (related ? .1m : 0m), .2m, .9m);
+        var rep = Reputation(seller.Key);
+        var reliability = Math.Clamp((prior * 10m + rep.Correct) / (10m + rep.Correct + rep.Incorrect), .2m, .9m);
+        var predictsOccurrence = NextRandom() < reliability;
+        var companies = selected.rule.Impacts.Keys.ToList();
+        var names = string.Join("、", companies.Select(id => Config.Companies.First(x => x.Id == id).Name));
+        var offer = new RumorOffer { Id = sessionId, SessionId = sessionId, SellerKey = seller.Key, SellerName = seller.Name, Identity = seller.Identity, IsGroupIdentity = seller.IsGroupIdentity, Reliability = reliability, PriorReliability = prior, Price = Config.RumorPrice, DueDay = selected.scheduled.Day, WindowEndDay = State.LastDay + Config.RumorHorizon, EventId = selected.scheduled.EventId, OccurrenceKey = selected.scheduled.OccurrenceKey, PredictsOccurrence = predictsOccurrence, CompanyIds = companies, Content = $"有人透露，未来数日{BuildRumorHint(selected.rule, predictsOccurrence)}；{names} 或受波及。" };
+        State.Rumors.Add(sessionId, offer);
+        return View(offer);
+    }
+
+    public IReadOnlyList<RumorView> GetRumors() => State.Rumors.Values.Where(x => x.Purchased || !x.Expired).Select(View).ToList();
+    public string BuildRumorHint(EventRule rule, bool correct)
+    {
+        // 真伪使用同样的陈述形式，不通过固定的否定句或真实事件标题泄露答案。
+        var configured = correct ? rule.TrueHint : rule.FalseHint;
+        if (!string.IsNullOrWhiteSpace(configured)) return configured;
+        var sectors = string.Join("、", Config.Sectors.Where(s => rule.Sectors.Contains(s.Id)).Select(s => s.Name));
+        if (sectors.Length == 0) sectors = "相关行业";
+        var direction = rule.Impacts.Values.Sum();
+        if (direction == 0) direction = rule.Impacts.Values.FirstOrDefault(v => v != 0);
+        var rising = direction >= 0;
+        if (!correct) rising = !rising;
+        return $"{sectors}相关公司行情可能{(rising ? "走强" : "走弱")}";
+    }
+    public void ResolveRumors(IReadOnlyList<ScheduledEvent> stillScheduled)
+    {
+        ResolveOccurredRumors();
+        foreach (var rumor in State.Rumors.Values.Where(x => x.Purchased && x.Resolution == RumorResolution.Pending))
+        {
+            // 未实际发生的计划事件只能记为未验证，取消不惩罚售卖者。
+            if (State.LastDay > rumor.DueDay && !stillScheduled.Any(e => e.EventId == rumor.EventId && e.OccurrenceKey == rumor.OccurrenceKey)) rumor.Resolution = RumorResolution.Unverified;
+        }
+    }
+
+    private void ResolveOccurredRumors()
+    {
+        foreach (var rumor in State.Rumors.Values.Where(x => x.Purchased && x.Resolution == RumorResolution.Pending && State.OccurredEvents.Contains(EventKey(x.EventId, x.OccurrenceKey))))
+        {
+            rumor.Resolution = rumor.PredictsOccurrence ? RumorResolution.True : RumorResolution.False;
+            var rep = Reputation(rumor.SellerKey);
+            if (rumor.PredictsOccurrence) rep.Correct++; else rep.Incorrect++;
+        }
+    }
+    private RumorView View(RumorOffer offer)
+    {
+        var rep = Reputation(offer.SellerKey);
+        return new RumorView { Id = offer.Id, SellerName = offer.SellerName, Identity = offer.Identity, IsGroupIdentity = offer.IsGroupIdentity, Price = offer.Price, Reliability = offer.Reliability, Correct = rep.Correct, Incorrect = rep.Incorrect, Purchased = offer.Purchased, Expired = offer.Expired, DueDay = offer.Purchased ? offer.WindowEndDay : 0, Content = offer.Purchased ? offer.Content : "购买后查看线索", CompanyIds = offer.Purchased ? offer.CompanyIds.ToList() : new(), Resolution = offer.Purchased ? offer.Resolution : RumorResolution.Pending };
+    }
+    private SellerReputation Reputation(string key)
+    {
+        if (!State.Reputations.TryGetValue(key, out var r)) State.Reputations[key] = r = new SellerReputation();
+        return r;
+    }
+
+    public OrderQuote QuoteOrder(string companyId, OrderSide side, int quantity, int cash)
+    {
+        var quote = new OrderQuote { CompanyId = companyId, Side = side, Quantity = quantity };
+        if (!State.StorageVerified || State.TradingFrozen) { quote.Message = State.TradingFrozen ? State.FreezeReason : "请先保存并重新读取存档，验证投资状态持久化。"; return quote; }
+        if (side != OrderSide.Buy && side != OrderSide.Sell || quantity <= 0 || !State.Companies.TryGetValue(companyId, out var company) || !Config.Companies.Any(c => c.Id == companyId)) { quote.Message = "公司或交易数量无效。"; return quote; }
+        quote.UnitPrice = company.Price;
+        var gross = company.Price * quantity;
+        quote.Fee = Math.Max(Config.MinimumFee, gross * Config.FeeRate);
+        var total = side == OrderSide.Buy ? -decimal.Ceiling(gross + quote.Fee) : decimal.Floor(gross - quote.Fee);
+        if (total < int.MinValue || total > int.MaxValue || total == int.MinValue) { quote.Message = "订单金额超出游戏资金范围。"; return quote; }
+        quote.CashDelta = (int)total;
+        if (side == OrderSide.Sell && total <= 0) { quote.Message = "卖出收入不足以支付手续费，请增加数量。"; return quote; }
+        if (side == OrderSide.Sell && State.Positions[companyId].Quantity < quantity) { quote.Message = "可卖持仓不足。"; return quote; }
+        if ((long)cash + quote.CashDelta < 0 || (long)cash + quote.CashDelta > int.MaxValue) { quote.Message = "余额不足或资金超出上限。"; return quote; }
+        if (side == OrderSide.Buy && (long)State.Positions[companyId].Quantity + quantity > int.MaxValue) { quote.Message = "持仓数量超出上限。"; return quote; }
+        quote.Success = true; quote.Message = "报价有效"; return quote;
+    }
+
+    public OperationResult PlaceOrder(string companyId, OrderSide side, int quantity, IWallet wallet, Action persist)
+    {
+        var quote = QuoteOrder(companyId, side, quantity, wallet.Cash);
+        if (!quote.Success) return OperationResult.Fail(quote.Message);
+        return Transact(wallet, quote.CashDelta, persist, () =>
+        {
+            var position = State.Positions[companyId];
+            if (side == OrderSide.Buy) { position.Quantity += quantity; position.Cost -= quote.CashDelta; }
+            else { var releasedCost = position.Cost * quantity / position.Quantity; position.Quantity -= quantity; position.Cost -= releasedCost; position.RealizedProfit += quote.CashDelta - releasedCost; }
+            Log(side == OrderSide.Buy ? "buy" : "sell", $"{(side == OrderSide.Buy ? "买入" : "卖出")} {Config.Companies.First(c => c.Id == companyId).Name} {quantity} 股", companyId, quantity, quote.CashDelta);
+        });
+    }
+    public OperationResult BuyRumor(string id, IWallet wallet, Action persist)
+    {
+        if (!State.StorageVerified || State.TradingFrozen) return OperationResult.Fail("存档尚未验证，或交易已冻结。");
+        if (!State.Rumors.TryGetValue(id, out var offer) || offer.Purchased || offer.Expired) return OperationResult.Fail("该情报不可购买。");
+        if (wallet.Cash < offer.Price) return OperationResult.Fail("余额不足。");
+        return Transact(wallet, -offer.Price, persist, () => { offer.Purchased = true; Log("rumor", $"向 {offer.SellerName} 购买内幕", "", 0, -offer.Price); ResolveOccurredRumors(); });
+    }
+
+    private OperationResult Transact(IWallet wallet, int delta, Action persist, Action mutate)
+    {
+        if (_busy) return OperationResult.Fail("上一笔交易尚未完成。");
+        _busy = true;
+        string? snapshot = null;
+        var initialCash = 0;
+        var cashTouched = false;
+        try
+        {
+            snapshot = Serialize();
+            initialCash = wallet.Cash;
+            mutate();
+            // 先确认完整状态可序列化，再接触原版资金。
+            _ = Serialize();
+            cashTouched = true;
+            wallet.ChangeCash(delta);
+            if ((long)wallet.Cash != (long)initialCash + delta) throw new InvalidOperationException("游戏资金变更结果不符");
+            persist();
+            return OperationResult.Ok("交易成功。");
+        }
+        catch (Exception ex)
+        {
+            if (snapshot == null) return OperationResult.Fail("交易准备失败：" + ex.Message);
+            State = Deserialize(snapshot, Config);
+            try
+            {
+                if (cashTouched)
+                {
+                    var adjustment = (long)initialCash - wallet.Cash;
+                    if (adjustment < int.MinValue || adjustment > int.MaxValue) throw new InvalidOperationException("资金补偿超出范围");
+                    if (adjustment != 0) wallet.ChangeCash((int)adjustment);
+                    if (wallet.Cash != initialCash) throw new InvalidOperationException("资金补偿未完成");
+                }
+                persist();
+            }
+            catch (Exception rollback)
+            {
+                State.TradingFrozen = true;
+                State.FreezeReason = "资金或存档补偿失败，请停止交易并检查日志：" + rollback.Message;
+                try { persist(); } catch { /* 保留内存冻结状态，避免继续下单。 */ }
+            }
+            return OperationResult.Fail("交易失败并已尝试恢复：" + ex.Message + (State.TradingFrozen ? "；" + State.FreezeReason : ""));
+        }
+        finally { _busy = false; }
+    }
+
+    private void MovePrice(string id, decimal change, string reason)
+    {
+        var c = State.Companies[id];
+        c.Price = Math.Clamp(decimal.Round(c.Price * (1m + change), 2, MidpointRounding.AwayFromZero), .01m, 10000000m);
+        c.History.Add(new PricePoint { Day = State.LastDay, Price = c.Price, Reason = reason });
+        if (c.History.Count > Config.HistoryLimit) c.History.RemoveRange(0, c.History.Count - Config.HistoryLimit);
+    }
+    private void Log(string kind, string text, string company = "", int quantity = 0, int cashDelta = 0)
+    {
+        State.Ledger.Add(new LedgerEntry { Day = State.LastDay, Kind = kind, Description = text, CompanyId = company, Quantity = quantity, CashDelta = cashDelta });
+        if (State.Ledger.Count > Config.LedgerLimit) State.Ledger.RemoveRange(0, State.Ledger.Count - Config.LedgerLimit);
+    }
+    private decimal NextRandom()
+    {
+        // 显式保存随机状态，保证读档后不会重新抽取行情和情报。
+        var x = State.RandomState;
+        x ^= x << 13; x ^= x >> 7; x ^= x << 17;
+        State.RandomState = x;
+        return (x >> 11) / 9007199254740992m;
+    }
+    private static string EventKey(string eventId, string occurrenceKey) => eventId.Length + ":" + eventId + ":" + occurrenceKey;
+}

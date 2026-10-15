@@ -1,0 +1,395 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using HarmonyLib;
+using Il2Cpp;
+using MelonLoader;
+using MelonModTemplate.Contracts;
+using MelonModTemplate.Market;
+
+namespace MelonModTemplate.Game;
+
+public sealed class GameBridge : IMarketHost, IWallet, IDisposable
+{
+    private const string SaveKey = "probably_stolen.stock_market.v1";
+    private const string TerminalName = "股市面板";
+    private readonly MelonLogger.Instance _log;
+    private readonly MarketConfig _config;
+    private readonly TerminalVisual _terminalVisual;
+    private readonly int _threadId = Environment.CurrentManagedThreadId;
+    private HarmonyLib.Harmony? _harmony;
+    private PlayerStore? _store;
+    private AdapterSave _save = new();
+    private string _identity = "";
+    private string _fault = "";
+    private bool _disposed;
+    private bool _monetaryOperation;
+    private bool _loadedPending;
+    private bool _loading;
+    private bool _inMenu = true;
+    private IntPtr _loadDictionaryPointer;
+    private IntPtr _dismissPending;
+    private IntPtr _clientPointer;
+    private long _nextPoll;
+    private long _nextTerminalScan;
+    private RumorView? _offer;
+    internal static GameBridge? Current { get; private set; }
+    public MarketEngine? Engine { get; private set; }
+    public event Action? OpenPanelRequested;
+    public Func<bool>? IsPanelVisible { get; set; }
+    internal bool BlocksGameInput => IsPanelVisible?.Invoke() == true;
+    public int Cash => _store?.GetCash() ?? 0;
+    public bool CanTrade => !_disposed && !_inMenu && !_loading && Engine != null && Engine.State.StorageVerified && !Engine.State.TradingFrozen && _fault.Length == 0 && IsCurrentStore();
+    public string Status => _fault.Length > 0 ? _fault : Engine == null ? "请进入游戏存档。" : !Engine.State.StorageVerified ? "存档探针待验证：请正常保存并重新载入此存档，验证后开放现金交易。" : Engine.State.TradingFrozen ? Engine.State.FreezeReason : "原版存档读回及资金一致性已通过；可交易。";
+    public string SellerDescription { get; private set; } = "当前没有顾客";
+    public string SellerReputation => _offer == null ? "暂无可验证情报记录" : $"{_offer.Identity} · {(_offer.IsGroupIdentity ? "该类来源" : "个人")}记录：属实 {_offer.Correct} / 失实 {_offer.Incorrect} · 参考可信度 {_offer.Reliability:P0}";
+    public string OfferDescription => _offer == null ? "当前顾客没有可出售的关联情报。" : _offer.Purchased ? _offer.Content : $"{_offer.Identity} 提供一条行业线索，当前顾客离开前可购买；购后查看时间和行业。";
+    public int? OfferCost => _offer?.Price;
+    public bool CanBuyRumor => CanTrade && _offer is { Purchased: false, Expired: false } && Cash >= _offer.Price;
+
+    public GameBridge(MelonLogger.Instance logger, MarketConfig config) { _log = logger; _config = config; _terminalVisual = new TerminalVisual(logger); }
+
+    public void Initialize(HarmonyLib.Harmony harmony)
+    {
+        if (Current != null) throw new InvalidOperationException("游戏适配器已初始化。");
+        Current = this; _harmony = harmony;
+        try { GamePatches.Install(harmony, _log); }
+        catch { GamePatches.Uninstall(harmony); Current = null; throw; }
+        _log.Msg("[股市探针] 已安装适配钩子；未运行游戏验收前不视为适配成功。");
+    }
+
+    public void Tick()
+    {
+        if (_disposed || Environment.CurrentManagedThreadId != _threadId || Environment.TickCount64 < _nextPoll) return;
+        _nextPoll = Environment.TickCount64 + 1000;
+        try
+        {
+            if (_inMenu || _loading || !PlayerStore.IsInstanceExist()) return;
+            var store = PlayerStore.Instance;
+            if (store == null || store.gridInv == null) return;
+            string identity = $"{store.saveSlotId}:{store.runID}:{store.runNumber}";
+            if (_store == null || _identity != identity || _loadedPending)
+            {
+                bool actualLoad = _loadedPending; _loadedPending = false;
+                Attach(store, identity, actualLoad);
+            }
+            RefreshCustomer();
+            if (Engine != null)
+            {
+                if (Engine.AdvanceDay(StoreStation.GetDayCounter())) Persist();
+                Engine.ResolveRumors(ScheduledEvents());
+                Persist();
+                if (!Engine.State.TerminalGranted || Environment.TickCount64 >= _nextTerminalScan)
+                { _nextTerminalScan = Environment.TickCount64 + 10000; RecoverTerminal(); }
+            }
+        }
+        catch (Exception ex) { Fault("游戏适配异常", ex); }
+    }
+
+    private void Attach(PlayerStore store, string identity, bool actualLoad)
+    {
+        _store = store; _identity = identity; _fault = ""; _offer = null;
+        bool restored = false;
+        if (store.modData != null && store.modData.ContainsKey(SaveKey))
+        {
+            var serialized = store.modData[SaveKey];
+            _save = JsonSerializer.Deserialize<AdapterSave>(serialized) ?? throw new InvalidOperationException("股市存档为空。");
+            if (_save.Version != 1 || _save.SaveIdentity != identity) throw new InvalidOperationException("股市存档版本或身份不匹配，已关闭交易。");
+            Engine = new MarketEngine(MarketConfig.Deserialize(_config.Serialize()), MarketEngine.Deserialize(_save.MarketJson, _config));
+            bool freshDictionary = _loadDictionaryPointer == IntPtr.Zero || store.modData.Pointer != _loadDictionaryPointer;
+            restored = actualLoad && freshDictionary && _save.WrittenBySave && !string.IsNullOrWhiteSpace(_save.ProbeNonce) && _save.SavedCash == store.GetCash();
+        }
+        else
+        {
+            _save = new AdapterSave { SaveIdentity = identity };
+            Engine = new MarketEngine(MarketConfig.Deserialize(_config.Serialize()));
+            Engine.State.SaveIdentity = identity;
+        }
+        // 每次载入均重新核实现金，不能仅相信之前保存的解锁布尔值。
+        Engine.Diagnostic += message => _log.Warning("[股市映射] " + message);
+        Engine.State.StorageVerified = restored;
+        if (actualLoad && _save.WrittenBySave && _save.SavedCash != store.GetCash())
+            _log.Warning($"[股市探针] 读回现金不匹配：记录 {_save.SavedCash}，当前 {store.GetCash()}，继续关闭交易。");
+        Engine.AdvanceDay(StoreStation.GetDayCounter());
+        var manager = StoreStation.Instance?.storeEventManager;
+        if (manager != null) foreach (var active in manager.GetActiveEvents()) EventActivated(manager, active, false);
+        _log.Msg($"[股市背包探针] gridInv.identifier={store.gridInv.identifier}，childItems={store.gridInv.childItems.Count}");
+        _log.Msg($"[股市探针] 存档 {identity}，原版 LoadGame={actualLoad}，nonce={_save.ProbeNonce}，读回验证={restored}，cash={store.GetCash()}");
+        Persist();
+    }
+
+    internal void BeginLoad()
+    {
+        _terminalVisual.ResetTracking();
+        _loadDictionaryPointer = _store?.modData?.Pointer ?? IntPtr.Zero;
+        _loading = true; _offer = null; _store = null; Engine = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero;
+    }
+    public void OnSceneChanged(string sceneName)
+    {
+        _inMenu = sceneName.IndexOf("Menu", StringComparison.OrdinalIgnoreCase) >= 0;
+        if (_inMenu) { _terminalVisual.ResetTracking(); _store = null; Engine = null; _offer = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero; }
+        _nextPoll = 0;
+    }
+    internal void EndLoad(bool success)
+    {
+        _loading = false; _loadedPending = success; _nextPoll = 0;
+        if (!success) _fault = "原版载入异常，股市未启用。";
+    }
+    internal void BeforeSave()
+    {
+        try
+        {
+            if (_store == null || Engine == null || _loading) return;
+            _terminalVisual.RestoreForSave();
+            _save.WrittenBySave = true; _save.SavedCash = Cash;
+            Persist();
+            _log.Msg($"[股市探针] 原版保存前写入 nonce={_save.ProbeNonce}，cash={Cash}，terminal={_save.TerminalItemId}");
+        }
+        catch (Exception ex) { Fault("股市保存准备失败", ex); }
+    }
+    internal void SaveCompleted(bool success)
+    {
+        _terminalVisual.ResumeAfterSave();
+        if (!success) { _save.WrittenBySave = false; _log.Error("[股市探针] 原版 SaveGame 抛出异常，本次保存不能用于解锁。"); }
+        else _log.Msg("[股市探针] 原版 SaveGame 无异常返回；需要随后 LoadGame 读回新的字典与相同现金，才开放交易。");
+    }
+
+    private void Persist()
+    {
+        if (_store == null || Engine == null) throw new InvalidOperationException("未附加存档。");
+        if (_store.modData == null) _store.modData = new Il2CppSystem.Collections.Generic.Dictionary<string, string>();
+        _save.MarketJson = Engine.Serialize();
+        string json = JsonSerializer.Serialize(_save);
+        _store.modData[SaveKey] = json;
+        if (_store.modData[SaveKey] != json) throw new InvalidOperationException("modData 内存写回失败。");
+    }
+
+    public string PlaceOrder(string companyId, int quantity, bool buy) => Monetary(() => Engine!.PlaceOrder(companyId, buy ? OrderSide.Buy : OrderSide.Sell, quantity, this, Persist).Message);
+    public string BuyRumor()
+    {
+        if (!IsCurrentStore()) return "存档正在切换，请稍后重试。";
+        RefreshCustomer();
+        if (_offer == null) return "当前没有可购买的情报。";
+        string result = Monetary(() => Engine!.BuyRumor(_offer.Id, this, Persist).Message);
+        RefreshOffer(); return result;
+    }
+    private string Monetary(Func<string> action)
+    {
+        if (!CanTrade) return Status;
+        if (Environment.CurrentManagedThreadId != _threadId || _monetaryOperation) return "操作繁忙，请稍后再试。";
+        _monetaryOperation = true;
+        try { return action(); }
+        catch (Exception ex) { Fault("现金操作异常，交易已冻结", ex); return Status; }
+        finally { _monetaryOperation = false; }
+    }
+    private bool IsCurrentStore()
+    {
+        if (_store == null || !PlayerStore.IsInstanceExist()) return false;
+        var current = PlayerStore.Instance;
+        return current != null && current.Pointer == _store.Pointer && $"{current.saveSlotId}:{current.runID}:{current.runNumber}" == _identity;
+    }
+    public void ChangeCash(int delta)
+    {
+        if (!_monetaryOperation || _store == null) throw new InvalidOperationException("禁止在订单之外修改现金。");
+        int before = _store.GetCash();
+        int expected = checked(before + delta);
+        if (expected < 0) throw new InvalidOperationException("余额不足。");
+        _store.ModCash(delta, false);
+        if (_store.GetCash() != expected) throw new InvalidOperationException("原版资金接口返回金额与预期不一致。");
+        _log.Msg($"[股市资金] {before} -> {expected}，delta={delta}");
+    }
+
+    private StoreClient? Client => _store?.currentClientInstance?.GetClientBlueprint();
+    private void RefreshCustomer()
+    {
+        var client = Client;
+        var pointer = _store?.currentClientInstance?.Pointer ?? IntPtr.Zero;
+        if (_dismissPending != IntPtr.Zero && pointer != _dismissPending) { SettleSession(); _dismissPending = IntPtr.Zero; }
+        if (_clientPointer != IntPtr.Zero && pointer != _clientPointer && !_save.SessionClosed) SettleSession();
+        if (client == null) { SellerDescription = "当前没有顾客"; _offer = null; _clientPointer = IntPtr.Zero; return; }
+        string key = $"{client.identifier}|{client.clientFaction}";
+        if (_save.SessionId.Length == 0 || _save.ClientKey != key || _save.SessionClosed)
+        {
+            _save.SessionSequence++; _save.ClientKey = key; _save.SessionClosed = false;
+            _save.SessionId = $"{_identity}:{StoreStation.GetDayCounter()}:{_save.SessionSequence}";
+            _log.Msg($"[股市顾客] session={_save.SessionId} id={client.identifier} faction={client.clientFaction} tags={string.Join(",", Strings(client.tag))}");
+            Persist();
+        }
+        SellerDescription = $"{client.displayName} · {client.identifier} · {client.clientFaction}";
+        _clientPointer = pointer;
+        RefreshOffer();
+    }
+    private void RefreshOffer()
+    {
+        var client = Client;
+        if (Engine == null || client == null || _save.SessionClosed) { _offer = null; return; }
+        var rule = _config.Sellers.FirstOrDefault(r => (!string.IsNullOrEmpty(r.Identifier) && r.Identifier == client.identifier) || (string.IsNullOrEmpty(r.Identifier) && !string.IsNullOrEmpty(r.Faction) && r.Faction == client.clientFaction));
+        var sectors = new List<string>();
+        var types = Strings(client.clientBuyingTagList).Concat(Strings(client.tag)).Append(client.attractedType ?? "").ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var sector in _config.Sectors) if (sector.ItemTypes.Any(types.Contains)) sectors.Add(sector.Id);
+        var seller = new SellerProfile
+        {
+            Key = $"type:{client.identifier}|{client.clientFaction}", Name = client.displayName ?? client.identifier,
+            Identity = rule?.Identity ?? "普通顾客", BaseReliability = rule?.BaseReliability ?? .50m,
+            Sectors = rule?.Sectors?.Count > 0 ? rule.Sectors : sectors, IsGroupIdentity = true
+        };
+        var offer = Engine.CreateRumorOffer(_save.SessionId, seller, ScheduledEvents());
+        if (_offer?.Id != offer?.Id) { _offer = offer; Persist(); } else _offer = offer;
+    }
+    private IReadOnlyList<ScheduledEvent> ScheduledEvents()
+    {
+        var result = new List<ScheduledEvent>();
+        var manager = StoreStation.Instance?.storeEventManager;
+        if (manager?.futurEvents == null || manager.futurEventsDay == null) return result;
+        for (int i = 0; i < Math.Min(manager.futurEvents.Count, manager.futurEventsDay.Count); i++)
+        {
+            var e = manager.futurEvents[i]; int day = e != null && e.startDay > 0 ? e.startDay : StoreStation.GetDayCounter() + manager.futurEventsDay[i];
+            if (e != null)
+            {
+                EnsureEventRule(e);
+                result.Add(new ScheduledEvent { EventId = e.identifier, Day = day, OccurrenceKey = Occurrence(e.identifier, day) });
+            }
+        }
+        return result;
+    }
+    private static string Occurrence(string eventId, int day) => $"{eventId}:{day}";
+    private void EnsureEventRule(StoreEvent ev)
+    {
+        if (Engine == null || ev.negociationDatas == null) return;
+        var modifiers = new List<CommodityPriceModifier>();
+        foreach (var modifier in ev.negociationDatas)
+            if (modifier != null)
+                modifiers.Add(new CommodityPriceModifier { ItemType = modifier.itemType, Percent = modifier.value });
+        EventImpactResolver.EnsureRule(Engine, ev.identifier, modifiers);
+    }
+    internal void EventActivated(StoreEventManager manager, StoreEvent ev, bool wasActive)
+    {
+        try
+        {
+            if (Engine == null || wasActive || !manager.IsEventActive(ev)) return;
+            int day = StoreStation.GetDayCounter();
+            Engine.AdvanceDay(day);
+            EnsureEventRule(ev);
+            // 隐藏事件可以影响价格，但公开界面仅显示市场异动。
+            bool isPublic = !ev.isHidden && ev.IsKnown && !ev.isHiddenFromNewsPaper;
+            bool applied = Engine.ActivateEvent(ev.identifier, Occurrence(ev.identifier, ev.startDay > 0 ? ev.startDay : day), day, isPublic);
+            _log.Msg($"[股市事件] id={ev.identifier} day={day} applied={applied}"); Persist();
+        }
+        catch (Exception ex) { Fault("事件适配失败", ex); }
+    }
+
+    public string RecoverTerminal()
+    {
+        if (_store == null || Engine == null) return "请先进入存档。";
+        try
+        {
+            foreach (var item in _store.FindAllItem(true))
+                if (IsTerminal(item)) { item.SetName(TerminalName); _terminalVisual.Apply(item); Engine.State.TerminalGranted = true; return "股市面板已在物品栏中。"; }
+            var terminal = DirectoryMaster.Item("postit", true);
+            if (terminal == null) return "原版便笺工厂不可用，稍后重试。";
+            terminal.SetName(TerminalName); terminal.SetUnitCount(1);
+            if (_store.gridInv == null || !_store.gridInv.MayHaveValidInventorySlot(terminal) || _store.gridInv.TryFindOneValidInventorySlot(terminal) == null) { terminal.Destroy(); return "物品栏空间不足，稍后自动重试。"; }
+            GraphUtils.TryAcceptAllMid(_store.gridInv, terminal);
+            if (terminal.parentInventory == null) { terminal.Destroy(); return "物品栏暂时无法接收道具。"; }
+            _save.TerminalItemId = terminal.uniqueId; _terminalVisual.Apply(terminal); Engine.State.TerminalGranted = true; Persist();
+            _log.Msg($"[股市道具] 原生 postit 已赠送 uniqueId={terminal.uniqueId}，请验证双击与保存恢复。");
+            return "已赠送股市面板。";
+        }
+        catch (Exception ex) { _log.Warning($"[股市道具] 延后赠送：{ex.Message}"); return "道具尚未就绪，将延后重试。"; }
+    }
+    internal bool IsTerminal(GameItem? item) => _store != null && item != null && _save.TerminalItemId >= 0 && item.identifier == "postit" && item.uniqueId == _save.TerminalItemId;
+    internal bool OpenTerminal(GameItem item)
+    {
+        if (!IsTerminal(item)) return false;
+        OpenPanelRequested?.Invoke(); return true;
+    }
+    internal void Dismissed(IntPtr previousPointer)
+    {
+        try
+        {
+            if (_store == null || Engine == null || previousPointer == IntPtr.Zero || _save.SessionClosed) return;
+            if (_store.currentClientInstance?.Pointer == previousPointer) { _dismissPending = previousPointer; _log.Msg("[股市探针] 遣散后实例尚未移除，延后至下一次顾客变化结算。"); return; }
+            SettleSession();
+        }
+        catch (Exception ex) { Fault("遣散结算失败", ex); }
+    }
+    private void SettleSession()
+    {
+        if (Engine == null || _save.SessionClosed || _save.SessionId.Length == 0) return;
+        Engine.AdvanceDay(StoreStation.GetDayCounter());
+        Engine.CloseCustomer(_save.SessionId); _save.SessionClosed = true; _offer = null; Persist();
+        _log.Msg($"[股市遣散] 已结算 session={_save.SessionId}");
+    }
+    internal TradeCapture? BeginTrade(string method, GameItem? item, bool? buy)
+    {
+        try
+        {
+            if (_store == null || Engine == null || _monetaryOperation || !IsCurrentStore()) return null;
+            RefreshCustomer();
+            if (Client == null || _save.SessionClosed) return null;
+            var capture = new TradeCapture { Method = method, CashBefore = Cash, Buy = buy, Session = _save.SessionId };
+            if (item != null && !IsTerminal(item)) capture.Items.Add(ItemCapture.Of(item));
+            return capture;
+        }
+        catch (Exception ex) { _log.Warning($"[股市探针] 成交快照失败：{ex.Message}"); return null; }
+    }
+    internal void CompleteTrade(TradeCapture? capture, Exception? exception)
+    {
+        if (capture == null || exception != null || Engine == null || _store == null) return;
+        try
+        {
+            int delta = Cash - capture.CashBefore;
+            if (capture.Items.Count == 0 || delta == 0 || (capture.Buy == true && delta >= 0) || (capture.Buy == false && delta <= 0))
+            { _log.Msg($"[股市探针] {capture.Method} 未确认成交，现金变化={delta}，items={capture.Items.Count}"); return; }
+            if (capture.CallbackAmounts.Count > 0 && capture.CallbackAmounts.Values.Sum() != Math.Abs((decimal)delta))
+            { _log.Warning($"[股市探针] {capture.Method} 回调金额合计 {capture.CallbackAmounts.Values.Sum()} 与现金变化 {delta} 不一致；本次不计行情，避免混入退款、奖励或其他收支。"); return; }
+            // 用原版实际现金变化确定方向和总额，仅在明确商品交易调用范围内记账。
+            decimal total = capture.Items.Sum(x => Math.Max(1m, x.Estimate));
+            foreach (var item in capture.Items.Where(i => capture.CallbackAmounts.Count == 0 || capture.CallbackAmounts.ContainsKey(i.Id)))
+            {
+                string tradeId = $"{capture.Session}:{++_save.TradeSequence}:{item.Id}:{delta}";
+                decimal signed = capture.CallbackAmounts.TryGetValue(item.Id, out decimal actualAmount) ? Math.Sign(delta) * actualAmount : delta * Math.Max(1m, item.Estimate) / total;
+                bool recorded = Engine.RecordTrade(capture.Session, tradeId, item.Types, signed);
+                _log.Msg($"[股市成交] {capture.Method} id={item.Id} types={string.Join(",",item.Types)} cashDelta={delta} allocated={signed} recorded={recorded}");
+            }
+            Persist();
+        }
+        catch (Exception ex) { Fault("商品成交记录失败", ex); }
+    }
+    internal void LogTradeCallback(string method, GameItem item, int amount) => _log.Msg($"[股市回调探针] {method} id={item.uniqueId} amount={amount} cash={Cash} types={string.Join(",",Strings(item.GetGameItemType()))}");
+    private void Fault(string text, Exception ex)
+    {
+        _fault = $"{text}：{ex.Message}";
+        if (Engine != null) { Engine.State.TradingFrozen = true; Engine.State.FreezeReason = _fault; }
+        _log.Error(_fault);
+    }
+    internal static List<string> Strings(Il2CppSystem.Collections.Generic.List<string>? values)
+    {
+        var result = new List<string>(); if (values != null) foreach (var v in values) if (!string.IsNullOrEmpty(v)) result.Add(v); return result;
+    }
+    public void Dispose()
+    {
+        if (_disposed) return; _disposed = true;
+        if (Current == this) Current = null;
+        GamePatches.Uninstall(_harmony); _terminalVisual.Dispose(); _store = null; Engine = null; _offer = null; OpenPanelRequested = null;
+    }
+}
+
+internal sealed class TradeCapture
+{
+    public string Method = "";
+    public string Session = "";
+    public int CashBefore;
+    public bool? Buy;
+    public List<ItemCapture> Items = new();
+    public Dictionary<int, decimal> CallbackAmounts = new();
+}
+internal sealed class ItemCapture
+{
+    public int Id;
+    public decimal Estimate;
+    public List<string> Types = new();
+    public static ItemCapture Of(GameItem item) => new() { Id = item.uniqueId, Estimate = Math.Max(1L, item.GetNegociatedValue()), Types = GameBridge.Strings(item.GetGameItemType()) };
+}
