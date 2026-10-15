@@ -44,12 +44,16 @@ internal sealed class ChartHoverOverlay
             var layout = _box.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
             layout.ignoreLayout = true;
             var background = _box.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
-            background.color = new Color(.105f, .10f, .085f, .98f); background.raycastTarget = false;
+            background.color = StockUiTheme.TooltipBackground; background.raycastTarget = false;
+            var outline = _box.AddComponent(Il2CppType.Of<Outline>()).Cast<Outline>();
+            outline.effectColor = StockUiTheme.Accent;
+            outline.effectDistance = new Vector2(1, -1);
+            outline.useGraphicAlpha = false;
             var group = _box.AddComponent(Il2CppType.Of<CanvasGroup>()).Cast<CanvasGroup>();
             group.blocksRaycasts = false; group.interactable = false;
             var textObject = CreateRect("Text", _boxRect);
             _label = textObject.AddComponent(Il2CppType.Of<TextMeshProUGUI>()).Cast<TextMeshProUGUI>();
-            _label.font = font; _label.fontSize = 12; _label.color = new Color(.96f, .89f, .71f, 1);
+            _label.font = font; _label.fontSize = 14; _label.color = StockUiTheme.Text;
             _label.richText = false; _label.raycastTarget = false; _label.enableWordWrapping = true;
             _label.alignment = TextAlignmentOptions.TopLeft;
             _label.overflowMode = TextOverflowModes.Ellipsis;
@@ -59,7 +63,7 @@ internal sealed class ChartHoverOverlay
             _guide = CreateRect("Guide", window);
             _guideRect = RectOf(_guide);
             var image = _guide.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
-            image.color = new Color(.96f, .86f, .58f, .70f); image.raycastTarget = false;
+            image.color = StockUiTheme.Accent; image.raycastTarget = false;
             var guideLayout = _guide.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
             guideLayout.ignoreLayout = true;
             _box.SetActive(false); _guide.SetActive(false);

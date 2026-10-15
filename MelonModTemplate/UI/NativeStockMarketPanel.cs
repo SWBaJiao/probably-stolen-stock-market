@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Il2Cpp;
 using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppTMPro;
 using MelonLoader;
 using MelonModTemplate.Contracts;
@@ -18,14 +19,13 @@ namespace MelonModTemplate.UI;
 public sealed class NativeStockMarketPanel : IDisposable
 {
     private const string WindowId = "MelonModTemplate.stock_market.native";
-    private static readonly Color TextColor = new(.95f, .87f, .66f, 1f);
-    private static readonly Color MutedColor = new(.72f, .76f, .72f, 1f);
-    private static readonly Color AccentColor = new(.43f, .83f, .82f, 1f);
-    private static readonly Color ButtonColor = new(.27f, .25f, .21f, 1f);
-    private static readonly Color SelectedColor = new(.26f, .40f, .38f, 1f);
+    private static readonly Color TextColor = StockUiTheme.Text;
+    private static readonly Color MutedColor = StockUiTheme.Muted;
+    private static readonly Color AccentColor = StockUiTheme.Accent;
     private readonly IMarketHost _host;
     private readonly NativeUiBootstrap _bootstrap = new();
     private readonly Dictionary<string, CustomUIElement> _elements = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _selectedButtons = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _textCache = new(StringComparer.Ordinal);
     private readonly Dictionary<string, float> _minimumHeights = new(StringComparer.Ordinal);
     private readonly Dictionary<string, float> _measuredWidths = new(StringComparer.Ordinal);
@@ -203,6 +203,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         Button("quantity.minus", "−", "quantity:-1", 32, 32);
         _builder.AddInput("股数", _quantity, null, "quantity");
         var input = Remember("quantity", _builder.Last, 32, -1);
+        StyleInput(input);
         _bindings.Add(new NativeQuantityBinding(input, this));
         Button("quantity.plus", "+", "quantity:1", 32, 32);
         _builder.End();
@@ -266,7 +267,11 @@ public sealed class NativeStockMarketPanel : IDisposable
         // 页面吃掉标题与页脚以外的剩余高度；缩小窗口时只缩滚动区域。
         for (Transform? ancestor = _builder.CurrentParent; ancestor != null && ancestor.Pointer != page.Pointer; ancestor = ancestor.parent)
             if (Get<ScrollRect>(ancestor.gameObject) is { } scroll)
-            { FillHeight(scroll.transform.Cast<RectTransform>()); break; }
+            {
+                FillHeight(scroll.transform.Cast<RectTransform>());
+                Surface(scroll.gameObject, "ScrollFill", StockUiTheme.Background, 2, 2, 2, 2);
+                break;
+            }
     }
 
     private void EndPage() { _builder!.End(); _builder.End(); }
@@ -280,6 +285,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         {
             element.text.fontSize = heading ? 18 : 16;
             element.text.color = heading ? AccentColor : TextColor;
+            element.text.fontStyle = heading ? FontStyles.Bold : FontStyles.Normal;
             element.text.enableWordWrapping = true;
             element.text.richText = false;
             element.text.alignment = TextAlignmentOptions.TopLeft;
@@ -294,7 +300,12 @@ public sealed class NativeStockMarketPanel : IDisposable
         var element = Remember(id, _builder.Last, height, width);
 
         if (element.text != null) { element.text.color = TextColor; element.text.fontSize = 16; element.text.richText = false; element.text.enableWordWrapping = true; }
-        if (element.image != null) element.image.color = ButtonColor;
+        if (element.image != null) element.image.color = Color.white;
+        if (element.button != null)
+        {
+            element.button.targetGraphic = Surface(element.root, "ButtonFill", Color.white, 2, 2, 2, 2);
+            StyleButton(id);
+        }
         _bindings.Add(new NativeButtonBinding(element, this, command));
         return element;
     }
@@ -309,13 +320,28 @@ public sealed class NativeStockMarketPanel : IDisposable
     private void StyleWindow()
     {
         if (_window?.root == null) return;
-        // 仅调整本窗口预制件实例的色调；边框 sprite 和字体仍来自游戏素材。
+        // 保留游戏边框与控件，内侧加实色层；不让原版背景纹理乘色后变成近黑色。
         var background = _window.root.GetComponent<Image>();
-        if (background != null) background.color = new Color(.15f, .14f, .12f, .98f);
+        if (background != null) background.color = Color.white;
+        Surface(_window.root, "OpaqueBackground", StockUiTheme.Background, 4, 4, 4, 4);
+        var titleBar = Surface(_window.root, "TitleBar", StockUiTheme.TitleBackground, 5, 5, 5, 5);
+        var titleRect = titleBar.transform.Cast<RectTransform>();
+        titleRect.anchorMin = new Vector2(0, 1); titleRect.anchorMax = Vector2.one;
+        titleRect.offsetMin = new Vector2(5, -46); titleRect.offsetMax = new Vector2(-5, -5);
+        titleBar.transform.SetSiblingIndex(1);
+        if (_window.frame?.closeButton != null)
+        {
+            var close = _window.frame.closeButton;
+            close.targetGraphic = Surface(close.gameObject, "CloseFill", Color.white, 2, 2, 2, 2);
+            SetButtonColors(close, false);
+            foreach (var label in close.gameObject.GetComponentsInChildren(Il2CppType.Of<TextMeshProUGUI>(), true))
+                label.Cast<TextMeshProUGUI>().color = TextColor;
+        }
         if (_window.frame?.titleText != null)
         {
             _window.frame.titleText.color = TextColor;
             _window.frame.titleText.richText = false;
+            _window.frame.titleText.fontStyle = FontStyles.Bold;
             try
             {
                 var font = _window.frame.titleText.font;
@@ -334,8 +360,8 @@ public sealed class NativeStockMarketPanel : IDisposable
         {
             var engine = _host.Engine;
             Text("summary", $"第 {Math.Max(0, engine.State.LastDay)} 日    可用资金 {Money(_host.Cash)}    现货交易 · 无杠杆");
-            Text("status", _host.Status, MutedColor);
-            Text("feedback", _feedback, AccentColor);
+            Text("status", _host.Status, _host.CanTrade ? StockUiTheme.Falling : StockUiTheme.Warning);
+            Text("feedback", _feedback, StockUiTheme.Warning);
             foreach (var company in engine.Config.Companies)
             {
                 if (!engine.State.Companies.TryGetValue(company.Id, out var stock)) continue;
@@ -343,7 +369,7 @@ public sealed class NativeStockMarketPanel : IDisposable
                 var change = close == 0 ? 0 : stock.Price / close - 1;
                 Text("company." + company.Id, $"{company.Name}  {stock.Price:0.00}  {SignedPercent(change)}");
                 Tint("company." + company.Id, company.Id == _companyId);
-                if (_elements["company." + company.Id].text != null) _elements["company." + company.Id].text.color = change > 0 ? new Color(.96f, .43f, .40f, 1) : change < 0 ? new Color(.37f, .81f, .58f, 1) : TextColor;
+                if (_elements["company." + company.Id].text != null) _elements["company." + company.Id].text.color = change > 0 ? StockUiTheme.Rising : change < 0 ? StockUiTheme.Falling : TextColor;
             }
             RefreshCompany(engine);
             RefreshPortfolio(engine);
@@ -461,7 +487,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (!valid) text.Append("请输入正整数股数。");
         else if (!_host.CanTrade) text.Append(_host.Status);
         else if (!quote.Success) text.Append(quote.Message);
-        Text("order.preview", text.ToString());
+        Text("order.preview", text.ToString(), valid && quote.Success && _host.CanTrade ? TextColor : StockUiTheme.Warning);
         Text("order.submit", _buy ? "确认买入" : "确认卖出");
         Enabled("order.submit", valid && quote.Success && _host.CanTrade);
     }
@@ -590,14 +616,69 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     private void Enabled(string id, bool enabled)
     {
-        if (_elements.TryGetValue(id, out var element) && element.button != null) element.button.interactable = enabled;
+        if (_elements.TryGetValue(id, out var element) && element.button != null)
+        { element.button.interactable = enabled; StyleButton(id); }
     }
 
     private void Tint(string id, bool selected)
     {
-        if (!_elements.TryGetValue(id, out var element)) return;
-        if (element.image != null) element.image.color = selected ? SelectedColor : ButtonColor;
-        if (element.text != null) element.text.color = selected ? AccentColor : TextColor;
+        if (selected) _selectedButtons.Add(id); else _selectedButtons.Remove(id);
+        StyleButton(id);
+    }
+
+    private void StyleButton(string id)
+    {
+        if (!_elements.TryGetValue(id, out var element) || element.button == null) return;
+        bool selected = _selectedButtons.Contains(id);
+        SetButtonColors(element.button, selected);
+        if (element.image != null) element.image.color = selected ? AccentColor : Color.white;
+        if (element.text != null)
+        {
+            element.text.color = element.button.interactable ? TextColor : MutedColor;
+            element.text.fontStyle = selected ? FontStyles.Bold : FontStyles.Normal;
+        }
+    }
+
+    private static void SetButtonColors(Selectable button, bool selected)
+    {
+        button.transition = Selectable.Transition.ColorTint;
+        var colors = button.colors;
+        // 当前 IL2CPP 代理裁剪了部分 ColorBlock setter，使用已还原的结构字段。
+        colors.m_NormalColor = selected ? StockUiTheme.Selected : StockUiTheme.Button;
+        colors.m_HighlightedColor = selected ? StockUiTheme.SelectedHover : StockUiTheme.Hover;
+        colors.m_SelectedColor = colors.m_HighlightedColor;
+        colors.m_PressedColor = StockUiTheme.Pressed;
+        colors.m_DisabledColor = StockUiTheme.Disabled;
+        colors.m_ColorMultiplier = 1; colors.m_FadeDuration = .1f;
+        button.colors = colors;
+    }
+
+    private static void StyleInput(CustomUIElement element)
+    {
+        if (element.input == null) return;
+        var input = element.input;
+        input.targetGraphic = Surface(element.root, "InputFill", Color.white, 2, 2, 2, 2);
+        SetButtonColors(input, false);
+        var colors = input.colors; colors.m_NormalColor = StockUiTheme.Surface; input.colors = colors;
+        input.customCaretColor = true; input.caretColor = AccentColor;
+        input.selectionColor = new Color(.35f, .65f, .85f, .55f);
+        if (input.textComponent != null) { input.textComponent.color = TextColor; input.textComponent.fontSize = 17; }
+        if (input.placeholder != null) input.placeholder.color = MutedColor;
+    }
+
+    private static Image Surface(GameObject parent, string name, Color color, float left, float top, float right, float bottom)
+    {
+        var types = new Il2CppReferenceArray<Il2CppSystem.Type>(new[] { Il2CppType.Of<RectTransform>() });
+        var go = new GameObject("StockMarket." + name, types);
+        go.transform.SetParent(parent.transform, false); go.transform.SetAsFirstSibling();
+        var rect = go.transform.Cast<RectTransform>();
+        rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+        rect.offsetMin = new Vector2(left, bottom); rect.offsetMax = new Vector2(-right, -top);
+        var layout = go.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
+        layout.ignoreLayout = true;
+        var image = go.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+        image.color = color; image.raycastTarget = false;
+        return image;
     }
 
     private bool IsAlive()
@@ -630,6 +711,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         _chart?.Dispose(); _chart = null;
         _intradayChart?.Dispose(); _intradayChart = null; _companyDetails = null;
         _bindings.Clear(); _elements.Clear(); _pages.Clear(); _textCache.Clear(); _minimumHeights.Clear(); _measuredWidths.Clear(); _builder = null;
+        _selectedButtons.Clear();
         _boundEngine = null; _saveIdentity = "";
         if (window != null)
         {

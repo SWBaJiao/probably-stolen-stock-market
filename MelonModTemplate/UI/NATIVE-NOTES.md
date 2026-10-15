@@ -3,7 +3,7 @@
 窗口使用当前游戏代理中真实存在的 `CustomUIManager`、`CustomUIBuilder`、`CustomUIWindow` 与 `CustomUIElement`。这些方法均是 `il2cpp_runtime_invoke` 的游戏原生调用，不依赖旧界面的 Unity IMGUI 路径。原版 `UIHelper` 只有提示位置计算接口，本实现未使用它创建控件。
 
 - 入口为 `NativeStockMarketPanel(IMarketHost)`，提供 `Show/Hide/Tick/Dispose` 和 `IsVisible`。宿主每帧调用 `Tick`；可见时每 0.5 秒更新既有控件文本和按钮状态，不重建窗口、滚动控件或数量输入框。
-- 独立窗口 ID 为 `MelonModTemplate.stock_market.native`，使用管理器提供的 overlay 画布和窗口、按钮、标签、输入、滚动预制件。沿用原生 sprite、TMP 字体及关闭/拖动组件，只调整本窗口实例的色调。没有复制交易按钮、背包窗口或任何原版业务组件。
+- 独立窗口 ID 为 `MelonModTemplate.stock_market.native`，使用管理器提供的 overlay 画布和窗口、按钮、标签、输入、滚动预制件。沿用原生边框、TMP 字体及关闭/拖动组件，在本窗口内部增加自有实色层。没有复制交易按钮、背包窗口或任何原版业务组件。
 - 当前代理没有指南中部分较新的快捷接口，例如 `BeginTabs/AddFlexibleSpace/GetWindow/OnClose` 构建器方法。本实现使用四个独立原生列容器切换分页，窗口关闭字段 `onClose` 绑定具名回调。
 - 按钮和输入事件通过 `DelegateSupport.ConvertDelegate` 转换到 `UnityAction`、`UnityAction<string>`，保存原生委托和托管入口；关闭时以相同实例 `RemoveListener`，然后销毁自己的窗口。输入使用 `TMP_InputField` 的整数限制。
 - 行情显示较昨收、最新变化、当日分时走势及 7/14/30 日 K 线、商品交叉权重、共同关联公司及已公开事件。情报只读取 `IMarketHost` 安全报价和 `GetRumors()` 的已购投影，不显示未购买未来事件。
@@ -40,3 +40,12 @@
 两图通过 `SetHoverBounds(windowRoot)` 共用窗口下的提示浮层，按拥有者令牌隐藏并计数释放，避免未激活的图清掉当前提示。提示背景与文字不接收射线；指引线挂在当前图内以服从滚动裁切。鼠标命中使用实际画布的 overlay/camera 语义，检查上级滚动裁切和可见性；提示框按窗口边界翻转、夹限。离开、切换、重绘和关闭时隐藏旧提示，字体与材质继续引用游戏已有资源。
 
 `Tests/ChartInteraction.Tests` 独立验证 23 项索引、边界和夹限场景，不加载游戏。实际鼠标命中、滚动裁切及提示位置仍需游戏内验收。
+
+
+## 0.5.2 高对比主题
+
+颜色集中于 `StockUiTheme`：不透明深蓝背景、浅白正文、浅蓝标题和边框；涨红跌绿，等待或错误说明用黄色。窗口、滚动区与按钮内侧使用本 Mod 子对象绘制纯色，避免原版纹理与色调相乘后近黑。原版边框及字体仍由游戏提供。
+
+装饰层设置 `LayoutElement.ignoreLayout=true`、`Image.raycastTarget=false` 并置于文字之前，随所属窗口销毁。按钮的 ColorTint 只作用于白色自有填充层，分别设置普通、选中、悬停、按下与禁用状态；正文颜色不随背景乘暗。当前代理裁剪了部分 `ColorBlock` 属性 setter，使用已还原的 `m_NormalColor/m_HighlightedColor/m_SelectedColor/m_PressedColor` 等结构字段，经原生 Selectable.colors 写回。
+
+图表背景不透明，坐标使用浅色文字，悬停框为 14 号白字及浅蓝细边框。源码调色板的 27 组正文、涨跌与状态文字组合对比检查最低为 5.05:1；这只是标称实色对比，实际字体、游戏材质、边框及交互状态仍需实机截图验收。原有 23 项图表命中及提示边界检查通过。

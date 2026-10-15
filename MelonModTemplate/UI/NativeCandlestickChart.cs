@@ -16,12 +16,12 @@ namespace MelonModTemplate.UI;
 public sealed class NativeCandlestickChart : IDisposable
 {
     private const int Capacity = 30;
-    private static readonly Color Rising = new(.92f, .34f, .29f, 1f);
-    private static readonly Color Falling = new(.25f, .76f, .44f, 1f);
-    private static readonly Color Neutral = new(.64f, .67f, .65f, 1f);
-    private static readonly Color Ink = new(.91f, .85f, .67f, 1f);
-    private static readonly Color Accent = new(.42f, .81f, .81f, 1f);
-    private static readonly Color GridColor = new(.65f, .61f, .49f, .19f);
+    private static readonly Color Rising = StockUiTheme.Rising;
+    private static readonly Color Falling = StockUiTheme.Falling;
+    private static readonly Color Neutral = StockUiTheme.Neutral;
+    private static readonly Color Ink = StockUiTheme.Text;
+    private static readonly Color Accent = StockUiTheme.Accent;
+    private static readonly Color GridColor = StockUiTheme.Grid;
     private readonly RectTransform _parent;
     private readonly TMP_FontAsset _font;
     private readonly Material? _material;
@@ -54,21 +54,24 @@ public sealed class NativeCandlestickChart : IDisposable
         _rect.offsetMax = Vector2.zero;
         try
         {
+            var background = _root.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+            background.color = StockUiTheme.ChartBackground;
+            background.raycastTarget = false;
             _title = Text("Title", TextAlignmentOptions.TopLeft, 13, Ink);
             _legend = Text("Legend", TextAlignmentOptions.TopRight, 11, Ink);
             _legend.Text!.text = "红涨  绿跌  灰横标：不完整";
-            _note = Text("Note", TextAlignmentOptions.TopLeft, 10, Neutral);
+            _note = Text("Note", TextAlignmentOptions.TopLeft, 11, StockUiTheme.Muted);
             _note.Text!.enableWordWrapping = true;
             _currentLabel = Text("CurrentPrice", TextAlignmentOptions.MidlineLeft, 11, Accent);
-            _currentLine = Block("CurrentLine", new Color(Accent.r, Accent.g, Accent.b, .58f));
+            _currentLine = Block("CurrentLine", Accent);
             _bottomAxis = Block("BottomAxis", GridColor);
             for (int i = 0; i < _grid.Length; i++)
             {
                 _grid[i] = Block("PriceGrid." + i, GridColor);
-                _priceLabels[i] = Text("PriceLabel." + i, TextAlignmentOptions.MidlineLeft, 10, Neutral);
+                _priceLabels[i] = Text("PriceLabel." + i, TextAlignmentOptions.MidlineLeft, 11, StockUiTheme.Muted);
             }
             for (int i = 0; i < _dayLabels.Length; i++)
-                _dayLabels[i] = Text("DayLabel." + i, TextAlignmentOptions.Midline, 10, Neutral);
+                _dayLabels[i] = Text("DayLabel." + i, TextAlignmentOptions.Midline, 11, StockUiTheme.Muted);
             for (int i = 0; i < _pool.Length; i++)
                 _pool[i] = new CandleNodes(Block("Wick." + i, Neutral), Block("Body." + i, Neutral), Block("SampleClose." + i, Neutral));
             HidePlot();

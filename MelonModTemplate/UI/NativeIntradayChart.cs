@@ -15,12 +15,12 @@ namespace MelonModTemplate.UI;
 // 横轴只表示真实采样顺序，不把游戏内的交易或事件伪装成分钟行情。
 public sealed class NativeIntradayChart : IDisposable
 {
-    private static readonly Color Ink = new(.91f, .85f, .67f, 1f);
-    private static readonly Color Neutral = new(.64f, .67f, .65f, 1f);
-    private static readonly Color CurveColor = new(.42f, .81f, .81f, 1f);
-    private static readonly Color CustomerColor = new(.94f, .65f, .26f, 1f);
-    private static readonly Color EventColor = new(.78f, .54f, .88f, 1f);
-    private static readonly Color GridColor = new(.65f, .61f, .49f, .19f);
+    private static readonly Color Ink = StockUiTheme.Text;
+    private static readonly Color Neutral = StockUiTheme.Neutral;
+    private static readonly Color CurveColor = StockUiTheme.Accent;
+    private static readonly Color CustomerColor = StockUiTheme.Warning;
+    private static readonly Color EventColor = StockUiTheme.Event;
+    private static readonly Color GridColor = StockUiTheme.Grid;
     private readonly RectTransform _parent;
     private readonly TMP_FontAsset _font;
     private readonly GameObject _root;
@@ -48,19 +48,22 @@ public sealed class NativeIntradayChart : IDisposable
         _rect.offsetMin = Vector2.zero; _rect.offsetMax = Vector2.zero;
         try
         {
+            var background = _root.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+            background.color = StockUiTheme.ChartBackground;
+            background.raycastTarget = false;
             _title = Text("Title", 13, TextAlignmentOptions.TopLeft, Ink);
-            _legend = Text("Legend", 10, TextAlignmentOptions.TopRight, Ink);
+            _legend = Text("Legend", 11, TextAlignmentOptions.TopRight, Ink);
             _legend.Text!.text = "青：走势  橙：顾客  紫：事件/异动";
             _summary = Text("Summary", 11, TextAlignmentOptions.TopLeft, Ink);
-            _note = Text("Note", 10, TextAlignmentOptions.TopLeft, Neutral);
+            _note = Text("Note", 10, TextAlignmentOptions.TopLeft, StockUiTheme.Muted);
             _note.Text!.enableWordWrapping = true;
-            _currentLine = Block("CurrentLine", new Color(CurveColor.r, CurveColor.g, CurveColor.b, .35f));
+            _currentLine = Block("CurrentLine", CurveColor);
             _currentLabel = Text("CurrentPrice", 11, TextAlignmentOptions.MidlineLeft, CurveColor);
             for (int i = 0; i < _grid.Length; i++)
             {
                 _grid[i] = Block("Grid." + i, GridColor);
-                _priceLabels[i] = Text("Price." + i, 10, TextAlignmentOptions.MidlineLeft, Neutral);
-                _xLabels[i] = Text("Sequence." + i, 10, TextAlignmentOptions.Midline, Neutral);
+                _priceLabels[i] = Text("Price." + i, 11, TextAlignmentOptions.MidlineLeft, StockUiTheme.Muted);
+                _xLabels[i] = Text("Sequence." + i, 11, TextAlignmentOptions.Midline, StockUiTheme.Muted);
             }
             EnsurePool(32);
             HidePlot();
