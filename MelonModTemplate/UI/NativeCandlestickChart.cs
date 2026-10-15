@@ -37,6 +37,9 @@ public sealed class NativeCandlestickChart : IDisposable
     private int _previousDays, _previousCurrentDay = int.MinValue;
     private float _previousWidth = -1, _previousHeight = -1;
     private bool _hasRendered, _disposed, _faulted;
+    private ChartHoverOverlay? _hover;
+    private HoverRect _hoverPlot;
+    private bool _hoverReady, _hoverWarned;
 
     public NativeCandlestickChart(RectTransform parent, TMP_FontAsset font, Material? material = null)
     {
@@ -92,6 +95,8 @@ public sealed class NativeCandlestickChart : IDisposable
             var day = currentDay ?? int.MinValue;
             if (_hasRendered && Math.Abs(width - _previousWidth) < .5f && Math.Abs(height - _previousHeight) < .5f
                 && count == _previousDays && day == _previousCurrentDay && currentPrice == _previousPrice && selected.SequenceEqual(_previous)) return;
+
+            HideHover(); _hoverReady = false;
 
             _title.Text!.text = $"日 K 线 · 最近 {selected.Length} 个有记录的游戏日";
             Place(_title, 8, Math.Max(0, height - 23), Math.Max(80, width - (width < 430 ? 16 : 200)), 22);
@@ -206,6 +211,8 @@ public sealed class NativeCandlestickChart : IDisposable
         var latest = candles[^1];
         _note.Text!.text = $"第 {latest.Day} 日  开 {KnownPrice(latest.Open)}  高 {KnownPrice(latest.High)}  低 {KnownPrice(latest.Low)}  收 {Price(latest.Close)}\n"
             + string.Join("；", messages) + "。";
+        _hoverPlot = new HoverRect(left, bottom, plotWidth, plotHeight);
+        _hoverReady = true;
     }
 
     private GraphicNode Block(string name, Color color)
@@ -250,6 +257,7 @@ public sealed class NativeCandlestickChart : IDisposable
 
     private void HidePlot()
     {
+        _hoverReady = false; HideHover();
         foreach (var node in _pool) node?.Hide();
         foreach (var node in _grid) if (node != null) Visible(node, false);
         foreach (var node in _priceLabels) if (node != null) Visible(node, false);
@@ -265,15 +273,56 @@ public sealed class NativeCandlestickChart : IDisposable
     public void SetVisible(bool visible)
     {
         if (_disposed) return;
+        if (!visible) HideHover();
         if (_root.activeSelf == visible) return;
         _root.SetActive(visible);
-        if (visible) _hasRendered = false;
+        if (visible) { _hasRendered = false; _hoverReady = false; }
+    }
+
+    public void SetHoverBounds(RectTransform windowRoot)
+    {
+        if (_disposed || _hover?.WindowPointer == windowRoot.Pointer) return;
+        _hover?.Release(this); _hover = null;
+        try { _hover = ChartHoverOverlay.Acquire(windowRoot, _font); }
+        catch (Exception ex) { HoverWarning(ex); }
+    }
+
+    public void HideHover() => _hover?.Hide(this);
+
+    public void TickHover()
+    {
+        if (_disposed || _hover == null) return;
+        try
+        {
+            if (!_hoverReady || !_hasRendered || !_root.activeInHierarchy || _previous.Length == 0
+                || Math.Abs(_parent.rect.width - _previousWidth) >= .5f || Math.Abs(_parent.rect.height - _previousHeight) >= .5f
+                || !_hover.TryPointer(_rect, _hoverPlot, out var point, out var screen, out var camera))
+            { HideHover(); return; }
+            var index = ChartHoverMath.CandleSlotIndex(point.x, _hoverPlot.X, _hoverPlot.Width, _previous.Length);
+            if (index < 0) { HideHover(); return; }
+            var candle = _previous[index];
+            var text = $"第 {candle.Day} 日" + (candle.Day == _previousCurrentDay ? " · 当日未收盘" : "")
+                + $"\n开 {KnownPrice(candle.Open)}    高 {KnownPrice(candle.High)}\n低 {KnownPrice(candle.Low)}    收 {Price(candle.Close)}";
+            if (!candle.IsComplete) text += "\n旧档或首次接入记录不完整；未知开高低显示 —。";
+            var guideX = (float)(_hoverPlot.X + (index + .5) * _hoverPlot.Width / _previous.Length);
+            _hover.Show(this, _rect, _hoverPlot, guideX, text, screen, camera);
+        }
+        catch (Exception ex) { _hoverReady = false; try { HideHover(); } catch { } HoverWarning(ex); }
+    }
+
+    private void HoverWarning(Exception ex)
+    {
+        if (_hoverWarned) return;
+        _hoverWarned = true;
+        MelonLogger.Warning("[日K线悬停] 本窗口悬停暂不可用：" + ex);
     }
 
     public void Dispose()
     {
         if (_disposed) return;
         _disposed = true;
+        try { _hover?.Release(this); } catch (Exception ex) { HoverWarning(ex); }
+        _hover = null;
         // 只销毁本图的对象树；字体与材质属于游戏，不能释放。
         try { UnityEngine.Object.Destroy(_root); }
         catch (Exception ex) { MelonLogger.Warning("[原生日K线] 图表对象清理失败：" + ex); }

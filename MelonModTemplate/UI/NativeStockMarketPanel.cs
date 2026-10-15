@@ -107,9 +107,14 @@ public sealed class NativeStockMarketPanel : IDisposable
             { Hide(); return; }
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            if (Time.unscaledTime < _nextRefresh) return;
-            _nextRefresh = Time.unscaledTime + .5f;
-            Refresh();
+            if (Time.unscaledTime >= _nextRefresh)
+            {
+                _nextRefresh = Time.unscaledTime + .5f;
+                Refresh();
+            }
+            // 指针命中按帧更新，不受行情文字半秒刷新间隔限制。
+            if (_chartDays == 1) _intradayChart?.TickHover();
+            else _chart?.TickHover();
         }
         catch (Exception ex) { Warn("tick", "原生股市窗口更新失败，已关闭并释放自己的控件。", ex); Hide(); }
     }
@@ -179,6 +184,9 @@ public sealed class NativeStockMarketPanel : IDisposable
         var font = _window.frame.titleText.font;
         _chart = new NativeCandlestickChart(chartRoot, font);
         _intradayChart = new NativeIntradayChart(chartRoot, font);
+        var hoverBounds = _window.root.transform.Cast<RectTransform>();
+        _chart.SetHoverBounds(hoverBounds);
+        _intradayChart.SetHoverBounds(hoverBounds);
         _builder.End();
 
         _builder.BeginColumn(4);
@@ -508,6 +516,8 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     private void SetPage(int index)
     {
+        _chart?.HideHover();
+        _intradayChart?.HideHover();
         _page = Math.Clamp(index, 0, 3);
         for (int i = 0; i < _pages.Count; i++) _pages[i].SetActive(i == _page);
     }

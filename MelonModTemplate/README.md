@@ -1,6 +1,6 @@
 # 股市 Mod 开发与使用
 
-程序集保持 `MelonModTemplate.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.4.0`。覆盖旧模板 DLL 后只会加载一个入口；无需同时保留旧模板。
+程序集保持 `MelonModTemplate.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.4.1`。覆盖旧模板 DLL 后只会加载一个入口；无需同时保留旧模板。
 
 ## 安装与构建
 
@@ -39,6 +39,8 @@ dotnet build MelonModTemplate/MelonModTemplate.csproj -c Release
 
 7/14/30 日继续使用日 K 线，显示开高低收、影线和当前价线。上涨红色、下跌绿色、平盘灰色；旧存档及首次盘中接入日只显示灰色收盘标记，未知开高低为 `—`。正常后续游戏日开始积累完整 OHLC；当天尚未收盘的记录随实际行情继续变化。
 
+鼠标移入图表绘图区可查看最近横轴采样：分时提示采样序号、价格及变价原因；日 K 线提示游戏日与开高低收。旧档未知值保持 `—`，当日记录标注未收盘。提示按帧响应并限制在窗口内，离开、切换、滚动裁出绘图区或关闭窗口后隐藏。
+
 ## 公司和商品
 
 默认 10 家公司：丰禾供给、清泉循环、白塔医疗、星锻工业、远星科技、环宇商贸、霆光能源、晨星物流、安盾防务、聚合材料。
@@ -71,10 +73,11 @@ dotnet build MelonModTemplate/MelonModTemplate.csproj -c Release
 dotnet run --project Tests/StockMarket.Tests
 dotnet run --project Tests/TerminalGraphics.Tests
 dotnet run --project Tests/TerminalGrant.Tests
+dotnet run --project Tests/ChartInteraction.Tests
 python3 MelonModTemplate/tools/verify_deployment.py
 ```
 
-独立测试使用 .NET 10 SDK，包含 86 项断言，覆盖交叉分配、行情去重、资金回滚、真假内幕、信誉、隐藏信息、存档隔离、事件推导、日 K 线累积、分时顺序与完整保存及旧档迁移。另有 10 个图像采样场景和 33 项道具发放断言，覆盖透明缩放、满背包、重复查询和不确定插入。部署验证使用临时目录，不写入实际游戏。
+独立测试使用 .NET 10 SDK，包含 86 项断言，覆盖交叉分配、行情去重、资金回滚、真假内幕、信誉、隐藏信息、存档隔离、事件推导、日 K 线累积、分时顺序与完整保存及旧档迁移。另有 10 个图像采样场景和 33 项道具发放断言，覆盖透明缩放、满背包、重复查询和不确定插入。图表另有 23 项交互边界检查，覆盖单点、多点、14 日槽位、裁切和提示框边界。部署验证使用临时目录，不写入实际游戏。
 
 `Market/` 为不依赖游戏的领域逻辑；`Game/` 负责原版接口、Harmony 补丁和存档；`UI/` 为游戏 CustomUI 原生面板；`Contracts/` 限定界面命令入口。`ModEntry` 成对订阅与解绑，并只清理本模组拥有的补丁和图像资源。
 

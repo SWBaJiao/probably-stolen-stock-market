@@ -34,6 +34,9 @@ public sealed class NativeIntradayChart : IDisposable
     private int _previousDay = int.MinValue;
     private bool _previousPartial, _hasRendered, _disposed, _faulted;
     private float _previousWidth = -1, _previousHeight = -1;
+    private ChartHoverOverlay? _hover;
+    private HoverRect _hoverPlot;
+    private bool _hoverReady, _hoverWarned;
 
     public NativeIntradayChart(RectTransform parent, TMP_FontAsset font)
     {
@@ -71,9 +74,11 @@ public sealed class NativeIntradayChart : IDisposable
 
     public void SetVisible(bool visible)
     {
-        if (_disposed || _root.activeSelf == visible) return;
+        if (_disposed) return;
+        if (!visible) HideHover();
+        if (_root.activeSelf == visible) return;
         _root.SetActive(visible);
-        if (visible) _hasRendered = false;
+        if (visible) { _hasRendered = false; _hoverReady = false; }
     }
 
     public void Render(IReadOnlyList<PricePoint> points, decimal currentPrice, int currentDay, bool isPartial)
@@ -86,6 +91,8 @@ public sealed class NativeIntradayChart : IDisposable
             var width = _parent.rect.width; var height = _parent.rect.height;
             if (_hasRendered && currentPrice == _previousPrice && currentDay == _previousDay && isPartial == _previousPartial
                 && Math.Abs(width - _previousWidth) < .5f && Math.Abs(height - _previousHeight) < .5f && samples.SequenceEqual(_previous)) return;
+
+            HideHover(); _hoverReady = false;
 
             _title.Text!.text = $"当日分时 · 第 {currentDay} 日 · 按变价顺序（{samples.Length} 条）";
             Place(_title, 8, Math.Max(0, height - 22), Math.Max(80, width - (width >= 540 ? 250 : 16)), 21);
@@ -200,6 +207,8 @@ public sealed class NativeIntradayChart : IDisposable
         _note.Text!.text = "最新原因：" + (latestReason.Length == 0 ? "行情采样" : latestReason)
             + "\n" + (isPartial ? "当前日采样不完整，接入前走势、真实开盘及全日极值未知；" : "")
             + (samples.Length == 1 ? "当前仅有一条真实样本，等待实际变化；" : "") + "横轴为采样顺序，不代表真实时分。";
+        _hoverPlot = new HoverRect(left, bottom, plotWidth, plotHeight);
+        _hoverReady = true;
     }
 
     private void EnsurePool(int required)
@@ -256,6 +265,7 @@ public sealed class NativeIntradayChart : IDisposable
 
     private void HidePlot()
     {
+        _hoverReady = false; HideHover();
         foreach (var node in _segments) Visible(node, false);
         foreach (var node in _markers) Visible(node, false);
         foreach (var node in _grid) if (node != null) Visible(node, false);
@@ -282,10 +292,51 @@ public sealed class NativeIntradayChart : IDisposable
 
     private static string Price(decimal value) => value.ToString("0.00", CultureInfo.InvariantCulture);
 
+    public void SetHoverBounds(RectTransform windowRoot)
+    {
+        if (_disposed || _hover?.WindowPointer == windowRoot.Pointer) return;
+        _hover?.Release(this); _hover = null;
+        try { _hover = ChartHoverOverlay.Acquire(windowRoot, _font); }
+        catch (Exception ex) { HoverWarning(ex); }
+    }
+
+    public void HideHover() => _hover?.Hide(this);
+
+    public void TickHover()
+    {
+        if (_disposed || _hover == null) return;
+        try
+        {
+            if (!_hoverReady || !_hasRendered || !_root.activeInHierarchy || _previous.Length == 0
+                || Math.Abs(_parent.rect.width - _previousWidth) >= .5f || Math.Abs(_parent.rect.height - _previousHeight) >= .5f
+                || !_hover.TryPointer(_rect, _hoverPlot, out var point, out var screen, out var camera))
+            { HideHover(); return; }
+            var index = ChartHoverMath.NearestSampleIndex(point.x, _hoverPlot.X, _hoverPlot.Width, _previous.Length);
+            if (index < 0) { HideHover(); return; }
+            var sample = _previous[index];
+            var reason = SafeReason(sample.Reason);
+            var text = $"第 {sample.Day} 日 · 采样 #{index + 1} / {_previous.Length}\n当时价格 {Price(sample.Price)}\n原因："
+                + (reason.Length == 0 ? "行情采样" : reason);
+            if (_previousPartial) text += "\n当日记录不完整；序号仅代表已保存采样顺序。";
+            var guideX = (float)(_hoverPlot.X + (_previous.Length == 1 ? _hoverPlot.Width / 2 : (double)index / (_previous.Length - 1) * _hoverPlot.Width));
+            _hover.Show(this, _rect, _hoverPlot, guideX, text, screen, camera);
+        }
+        catch (Exception ex) { _hoverReady = false; try { HideHover(); } catch { } HoverWarning(ex); }
+    }
+
+    private void HoverWarning(Exception ex)
+    {
+        if (_hoverWarned) return;
+        _hoverWarned = true;
+        MelonLogger.Warning("[分时悬停] 本窗口悬停暂不可用：" + ex);
+    }
+
     public void Dispose()
     {
         if (_disposed) return;
         _disposed = true;
+        try { _hover?.Release(this); } catch (Exception ex) { HoverWarning(ex); }
+        _hover = null;
         try { UnityEngine.Object.Destroy(_root); }
         catch (Exception ex) { MelonLogger.Warning("[原生分时图] 清理对象失败：" + ex); }
         // 字体为游戏已有资源，本图只释放自己的 UGUI 对象树。
