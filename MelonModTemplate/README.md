@@ -1,6 +1,6 @@
 # 股市 Mod 开发与使用
 
-程序集保持 `MelonModTemplate.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.1.1`。覆盖旧模板 DLL 后只会加载一个入口；无需同时保留旧模板。
+程序集保持 `MelonModTemplate.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.2.0`。覆盖旧模板 DLL 后只会加载一个入口；无需同时保留旧模板。
 
 ## 安装与构建
 
@@ -31,9 +31,9 @@ dotnet build MelonModTemplate/MelonModTemplate.csproj -c Release
 
 窗口关闭可点击“关闭”或按 Escape。`Ctrl+F8` 只请求补领道具，不直接打开交易窗口。面板显示期间阻断主要原版买卖、拖拽及顾客操作，关闭后恢复鼠标状态。最终输入穿透情况仍需游戏内验证。
 
-面板采用原生 Group 裁剪、自绘按钮、数字键输入和样式柱图，避开本版本中未还原的 ScrollView、TextField 和 DrawTexture 方法。点击股数字段后输入数字，支持退格及全选；滚动使用鼠标滚轮或右侧上下按钮。
+面板通过游戏的 `CustomUIManager` 和 `CustomUIBuilder` 创建独立原生窗口。优先使用已有控件预制件；缺少 SDK 模板时，以原生 UGUI 控件和游戏已加载的窗口、按钮图像及 TMP 字体建立本 Mod 的通用模板。行情、持仓、内幕、流水分为四个页面，交易仍通过原有资金和存档门控接口提交。
 
-中文字体优先选择微软雅黑、思源黑体、宋体等系统字体；当前 CrossOver 容器已有这些字体。也可放置 `Assets/Fonts/StockMarket.ttf` 作为独立字体。找不到中文字体时日志会提示具体路径。
+文字优先沿用游戏预制件的 TMP 字体和样式；中文覆盖检查及本窗口的字体回退记录在原生面板日志中。原生控件初始化、实际大小和输入效果需要在当前游戏中验证。
 
 ## 公司和商品
 
@@ -59,7 +59,7 @@ dotnet build MelonModTemplate/MelonModTemplate.csproj -c Release
 
 全部投资状态和原版资金共同保存在 `PlayerStore.modData["probably_stolen.stock_market.v1"]`。不使用独立持仓文件。交易失败会补偿现金和持仓；补偿或重写旧状态失败时冻结交易。
 
-股市入口使用原生 postit 和存档内唯一编号识别，普通便笺不受影响。发放入口为 `EmporiumEntry.invElement`，需要确认主背包窗口实际绑定，并在插入后核对父容器和直接成员。成功后锁定本次会话，空查询不再触发自动造物；旧编号缺失时使用 `Ctrl+F8` 显式恢复。独立 PNG 通过原生解码、CPU 最近邻缩放和原生纹理上传注册图集，保留透明度及原版占位。保存前还原原版资源路径，保存后重新应用图标。缺图时回退便笺图像。
+股市入口使用原生 postit 和存档内唯一编号识别，普通便笺不受影响。发放入口为 `EmporiumEntry.invElement`，需要确认主背包窗口实际绑定，并在插入后核对父容器和直接成员。成功后锁定本次会话，空查询不再触发自动造物；旧编号缺失时使用 `Ctrl+F8` 显式恢复。独立 PNG 通过原生解码、CPU 最近邻缩放和原生纹理上传注册图集，保留透明度及原版占位。图集载入后会显式刷新真实与拖拽 Image，并处理 overrideSprite；日志只有在两个 Image 的实际精灵指针一致时才报告 renderer readback。保存前还原原版资源路径，保存后重新应用图标。缺图时回退便笺图像。
 
 ## 验证与代码结构
 
@@ -72,6 +72,6 @@ python3 MelonModTemplate/tools/verify_deployment.py
 
 独立测试使用 .NET 10 SDK，包含 60 项断言，覆盖交叉分配、行情去重、资金回滚、真假内幕、信誉、隐藏信息、存档隔离和事件推导。另有 10 个图像采样场景和 33 项道具发放断言，覆盖透明缩放、满背包、重复查询和不确定插入。部署验证使用临时目录，不写入实际游戏。
 
-`Market/` 为不依赖游戏的领域逻辑；`Game/` 负责原版接口、Harmony 补丁和存档；`UI/` 为 IMGUI 面板；`Contracts/` 限定界面命令入口。`ModEntry` 成对订阅与解绑，并只清理本模组拥有的补丁和图像资源。
+`Market/` 为不依赖游戏的领域逻辑；`Game/` 负责原版接口、Harmony 补丁和存档；`UI/` 为游戏 CustomUI 原生面板；`Contracts/` 限定界面命令入口。`ModEntry` 成对订阅与解绑，并只清理本模组拥有的补丁和图像资源。
 
-进一步的静态证据、适配限制和实机步骤见 [ADAPTER-NOTES.md](Game/ADAPTER-NOTES.md)。游戏启动和实际游玩由使用者验证；编译成功不代表原生调用顺序和存档持久化已验收。
+进一步的静态证据、适配限制和实机步骤见 [游戏适配说明](Game/ADAPTER-NOTES.md) 与 [原生界面说明](UI/NATIVE-NOTES.md)。游戏启动和实际游玩由使用者验证；编译成功不代表原生调用顺序和存档持久化已验收。

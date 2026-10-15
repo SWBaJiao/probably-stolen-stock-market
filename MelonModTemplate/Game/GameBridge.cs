@@ -50,6 +50,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     public string SellerReputation => _offer == null ? "暂无可验证情报记录" : $"{_offer.Identity} · {(_offer.IsGroupIdentity ? "该类来源" : "个人")}记录：属实 {_offer.Correct} / 失实 {_offer.Incorrect} · 参考可信度 {_offer.Reliability:P0}";
     public string OfferDescription => _offer == null ? "当前顾客没有可出售的关联情报。" : _offer.Purchased ? _offer.Content : $"{_offer.Identity} 提供一条行业线索，当前顾客离开前可购买；购后查看时间和行业。";
     public int? OfferCost => _offer?.Price;
+    public string? OfferId => _offer?.Id;
     public bool CanBuyRumor => CanTrade && _offer is { Purchased: false, Expired: false } && Cash >= _offer.Price;
 
     public GameBridge(MelonLogger.Instance logger, MarketConfig config) { _log = logger; _config = config; _terminalVisual = new TerminalVisual(logger); }
@@ -58,8 +59,16 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     {
         if (Current != null) throw new InvalidOperationException("游戏适配器已初始化。");
         Current = this; _harmony = harmony;
-        try { GamePatches.Install(harmony, _log); }
-        catch { GamePatches.Uninstall(harmony); Current = null; throw; }
+        try
+        {
+            GamePatches.Install(harmony, _log);
+            IconRenderPatches.Install(harmony, _log);
+        }
+        catch
+        {
+            IconRenderPatches.Uninstall(harmony);
+            GamePatches.Uninstall(harmony); Current = null; throw;
+        }
         _log.Msg("[股市探针] 已安装适配钩子；未运行游戏验收前不视为适配成功。");
     }
 
@@ -172,11 +181,13 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     }
 
     public string PlaceOrder(string companyId, int quantity, bool buy) => Monetary(() => Engine!.PlaceOrder(companyId, buy ? OrderSide.Buy : OrderSide.Sell, quantity, this, Persist).Message);
-    public string BuyRumor()
+    public string BuyRumor(string? expectedOfferId = null)
     {
         if (!IsCurrentStore()) return "存档正在切换，请稍后重试。";
         RefreshCustomer();
         if (_offer == null) return "当前没有可购买的情报。";
+        if (string.IsNullOrEmpty(expectedOfferId) || expectedOfferId != _offer.Id)
+            return "顾客或情报报价已变化，请刷新面板后再购买。";
         string result = Monetary(() => Engine!.BuyRumor(_offer.Id, this, Persist).Message);
         RefreshOffer(); return result;
     }
@@ -488,7 +499,8 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     {
         if (_disposed) return; _disposed = true;
         if (Current == this) Current = null;
-        GamePatches.Uninstall(_harmony); _terminalVisual.Dispose(); _trackedTerminal = null; _store = null; Engine = null; _offer = null; OpenPanelRequested = null;
+        GamePatches.Uninstall(_harmony); _terminalVisual.Dispose(); IconRenderPatches.Uninstall(_harmony);
+        _trackedTerminal = null; _store = null; Engine = null; _offer = null; OpenPanelRequested = null;
     }
 }
 

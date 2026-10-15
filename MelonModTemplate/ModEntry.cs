@@ -12,7 +12,7 @@ public sealed class ModEntry : MelonMod
 {
     private SceneHooks? _sceneHooks;
     private GameBridge? _market;
-    private StockMarketPanel? _panel;
+    private NativeStockMarketPanel? _panel;
     private HarmonyLib.Harmony? _marketHarmony;
     private bool _subscribed;
     private DateTime _lastError;
@@ -30,7 +30,7 @@ public sealed class ModEntry : MelonMod
             var config = MarketConfigLoader.Load(LoggerInstance);
             _marketHarmony = new HarmonyLib.Harmony(ModInfo.Id);
             _market = new GameBridge(LoggerInstance, config);
-            _panel = new StockMarketPanel(_market);
+            _panel = new NativeStockMarketPanel(_market);
             _market.IsPanelVisible = () => _panel?.IsVisible == true;
             _market.OpenPanelRequested += HandleOpenPanel;
             _market.Initialize(_marketHarmony);
@@ -57,7 +57,7 @@ public sealed class ModEntry : MelonMod
 
     public override void OnUpdate()
     {
-        try { _market?.Tick(); }
+        try { _market?.Tick(); _panel?.Tick(); }
         catch (Exception ex) { LogRuntimeError(ex); }
     }
 
@@ -73,7 +73,6 @@ public sealed class ModEntry : MelonMod
                 LoggerInstance.Msg("[股市道具] 手动补领：" + _market.RecoverTerminal());
                 input.Use();
             }
-            _panel?.Draw();
         }
         catch (Exception ex)
         {

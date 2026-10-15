@@ -15,6 +15,9 @@ internal sealed class TerminalVisual : IDisposable
     private const string SpriteKey = "stock_market_terminal";
     private readonly MelonLogger.Instance _log;
     private readonly Dictionary<IntPtr, OriginalVisual> _originals = new();
+    private readonly HashSet<IntPtr> _rendererLogged = new();
+    private readonly HashSet<IntPtr> _resolverLogged = new();
+    private static TerminalVisual? _active;
     private Texture2D? _texture;
     private Sprite? _sprite;
     private readonly HashSet<string> _warnedStages = new(StringComparer.Ordinal);
@@ -22,7 +25,7 @@ internal sealed class TerminalVisual : IDisposable
     private bool _disposed;
     private bool _saving;
 
-    public TerminalVisual(MelonLogger.Instance log) => _log = log;
+    public TerminalVisual(MelonLogger.Instance log) { _log = log; _active = this; }
 
     public void Apply(GameItem item)
     {
@@ -33,7 +36,9 @@ internal sealed class TerminalVisual : IDisposable
             // 每个存档仅保留当前入口，补领后立即释放旧道具包装引用。
             if (!_originals.ContainsKey(item.Pointer)) _originals.Clear();
             bool savedCustom = item.spriteAtlasPath == AtlasKey;
-            _originals.TryAdd(item.Pointer, new OriginalVisual(item, savedCustom ? "Items/items_tool" : item.spriteAtlasPath, savedCustom ? "postit" : item.spritePath));
+            var element = item.TryCast<GameItemElement>();
+            _originals.TryAdd(item.Pointer, new OriginalVisual(item, savedCustom ? "Items/items_tool" : item.spriteAtlasPath, savedCustom ? "postit" : item.spritePath,
+                element?.background?.image?.m_OverrideSprite, element?.fakeBackground?.image?.m_OverrideSprite));
             // 载入失败后本次 Mod 生命周期内不再分配纹理，避免自动补领轮询不断重试。
             if (_sprite == null && (_loadAttempted || !Load(item))) { Restore(item); return; }
             stage = "atlas registration";
@@ -43,11 +48,38 @@ internal sealed class TerminalVisual : IDisposable
             if (cache[AtlasKey].ContainsKey(SpriteKey) && cache[AtlasKey][SpriteKey]?.Pointer != _sprite?.Pointer)
             { Warn("atlas key", "专用图集键已被其他资源占用，保留便笺图像。"); Restore(item); return; }
             cache[AtlasKey][SpriteKey] = _sprite!;
-            if (item.spriteAtlasPath == AtlasKey && item.spritePath == SpriteKey) return;
             stage = "item sprite apply";
-            item.SetSprite(AtlasKey, SpriteKey);
+            if (item.spriteAtlasPath != AtlasKey || item.spritePath != SpriteKey) item.SetSprite(AtlasKey, SpriteKey);
+            stage = "native renderer refresh";
+            if (element == null || element.IsDestroyed()) throw new InvalidOperationException("专用道具的 GameItemElement 渲染对象未就绪。");
+            // 原生 SetSprite 仅写路径和 spriteChanged 标记；以下入口才实际更新两个 Image。
+            element.ValidatePartialSprite();
+            element.ApplyAnimationFrame(_sprite!);
+            var real = element.background?.image;
+            var fake = element.fakeBackground?.image;
+            if (real == null || fake == null) throw new InvalidOperationException("道具真实或拖拽图像节点未就绪。");
+            // 原生刷新只更新 Image.sprite，已有 overrideSprite 仍可能遮住它。
+            real.overrideSprite = _sprite!;
+            fake.overrideSprite = _sprite!;
+            stage = "renderer readback";
+            bool realMatches = real.sprite?.Pointer == _sprite!.Pointer && real.overrideSprite?.Pointer == _sprite.Pointer;
+            bool fakeMatches = fake.sprite?.Pointer == _sprite.Pointer && fake.overrideSprite?.Pointer == _sprite.Pointer;
+            if (!realMatches || !fakeMatches) throw new InvalidOperationException($"实际 Image 读回不匹配：real={real.sprite?.Pointer}/{real.overrideSprite?.Pointer} fake={fake.sprite?.Pointer}/{fake.overrideSprite?.Pointer} expected={_sprite.Pointer}");
+            if (_rendererLogged.Add(item.Pointer))
+                _log.Msg($"[股市图像] stage=renderer readback uniqueId={item.uniqueId} real={real.sprite?.Pointer} fake={fake.sprite?.Pointer} expected={_sprite.Pointer}，真实与拖拽 Image 均已绑定；视觉显示仍待游戏截图确认。");
         }
         catch (Exception ex) { Warn(stage, "专用图像应用失败，保留原版便笺图像。", ex); Restore(item); }
+    }
+
+    internal static bool TryResolve(GameItemElement item, string name, out Sprite? sprite)
+    {
+        sprite = null;
+        var active = _active;
+        if (active == null || active._disposed || active._saving || active._sprite == null || !active._originals.ContainsKey(item.Pointer)
+            || item.identifier != "postit" || item.spriteAtlasPath != AtlasKey || item.spritePath != SpriteKey || name != SpriteKey) return false;
+        sprite = active._sprite;
+        if (active._resolverLogged.Add(item.Pointer)) active._log.Msg($"[股市图像] stage=resolve override uniqueId={item.uniqueId}，原生解析返回专用精灵。");
+        return true;
     }
 
     private bool Load(GameItem item)
@@ -100,7 +132,7 @@ internal sealed class TerminalVisual : IDisposable
             _sprite = Sprite.Create(_texture, new Rect(0, 0, width, height), new Vector2(.5f, .5f), native != null ? native.pixelsPerUnit : 100f);
             if (_sprite == null) throw new InvalidOperationException("原生精灵创建返回空值。");
             _sprite.name = SpriteKey;
-            _log.Msg($"[股市图像] 原生 PNG 解码与 CPU 像素采样完成，已注册 {width}×{height} 原版尺寸精灵。");
+            _log.Msg($"[股市图像] stage=asset ready：PNG 解码与 CPU 采样完成，已创建 {width}×{height} 纹理和精灵；实际 Image 绑定尚待核对。");
             return true;
         }
         catch (Exception ex)
@@ -127,6 +159,9 @@ internal sealed class TerminalVisual : IDisposable
             // 先恢复可序列化字段；即使渲染节点已销毁，存档仍保留原版图集。
             item.spriteAtlasPath = original.Atlas;
             item.spritePath = original.Sprite;
+            if (element?.background?.image != null) element.background.image.overrideSprite = original.RealOverride!;
+            if (element?.fakeBackground?.image != null) element.fakeBackground.image.overrideSprite = original.FakeOverride!;
+            element?.ValidatePartialSprite();
             item.Validate();
         }
         catch (Exception ex) { Warn("restore native atlas", "原版图集字段已尝试恢复，渲染刷新失败。", ex); }
@@ -152,11 +187,12 @@ internal sealed class TerminalVisual : IDisposable
     public void ResetTracking()
     {
         // 场景已经卸载时不触碰旧原生对象，只清理包装引用。
-        _originals.Clear(); _saving = false;
+        _originals.Clear(); _rendererLogged.Clear(); _resolverLogged.Clear(); _saving = false;
     }
     public void Dispose()
     {
         if (_disposed) return; _disposed = true;
+        if (_active == this) _active = null;
         foreach (var original in _originals.Values) Restore(original.Item);
         _originals.Clear();
         try
@@ -176,5 +212,5 @@ internal sealed class TerminalVisual : IDisposable
         catch (Exception ex) { Warn("target texture cleanup", "目标纹理清理失败。", ex); }
         _sprite = null; _texture = null;
     }
-    private sealed record OriginalVisual(GameItem Item, string Atlas, string Sprite);
+    private sealed record OriginalVisual(GameItem Item, string Atlas, string Sprite, Sprite? RealOverride, Sprite? FakeOverride);
 }

@@ -45,3 +45,11 @@
 当前生成代理中 Graphics.DrawTextureImpl 直接抛出 Method unstripping failed。图标改为已核实的原生 LoadImage/GetPixels32/SetPixels32/Apply/Sprite.Create 调用，加纯 C# 最近邻采样；不使用 Graphics、GL、RenderTexture 绘制路径。图片失败会记录阶段和完整异常，本次运行不重复分配失败资源。
 
 面板滚动、输入、柱图与字体创建也需要避开代理中的裁剪占位方法；具体替换见 [界面适配说明](../UI/ADAPTER-NOTES.md)。补领热键使用已核实的 Event.current/control/keyCode 绑定，只补领物品，不改变通过背包双击打开的主交互。
+
+## 0.2.0 真实图像绑定与原生窗口
+
+0.1.1 实机日志确认 PNG 解码和 32×32 缓存创建成功，但用户截图仍显示便笺，因此“资产已载入”不等于背包图像已绑定。对当前 GameAssembly.dll 的静态反汇编显示：SetSprite（RVA 0x79BDB0）仅修改路径与 spriteChanged；ValidatePartialSprite（RVA 0x78E510）和 ApplyAnimationFrame（RVA 0x788A40）才更新真实及拖拽 Image。
+
+新实现会显式调用图像刷新、设置实际 overrideSprite，并比较两个 Image.sprite/overrideSprite 的指针。只有读回与生成精灵相同时才打印 stage=renderer readback；该日志仍不代替视觉截图。专用 ResolveSpriteByName 补丁只处理当前股市道具的独立路径，保存及切档时停用，关闭时移除。
+
+双击界面改用本版本实际提供的 CustomUIManager/CustomUIBuilder 与游戏预制件，详见 [原生界面说明](../UI/NATIVE-NOTES.md)。需要用户重启后确认图标、窗口素材、中文、页面切换、数量输入、原版资金门控和关闭恢复输入。

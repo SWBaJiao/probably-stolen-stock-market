@@ -12,9 +12,10 @@ public interface IMarketHost
     string SellerDescription { get; }
     string SellerReputation { get; }
     string OfferDescription { get; }
+    string? OfferId { get; }
     int? OfferCost { get; }
     bool CanBuyRumor { get; }
     string PlaceOrder(string companyId, int quantity, bool buy);
-    string BuyRumor();
+    string BuyRumor(string? expectedOfferId = null);
     string RecoverTerminal();
 }
