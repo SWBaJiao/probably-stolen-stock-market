@@ -14,6 +14,7 @@ public sealed class BrokerVisitState
     public int ArrivalDay { get; set; } = -1;
     public bool HasArrived { get; set; }
     public bool Departed { get; set; }
+    public bool IsManual { get; set; }
 }
 // 报价投影只提供来源和产品类别，不提供未购买的公司与方向。
 public sealed class BrokerVisitView
@@ -25,6 +26,7 @@ public sealed class BrokerVisitView
     public int ArrivalDay { get; set; }
     public bool HasArrived { get; set; }
     public bool Departed { get; set; }
+    public bool IsManual { get; set; }
     public string SourceName { get; set; } = "";
     public string SourceIdentity { get; set; } = "";
     public string ProductKind { get; set; } = "";

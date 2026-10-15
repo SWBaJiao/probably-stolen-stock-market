@@ -18,4 +18,5 @@ public interface IMarketHost
     string PlaceOrder(string companyId, int quantity, bool buy);
     string BuyRumor(string? expectedOfferId = null);
     string RecoverTerminal();
+    string InviteIntelBroker();
 }

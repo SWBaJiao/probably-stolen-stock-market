@@ -167,6 +167,45 @@ static class BrokerTests
         var oldJson = JsonNode.Parse(legacy.Serialize())!; oldJson.AsObject().Remove("Broker");
         var restored = new MarketEngine(legacy.Config, MarketEngine.Deserialize(oldJson.ToJsonString(), legacy.Config));
         check(restored.State.Version == 1 && restored.GetRumors().Single().Purchased && restored.GetIntelRecords().Count == 0 && !restored.State.Rumors[old.Id].CalendarEligible, "旧 schema 情报继续归档且不会补发纸条或日历提醒");
+
+        var manual = Planned();
+        manual.engine.MarkBrokerArrived(manual.visit.VisitId);
+        manual.engine.CloseBrokerVisit(manual.visit.VisitId);
+        manual.engine.AdvanceDay(2);
+        check(manual.engine.TryPlanBrokerVisit(new[] { Future(3) }) == null, "手动邀请前自动计划仍受已有到访冷却限制");
+        var manualVisit = manual.engine.TryPlanBrokerVisit(new[] { Future(3) }, manual: true)!;
+        check(manualVisit != null && manualVisit.IsManual && !manualVisit.HasArrived && manual.engine.State.Broker.LastArrivalDay == 1, "冷却期间可手动计划但未到访前不改最后到访日");
+        var manualSaved = manual.engine.Serialize();
+        var manualReloaded = new MarketEngine(manual.engine.Config, MarketEngine.Deserialize(manualSaved, manual.engine.Config));
+        var autoResumed = manualReloaded.TryPlanBrokerVisit(new[] { Future(3) });
+        check(autoResumed != null && autoResumed.IsManual && autoResumed.VisitId == manualVisit!.VisitId && manualReloaded.Serialize() == manualSaved && manualReloaded.MarkBrokerArrived(autoResumed.VisitId) && manualReloaded.State.Broker.LastArrivalDay == 2, "手邀计划保存重读后自动 Tick 复用并允许冷却期间实际到访");
+        var arrivedSaved = manualReloaded.Serialize();
+        var arrivedReloaded = new MarketEngine(manual.engine.Config, MarketEngine.Deserialize(arrivedSaved, manual.engine.Config));
+        check(arrivedReloaded.GetBrokerVisit()!.HasArrived && arrivedReloaded.GetBrokerVisit()!.IsManual && arrivedReloaded.Serialize() == arrivedSaved, "手邀实际到访状态与新冷却起点准确恢复");
+        for (var click = 0; click < 5; click++) arrivedReloaded.TryPlanBrokerVisit(new[] { Future(3) }, manual: true);
+        check(arrivedReloaded.Serialize() == arrivedSaved, "连续手动点击复用同日来源报价真假与外观不重抽");
+        arrivedReloaded.BuyBrokerOffer(manualVisit!.OfferId, new[] { Future(3) }, new Wallet(), () => { });
+        var boughtSaved = arrivedReloaded.Serialize();
+        check(arrivedReloaded.TryPlanBrokerVisit(new[] { Future(3) }, manual: true)!.Purchased && arrivedReloaded.Serialize() == boughtSaved, "同日已购手动报价不会生成第二条情报");
+        arrivedReloaded.CloseBrokerVisit(manualVisit.VisitId);
+        var closedSaved = arrivedReloaded.Serialize();
+        check(arrivedReloaded.TryPlanBrokerVisit(new[] { Future(3) }, manual: true) == null && arrivedReloaded.Serialize() == closedSaved, "同日手邀结束后不能再次生成该 NPC 或新报价");
+        arrivedReloaded.AdvanceDay(3);
+        check(arrivedReloaded.TryPlanBrokerVisit(new[] { Future(4) }) == null, "手邀实际到访后第一天自动计划仍受冷却限制");
+        arrivedReloaded.AdvanceDay(4);
+        check(arrivedReloaded.TryPlanBrokerVisit(new[] { Future(5) }) == null, "手邀实际到访后第二天自动计划仍受冷却限制");
+        arrivedReloaded.AdvanceDay(5);
+        var automaticAgain = arrivedReloaded.TryPlanBrokerVisit(new[] { Future(6) });
+        check(automaticAgain != null && !automaticAgain.IsManual && arrivedReloaded.MarkBrokerArrived(automaticAgain.VisitId), "手邀后满三日恢复普通自动到访且不继承手动绕过标记");
+        var noManualIntel = Engine(); var noManualSnapshot = noManualIntel.Serialize();
+        check(noManualIntel.TryPlanBrokerVisit(Array.Empty<ScheduledEvent>(), manual: true) == null && noManualIntel.Serialize() == noManualSnapshot, "手动邀请没有未来可售情报时不造 NPC 不消耗随机状态");
+        var expiredManual = Engine(); var staleManualVisit = expiredManual.TryPlanBrokerVisit(new[] { Future() }, manual: true)!;
+        expiredManual.TryPlanBrokerVisit(Array.Empty<ScheduledEvent>(), manual: true);
+        var expiredSaved = expiredManual.Serialize();
+        check(expiredManual.TryPlanBrokerVisit(new[] { Future() }, manual: true)!.OfferId == staleManualVisit.OfferId && expiredManual.GetBrokerVisit()!.Expired && expiredManual.Serialize() == expiredSaved, "同日已失效手邀报价不会恢复有效或重新抽取");
+        var oldBrokerJson = JsonNode.Parse(Planned().engine.Serialize())!;
+        oldBrokerJson["Broker"]!.AsObject().Remove("IsManual");
+        check(!new MarketEngine(manual.engine.Config, MarketEngine.Deserialize(oldBrokerJson.ToJsonString(), manual.engine.Config)).State.Broker.IsManual, "旧到访存档缺少手动字段时按自动计划兼容读取");
     }
     sealed class Wallet : IWallet
     {

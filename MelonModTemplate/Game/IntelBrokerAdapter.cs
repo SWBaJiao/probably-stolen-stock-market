@@ -59,37 +59,58 @@ internal sealed class IntelBrokerAdapter : IDisposable
     internal void Tick()
     {
         if (_disposed || !_host.BrokerReady) return;
-        try
-        {
-            if (_identity != _host.BrokerSaveIdentity) { Reset(); _identity = _host.BrokerSaveIdentity; }
-            Register();
-            var store = PlayerStore.Instance;
-            if (store == null || store.storeClientManager == null || store.storeState != PlayerStore.StoreState.OPEN) return;
-            var engine = _host.Engine;
-            if (engine == null) return;
-            FlushArrivalPersistence();
-            var manager = store.storeClientManager;
-            // BrokerReady 和上方存档身份检查已确认当前存档，保留其队列引用以清理过期来访。
-            if (_queue != null && _queue.Pointer != manager.Pointer) RemoveQueued();
-            _queue = manager;
-            var visit = engine.TryPlanBrokerVisit(_host.GetBrokerScheduledEvents());
-            _host.PersistBrokerState();
-            if (visit == null || visit.Purchased || visit.Departed || visit.Expired) { RemoveQueued(); return; }
-            if (_visitId.Length > 0 && _visitId != visit.VisitId) { RemoveQueued(); ClearVisitCallbacks(); }
-            _visitId = visit.VisitId;
-            if (IsBroker(_host.CurrentClient)) { Arrived(_host.CurrentClient!, visit.VisitId, _identity); UpdateUi(); return; }
-            if (manager.clientStack == null) return;
-            _queue = manager;
-            foreach (var client in manager.clientStack) if (IsBroker(client)) return;
-            var created = StoreClientListDict.CreateStoreClient(NpcId);
-            if (!IsBroker(created)) throw new InvalidOperationException("专属情报商工厂返回了其他顾客，已停止本次排队。");
-            int before = manager.clientStack.Count;
-            manager.AddClient(created);
-            _queue = manager;
-            _log.Msg($"[股市掮客探针] 队尾追加 visit={visit.VisitId}，原队列={before}，现队列={manager.clientStack.Count}；未替换剧情顾客。");
-            _lastFault = "";
-        }
+        try { QueueVisit(false); }
         catch (Exception ex) { Report(ex); }
+    }
+
+    internal string RequestVisit()
+    {
+        if (_disposed || !_host.BrokerReady) return "请先进入游戏存档。";
+        try { return QueueVisit(true); }
+        catch (Exception ex) { Report(ex); return "邀请未完成，请查看加载日志。"; }
+    }
+
+    private string QueueVisit(bool manual)
+    {
+        if (_identity != _host.BrokerSaveIdentity) { Reset(); _identity = _host.BrokerSaveIdentity; }
+        Register();
+        var store = PlayerStore.Instance;
+        if (store == null || store.storeClientManager == null || store.storeState != PlayerStore.StoreState.OPEN) return "请先开门营业，再邀请内幕掮客。";
+        var engine = _host.Engine;
+        if (engine == null) return "请先进入游戏存档。";
+        if (manual && IsBroker(_host.CurrentClient)) return "内幕掮客正在接待中，关闭股市面板后与他交谈。";
+        FlushArrivalPersistence();
+        var manager = store.storeClientManager;
+        // BrokerReady 和上方存档身份检查已确认当前存档，保留其队列引用以清理过期来访。
+        if (_queue != null && _queue.Pointer != manager.Pointer) RemoveQueued();
+        _queue = manager;
+        var visit = engine.TryPlanBrokerVisit(_host.GetBrokerScheduledEvents(), manual);
+        _host.PersistBrokerState();
+        if (visit == null || visit.Purchased || visit.Departed || visit.Expired)
+        {
+            RemoveQueued();
+            var current = engine.GetBrokerVisit();
+            return current?.PlannedDay == engine.State.LastDay
+                ? "今日这份报价已经购买、结束或失效，请次日再试。"
+                : "未来观察窗口内暂无可售股市线索，暂时无法邀请。";
+        }
+        if (_visitId.Length > 0 && _visitId != visit.VisitId) { RemoveQueued(); ClearVisitCallbacks(); }
+        _visitId = visit.VisitId;
+        if (IsBroker(_host.CurrentClient)) { Arrived(_host.CurrentClient!, visit.VisitId, _identity); UpdateUi(); return "内幕掮客正在接待中，关闭股市面板后与他交谈。"; }
+        if (manager.clientStack == null) return "顾客队列尚未就绪，请稍后再试。";
+        _queue = manager;
+        foreach (var client in manager.clientStack) if (IsBroker(client)) return "内幕掮客已在顾客队列中，请等待接待。";
+        var created = StoreClientListDict.CreateStoreClient(NpcId);
+        if (!IsBroker(created)) throw new InvalidOperationException("专属情报商工厂返回了其他顾客，已停止本次排队。");
+        int before = manager.clientStack.Count;
+        manager.AddClient(created);
+        _queue = manager;
+        bool inserted = false;
+        foreach (var client in manager.clientStack) if (client?.Pointer == created.Pointer) inserted = true;
+        if (!inserted) throw new InvalidOperationException("原版队列没有读回新掮客，请稍后重试。");
+        _log.Msg($"[股市掮客探针] 队尾追加 visit={visit.VisitId} manual={manual}，原队列={before}，现队列={manager.clientStack.Count}；未替换剧情顾客。");
+        _lastFault = "";
+        return "内幕掮客已加入顾客队尾，关闭股市面板后等待接待。";
     }
 
     private void Register()

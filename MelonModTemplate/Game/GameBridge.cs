@@ -218,6 +218,18 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     }
     public string BuyRumor(string? expectedOfferId = null) => "请与行情掮客交谈，在原版情报界面购买。";
 
+    public string InviteIntelBroker()
+    {
+        if (!BrokerReady) return "请先进入游戏存档。";
+        if (Environment.CurrentManagedThreadId != _threadId || _monetaryOperation) return "操作繁忙，请稍后再试。";
+        try
+        {
+            Engine!.AdvanceDay(StoreStation.GetDayCounter());
+            return _broker?.RequestVisit() ?? "掮客功能尚未初始化。";
+        }
+        catch (Exception ex) { _log.Warning("[股市掮客] 手动邀请失败：" + ex); return "邀请未完成，请查看加载日志。"; }
+    }
+
     internal OperationResult PurchaseBrokerOffer(string visitId, string offerId)
     {
         if (!CanBuyBrokerIntel) return OperationResult.Fail(BrokerTradeStatus);

@@ -6,7 +6,7 @@ namespace MelonModTemplate.Market;
 
 public sealed partial class MarketEngine
 {
-    public BrokerVisitView? TryPlanBrokerVisit(IReadOnlyList<ScheduledEvent> scheduled)
+    public BrokerVisitView? TryPlanBrokerVisit(IReadOnlyList<ScheduledEvent> scheduled, bool manual = false)
     {
         if (_busy || State.LastDay < 0) return null;
         var visit = State.Broker;
@@ -16,7 +16,7 @@ public sealed partial class MarketEngine
             return visit.Departed ? null : GetBrokerVisit();
         }
         if (visit.VisitId.Length > 0) CloseBrokerVisit(visit.VisitId);
-        if (visit.LastArrivalDay >= 0 && State.LastDay - visit.LastArrivalDay < Config.BrokerCooldownDays) return null;
+        if (!manual && visit.LastArrivalDay >= 0 && State.LastDay - visit.LastArrivalDay < Config.BrokerCooldownDays) return null;
         var candidates = scheduled.Where(e => e.Day > State.LastDay && e.Day <= State.LastDay + Config.RumorHorizon && !State.OccurredEvents.Contains(EventKey(e.EventId, e.OccurrenceKey)))
             .Select(e => (scheduled: e, rule: Config.Events.FirstOrDefault(r => r.EventId == e.EventId)))
             .Where(x => x.rule != null && x.rule.Impacts.Any(p => p.Value != 0 && Config.Companies.Any(c => c.Id == p.Key)))
@@ -69,6 +69,7 @@ public sealed partial class MarketEngine
         visit.ArrivalDay = -1;
         visit.HasArrived = false;
         visit.Departed = false;
+        visit.IsManual = manual;
         return GetBrokerVisit();
     }
 
@@ -77,7 +78,7 @@ public sealed partial class MarketEngine
         var visit = State.Broker;
         if (visit.VisitId != visitId || visit.Departed || visit.PlannedDay != State.LastDay || !State.Rumors.TryGetValue(visit.OfferId, out var offer) || offer.Expired) return false;
         if (visit.HasArrived) return true;
-        if (visit.LastArrivalDay >= 0 && State.LastDay - visit.LastArrivalDay < Config.BrokerCooldownDays) return false;
+        if (!visit.IsManual && visit.LastArrivalDay >= 0 && State.LastDay - visit.LastArrivalDay < Config.BrokerCooldownDays) return false;
         visit.HasArrived = true;
         visit.ArrivalDay = State.LastDay;
         visit.LastArrivalDay = State.LastDay;
@@ -104,7 +105,7 @@ public sealed partial class MarketEngine
     {
         var v = State.Broker;
         if (v.VisitId.Length == 0 || !State.Rumors.TryGetValue(v.OfferId, out var offer)) return null;
-        return new BrokerVisitView { VisitId = v.VisitId, OfferId = v.OfferId, AppearanceKey = v.AppearanceKey, PlannedDay = v.PlannedDay, ArrivalDay = v.ArrivalDay, HasArrived = v.HasArrived, Departed = v.Departed, SourceName = offer.SellerName, SourceIdentity = offer.Identity, ProductKind = offer.Industry + "类·" + offer.ProductKind, Price = offer.Price, Purchased = offer.Purchased, Expired = offer.Expired || v.Departed || v.PlannedDay != State.LastDay };
+        return new BrokerVisitView { VisitId = v.VisitId, OfferId = v.OfferId, AppearanceKey = v.AppearanceKey, PlannedDay = v.PlannedDay, ArrivalDay = v.ArrivalDay, HasArrived = v.HasArrived, Departed = v.Departed, IsManual = v.IsManual, SourceName = offer.SellerName, SourceIdentity = offer.Identity, ProductKind = offer.Industry + "类·" + offer.ProductKind, Price = offer.Price, Purchased = offer.Purchased, Expired = offer.Expired || v.Departed || v.PlannedDay != State.LastDay };
     }
 
     public OperationResult BuyBrokerOffer(string offerId, IReadOnlyList<ScheduledEvent> scheduled, IWallet wallet, Action persist)
