@@ -6,11 +6,11 @@ static class EventLifecycleTests
 {
     static MarketEngine Engine()
     {
-        var c = MarketConfig.CreateDefault(); c.DailyLimit = 0m;
+        var c = MarketConfig.CreateDefault(); c.DailyLimit = 0m; c.EventShockWindowDays = 1;
         c.Events.Clear();
         c.Events.Add(new EventRule { EventId = "rise", Description = "公开上行事件", Impacts = new() { ["water"] = .1m, ["medical"] = .05m } });
         c.Events.Add(new EventRule { EventId = "fall", Description = "不可公开的下行事件名", Impacts = new() { ["water"] = -.1m } });
-        var e = new MarketEngine(c); e.ApplyStorageAccess(false); e.AdvanceDay(1); return e;
+        var e = new MarketEngine(c); e.ApplyStorageAccess(false); e.AdvanceDay(1); e.State.RandomState = 1; return e;
     }
     static MarketEngine Clone(MarketEngine e) { var c = MarketConfig.Deserialize(e.Config.Serialize()); return new MarketEngine(c, MarketEngine.Deserialize(e.Serialize(), c)); }
     static ActiveMarketEvent Native(string id = "rise", string key = "one", int? end = 5, bool permanent = false, bool visible = true) => new() { EventId = id, OccurrenceKey = key, StartDay = 1, ExpectedEndDayExclusive = end, IsPermanent = permanent, IsPublic = visible };

@@ -7,7 +7,7 @@ static class DailyTradeTests
     static MarketEngine Engine()
     {
         var config = MarketConfig.CreateDefault();
-        config.DailyLimit = 0m;
+        config.DailyLimit = 0m; config.EventShockWindowDays = 1;
         var engine = new MarketEngine(config);
         engine.ApplyStorageAccess(false); engine.AdvanceDay(1);
         config.DailyLimit = .03m;

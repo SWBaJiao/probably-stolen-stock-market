@@ -64,6 +64,8 @@ public sealed class DailyCandle
 }
 public sealed class CompanyState
 {
+    public int EventDriftDay { get; set; } = -1;
+    public decimal EventDriftRatio { get; set; } = 1m;
     public decimal PersistentEventFactor { get; set; } = 1m;
     public decimal Price { get; set; } = 100m;
     public decimal DailyRetailImpact { get; set; }

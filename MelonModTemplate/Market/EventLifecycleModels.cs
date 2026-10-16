@@ -34,6 +34,13 @@ public sealed class EventLifecycleState
     public bool NativeActive { get; set; } = true;
     public bool IsPermanent { get; set; }
     public bool IsPublic { get; set; }
+    public string PublicDescription { get; set; } = "";
+    public decimal PreheatChance { get; set; }
+    public int ShockPlanVersion { get; set; }
+    public int ShockDay { get; set; }
+    public bool ShockApplied { get; set; }
+    public bool ShockCancelled { get; set; }
+    public ulong PreheatSeed { get; set; }
     public bool LegacyAdopted { get; set; }
     public bool RecoveryTargetFrozen { get; set; }
     public decimal RetentionRatio { get; set; }

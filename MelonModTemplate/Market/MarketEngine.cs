@@ -209,15 +209,12 @@ public sealed partial class MarketEngine
         State.ObservedEventDirections[key] = rule == null ? new() : rule.Impacts.Where(p => p.Value != 0 && State.Companies.ContainsKey(p.Key)).ToDictionary(p => p.Key, p => Math.Sign(p.Value));
         if (rule != null)
         {
-            var applied = new Dictionary<string, decimal>();
-            foreach (var impact in rule.Impacts)
-            {
-                var before = State.Companies[impact.Key].Price;
-                MovePrice(impact.Key, impact.Value, isPublic ? rule.Description : "市场异动");
-                applied[impact.Key] = State.Companies[impact.Key].Price / before;
-            }
-            RegisterEventLifecycle(native, observedDay, applied, false);
-            if (isPublic) Log("event", string.IsNullOrEmpty(rule.Description) ? "公开事件已影响关联公司。" : rule.Description);
+            RegisterEventLifecycle(native, observedDay, null, false);
+            AdvanceEventLifecycles(observedDay);
+            // 零方向规则仍保留原有已生效采样语义，不创建无意义的生命周期。
+            foreach (var impact in rule.Impacts.Where(p => p.Value == 0m))
+                MovePrice(impact.Key, 0m, isPublic ? rule.Description : "市场异动");
+            if (isPublic) Log("event", string.IsNullOrEmpty(rule.Description) ? "公开事件已生效，关联公司行情可能受影响。" : rule.Description);
         }
         else Diagnostic?.Invoke("未映射事件标识：" + eventId);
         ResolveOccurredRumors();

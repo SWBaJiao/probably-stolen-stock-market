@@ -18,6 +18,7 @@ MarketEngine Engine()
     var c = MarketConfig.CreateDefault();
     // 通用旧场景只验证原有交易、存档和图表；持续事件行为由专用生命周期用例覆盖。
     c.EventContinuationScale = 0m;
+    c.EventShockWindowDays = 1;
     c.Events.Add(new EventRule { EventId = "test-water", Description = "净水设施故障", Sectors = new() { "water" }, Impacts = new() { ["water"] = -.1m, ["industrial"] = .05m } });
     return new MarketEngine(c) { State = { StorageVerified = true } };
 }
@@ -346,6 +347,7 @@ PhoneBookingTests.Run(Check);
 BrokerIntroductionTests.Run(Check);
 DailyTradeTests.Run(Check);
 EventLifecycleTests.Run(Check);
+EventShockTimingTests.Run(Check);
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet

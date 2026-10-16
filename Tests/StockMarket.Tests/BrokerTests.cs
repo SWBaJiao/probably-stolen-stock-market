@@ -94,7 +94,7 @@ static class BrokerTests
             p = Find(kind, correct);
             var offer = p.engine.State.Rumors[p.visit.OfferId];
             var rule = p.engine.Config.Events[0];
-            check(offer.ProductKind == kind && offer.CompanyDirections.Count == (kind == "行业情报" ? 2 : 1) && offer.CompanyDirections.All(d => d.Value == Math.Sign(rule.Impacts[d.Key]) * (correct ? 1 : -1)) && offer.Content.StartsWith("有人透露，未来3日，") && offer.Content.Contains(kind == "行业情报" ? "与武器、防护装备类商品相关的部分公司：" : "消息指向") && offer.Content.EndsWith("以上为来源传闻，不保证准确。") && !offer.Content.Contains("不会") && !offer.Content.Contains("真正事件") && !offer.Content.Contains("2"), $"{kind}{(correct ? "真" : "假")}按范围和逐公司方向陈述且不泄露事件日期");
+            check(offer.ProductKind == kind && offer.CompanyDirections.Count == (kind == "行业情报" ? 2 : 1) && offer.CompanyDirections.All(d => d.Value == Math.Sign(rule.Impacts[d.Key]) * (correct ? 1 : -1)) && offer.Content.StartsWith("有人透露，未来3日相关消息可能落地。") && offer.Content.Contains("行情反应可能滞后") && offer.Content.Contains(kind == "行业情报" ? "与武器、防护装备类商品相关的部分公司：" : "消息指向") && offer.Content.EndsWith("以上为来源传闻，不保证准确。") && !offer.Content.Contains("不会") && !offer.Content.Contains("真正事件") && !offer.Content.Contains("2"), $"{kind}{(correct ? "真" : "假")}按范围和逐公司方向陈述且不泄露事件日期");
             p.engine.MarkBrokerArrived(p.visit.VisitId); p.engine.BuyBrokerOffer(offer.Id, new[] { Future() }, new Wallet(), () => { });
             p.engine.AdvanceDay(2); p.engine.ActivateEvent(Future().EventId, Future().OccurrenceKey, 2); p.engine.ActivateEvent(Future().EventId, Future().OccurrenceKey, 2);
             var rep = p.engine.State.Reputations[offer.SellerKey];

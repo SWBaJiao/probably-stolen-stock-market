@@ -425,7 +425,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             bool processed = Engine.ActivateEvent(observation.EventId, observation.OccurrenceKey, day, observation.IsPublic,
                 observation.ExpectedEndDayExclusive, observation.IsPermanent);
             int impacts = Engine.Config.Events.FirstOrDefault(r => r.EventId == ev.identifier)?.Impacts.Count(p => p.Value != 0) ?? 0;
-            _log.Msg($"[股市事件] id={ev.identifier} day={day} lifecycleSynced=true directApplied={processed} mappedCompanies={impacts}"); Persist();
+            _log.Msg($"[股市事件] id={ev.identifier} day={day} lifecycleSynced=true directRegistered={processed} mappedCompanies={impacts}"); Persist();
         }
         catch (Exception ex) { Fault("事件适配失败", ex); }
     }
@@ -489,7 +489,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         observation = new ActiveMarketEvent();
         // 原版激活函数写入实际游戏日，0 是合法首日；负值不能改用每次观察日构造新 key。
         if (string.IsNullOrWhiteSpace(ev.identifier) || ev.startDay < 0)
-        { EventSnapshotWarning("生效事件缺少有效标识或 startDay 为负，本次不新造发生键、不施首冲，等待原生数据恢复。"); return false; }
+        { EventSnapshotWarning("生效事件缺少有效标识或 startDay 为负，本次不新造发生键、不登记行情计划，等待原生数据恢复。"); return false; }
         int? end = ev.totalDuration > 0 && ev.startDay <= int.MaxValue - ev.totalDuration
             ? ev.startDay + ev.totalDuration : null;
         observation = new ActiveMarketEvent
@@ -515,7 +515,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             if (_eventDayStartDepth == 0 && EnsureMarketDay(manager, authorizeManager: true)) Persist();
             int day = StoreStation.GetDayCounter();
             // 日开始替换旧事件时，新日尚未结算；旧事件最后生效日为前一日。
-            // 同批刚激活又移除的事件保留当日，避免抹掉其真实首冲。
+            // 同批刚激活又移除的事件保留当日，避免抹掉其实际发生记录。
             int lastActiveDay = _eventDayStartDepth > 0 && observation.StartDay < day ? day - 1 : day;
             return new EventLifecycleCapture(manager, ev, observation, lastActiveDay, Engine!, _identity);
         }
@@ -562,7 +562,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             int day = StoreStation.GetDayCounter();
             foreach (var active in _pendingEventActivations)
                 Engine!.ActivateEvent(active.EventId, active.OccurrenceKey, day, active.IsPublic, active.ExpectedEndDayExclusive, active.IsPermanent);
-            // 同一次日开始流程中激活又结束的事件仍保留一次首冲及真实结束日。
+            // 同一次日开始流程中激活又结束的事件仍登记事实与真实结束日，未发生的大跳由领域取消。
             foreach (var ending in _pendingEventEndings)
                 Engine!.EndEvent(ending.Observation.EventId, ending.Observation.OccurrenceKey, ending.Day);
             Persist();

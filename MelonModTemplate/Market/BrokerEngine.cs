@@ -66,7 +66,7 @@ public sealed partial class MarketEngine
             EventId = candidate.scheduled.EventId, OccurrenceKey = candidate.scheduled.OccurrenceKey,
             PredictsOccurrence = correct, CompanyIds = directions.Keys.ToList(), CompanyDirections = directions,
             Industry = sector?.Name ?? "综合贸易", ProductKind = industryOffer ? "行业情报" : "公司情报",
-            Content = "有人透露，未来" + Config.RumorHorizon + "日，" + (industryOffer ? "与" + (sector?.Name ?? "综合贸易") + "类商品相关的部分公司：" : "消息指向") + string.Join("；", predictions) + "。以上为来源传闻，不保证准确。"
+            Content = "有人透露，未来" + Config.RumorHorizon + "日相关消息可能落地。" + (industryOffer ? "与" + (sector?.Name ?? "综合贸易") + "类商品相关的部分公司：" : "消息指向") + string.Join("；", predictions) + "。行情反应可能滞后，以上为来源传闻，不保证准确。"
         };
         if (visit.VisitId.Length > 0) CloseBrokerVisit(visit.VisitId);
         State.Rumors.Add(id, offer);
