@@ -32,7 +32,6 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private bool _monetaryOperation;
     private bool _loadedPending;
     private bool _loading;
-    private bool _roundTripVerified;
     private PlayerStore.StoreState? _observedStoreState;
     private bool _inMenu = true;
     private IntPtr _loadDictionaryPointer;
@@ -82,8 +81,8 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     public string? OfferId => _offer?.Id;
     public bool CanBuyRumor => false;
     internal bool BrokerReady => !_disposed && !_inMenu && !_loading && Engine != null && IsCurrentStore();
-    internal bool CanBuyBrokerIntel => CanTrade && _roundTripVerified;
-    internal string BrokerTradeStatus => !_roundTripVerified ? "股市内幕付款仍需正常保存并重新载入，确认此存档恢复后开放。" : Status;
+    internal bool CanBuyBrokerIntel => CanTrade;
+    internal string BrokerTradeStatus => Status;
     internal string BrokerSaveIdentity => _identity;
     internal StoreClient? CurrentClient => Client;
     internal PlayerStore? CurrentStore => _store;
@@ -176,7 +175,6 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         }
         // 每次附加按本机配置决定访问权限，不信任存档中的旧解锁布尔值。
         Engine.Diagnostic += message => _log.Warning("[股市映射] " + message);
-        _roundTripVerified = restored;
         Engine.ApplyStorageAccess(restored);
         if (actualLoad && _save.WrittenBySave && _save.SavedCash != store.GetCash())
             _log.Warning($"[股市探针] 读回现金不匹配：记录 {_save.SavedCash}，当前 {store.GetCash()}，严格验证={_config.RequireSaveReloadVerification}。");
@@ -200,7 +198,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         _terminalVisual.ResetTracking();
         _trackedTerminal = null; _terminalGrant = new TerminalGrantPolicy();
         _loadDictionaryPointer = _store?.modData?.Pointer ?? IntPtr.Zero;
-        _loading = true; _roundTripVerified = false; _offer = null; _store = null; Engine = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero;
+        _loading = true; _offer = null; _store = null; Engine = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero;
     }
     public void OnSceneChanged(string sceneName)
     {

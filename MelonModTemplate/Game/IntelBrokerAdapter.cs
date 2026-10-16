@@ -5,6 +5,7 @@ using System.Reflection;
 using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime;
+using Il2CppTMPro;
 using MelonLoader;
 using MelonModTemplate.Market;
 
@@ -47,6 +48,8 @@ internal sealed class IntelBrokerAdapter : IDisposable
             Patch(typeof(StoreClient), "OnIntroduced", nameof(IntroducedPrefix), true);
             Patch(typeof(StoreClient), "OnIntroduced", nameof(IntroducedPostfix), false);
             Patch(typeof(NegociationUIManager), "InitUIWithItemInformationDealerMode", nameof(InformationUiPostfix), false);
+            Patch(typeof(NegociationUIManager), "RefreshUI", nameof(InformationUiPostfix), false);
+            Patch(typeof(NegociationUIManager), "Update", nameof(InformationUiPostfix), false);
             Patch(typeof(NegociationUIManager), "OnOfferAcceptClick", nameof(PurchasePrefix), true);
             Patch(typeof(NegociationUIManager), "OnAcceptMultipleButtonClick", nameof(OtherOfferPrefix), true);
             Patch(typeof(NegociationUIManager), "OnWholesaleClick", nameof(OtherOfferPrefix), true);
@@ -235,20 +238,28 @@ internal sealed class IntelBrokerAdapter : IDisposable
         _pendingArrivalVisit = "";
     }
 
-    private void UpdateUi()
+    private void UpdateUi(NegociationUIManager? source = null)
     {
-        if (_disposed || !IsBroker(_host.CurrentClient)) return;
+        if (_disposed || !_host.BrokerReady || !IsBroker(_host.CurrentClient)) return;
         var view = _host.Engine?.GetBrokerVisit();
-        var ui = NegociationUIManager.Instance;
-        if (ui == null || view == null) return;
-        if (ui.titleTMP != null) ui.titleTMP.text = "股市内幕交易";
-        if (ui.itemName != null) ui.itemName.text = view.ProductKind;
-        if (ui.bodyTMP != null) ui.bodyTMP.text = PublicOffer(view) + (_pendingArrivalVisit.Length > 0 ? "\n\n到访状态暂未保存，正在重试；保存成功后才能购买。" : !_host.CanBuyBrokerIntel ? "\n\n" + _host.BrokerTradeStatus : _host.Cash < view.Price ? "\n\n余额不足，暂时无法购买。" : "");
-        if (ui.costTMP != null) ui.costTMP.text = $"{view.Price} 游戏币";
-        if (ui.acceptOfferButtonButtonTMP != null) ui.acceptOfferButtonButtonTMP.text = view.Purchased ? "已购买" : "购买股市情报";
-        if (ui.acceptOfferButtonButton != null) ui.acceptOfferButtonButton.interactable = _pendingArrivalVisit.Length == 0 && _host.CanBuyBrokerIntel && !_host.BlocksGameInput && !view.Purchased && !view.Expired && !view.Departed && _host.Cash >= view.Price;
-        if (ui.acceptMultipleButton != null) ui.acceptMultipleButton.gameObject.SetActive(false);
-        if (ui.wholesaleButton != null) ui.wholesaleButton.gameObject.SetActive(false);
+        var ui = source ?? NegociationUIManager.Instance;
+        if (ui == null || view == null || view.VisitId != _visitId || _identity != _host.BrokerSaveIdentity
+            || ui.uiObject == null || !ui.uiObject.activeInHierarchy) return;
+        // 原版周期刷新会在初始化之后重写标题，必须在原生刷新返回后统一应用专属文案。
+        SetText(ui.titleTMP, "股市内幕交易");
+        SetText(ui.itemName, view.ProductKind);
+        SetText(ui.bodyTMP, PublicOffer(view) + (_pendingArrivalVisit.Length > 0 ? "\n\n到访状态暂未保存，正在重试；保存成功后才能购买。" : !_host.CanBuyBrokerIntel ? "\n\n" + _host.BrokerTradeStatus : _host.Cash < view.Price ? "\n\n余额不足，暂时无法购买。" : ""));
+        SetText(ui.costTMP, $"{view.Price} 游戏币");
+        SetText(ui.acceptOfferButtonButtonTMP, view.Purchased ? "已购买" : "购买股市情报");
+        bool canPurchase = !_purchasing && _pendingArrivalVisit.Length == 0 && _host.CanBuyBrokerIntel && !_host.BlocksGameInput && !view.Purchased && !view.Expired && !view.Departed && _host.Cash >= view.Price;
+        if (ui.acceptOfferButtonButton != null && ui.acceptOfferButtonButton.interactable != canPurchase) ui.acceptOfferButtonButton.interactable = canPurchase;
+        if (ui.acceptMultipleButton != null && ui.acceptMultipleButton.gameObject.activeSelf) ui.acceptMultipleButton.gameObject.SetActive(false);
+        if (ui.wholesaleButton != null && ui.wholesaleButton.gameObject.activeSelf) ui.wholesaleButton.gameObject.SetActive(false);
+    }
+
+    private static void SetText(TextMeshProUGUI? label, string text)
+    {
+        if (label != null && label.text != text) label.text = text;
     }
 
     private void Purchase()
@@ -400,10 +411,10 @@ internal sealed class IntelBrokerAdapter : IDisposable
         }
         catch (Exception ex) { adapter.Report(ex); }
     }
-    private static void InformationUiPostfix()
+    private static void InformationUiPostfix(NegociationUIManager __instance)
     {
         var adapter = Current;
-        try { adapter?.UpdateUi(); }
+        try { adapter?.UpdateUi(__instance); }
         catch (Exception ex) { adapter?.Report(ex); }
     }
     private static bool PurchasePrefix()

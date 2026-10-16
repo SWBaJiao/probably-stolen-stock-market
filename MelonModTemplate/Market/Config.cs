@@ -59,9 +59,9 @@ public sealed class MarketConfig
         Sector("weapons", "武器、防护装备", new[] { "weapon", "armor", "protection" }, ("defense", .65m), ("commerce", .20m), ("technology", .15m));
         Sector("luxury", "奢侈品", new[] { "luxury", "LUXURY_ITEM" }, ("commerce", .75m), ("logistics", .15m), ("technology", .10m));
         // 事件标识来自当前存档；涨跌幅为本模组的玩法配置。
-        c.Events.Add(new EventRule { EventId = "badNutrifruitHarvest", Description = "营养果歉收，食品供应承压", TrueHint = "食品供应可能收紧，相关商家的进货压力正在增加", FalseHint = "食品供应可能增加，相关商家的进货压力正在缓解", Sectors = new() { "food" }, Impacts = new() { ["harvest"] = -.12m, ["commerce"] = -.05m, ["logistics"] = -.05m } });
-        c.Events.Add(new EventRule { EventId = "bm_illegal_weapon_shipment", Description = "非法武器货物到港，防务市场出现波动", TrueHint = "一批防务物资可能流入市场，供应渠道正在扩张", FalseHint = "防务物资流通可能收紧，供应渠道正在收缩", Sectors = new() { "weapons", "electronics" }, Impacts = new() { ["defense"] = .10m, ["commerce"] = .06m, ["technology"] = .05m } });
-        c.Events.Add(new EventRule { EventId = "rev_mobilization_secret", Description = "武器需求增加", TrueHint = "有组织正在筹集装备，相关采购规模可能扩大", FalseHint = "有组织正在缩减装备采购，相关订单规模可能回落", Sectors = new() { "weapons", "minerals", "electronics" }, Impacts = new() { ["defense"] = .12m, ["industrial"] = .07m, ["technology"] = .05m } });
+        c.Events.Add(new EventRule { ImpactSource = EventImpactResolver.BuiltinPriceSource, DirectionVersion = 1, EventId = "badNutrifruitHarvest", Description = "营养果歉收，食品供应承压", TrueHint = "食品供应可能收紧，相关商家的进货压力正在增加", FalseHint = "食品供应可能增加，相关商家的进货压力正在缓解", Sectors = new() { "food" }, Impacts = new() { ["harvest"] = -.12m, ["commerce"] = -.05m, ["logistics"] = -.05m } });
+        c.Events.Add(new EventRule { ImpactSource = EventImpactResolver.BuiltinPriceSource, DirectionVersion = 1, EventId = "bm_illegal_weapon_shipment", Description = "非法武器货物到港，防务市场出现波动", TrueHint = "一批防务物资可能流入市场，供应渠道正在扩张", FalseHint = "防务物资流通可能收紧，供应渠道正在收缩", Sectors = new() { "weapons", "electronics" }, Impacts = new() { ["defense"] = .10m, ["commerce"] = .06m, ["technology"] = .05m } });
+        c.Events.Add(new EventRule { ImpactSource = EventImpactResolver.BuiltinPriceSource, DirectionVersion = EventImpactResolver.CurrentDirectionVersion, EventId = "rev_mobilization_secret", Description = "武器需求增加", TrueHint = "有组织正在筹集装备，相关采购规模可能扩大", FalseHint = "有组织正在缩减装备采购，相关订单规模可能回落", Sectors = new() { "weapons", "minerals", "electronics" }, Impacts = new() { ["defense"] = -.12m, ["industrial"] = -.07m, ["technology"] = -.05m } });
         void Seller(string id, string identity, decimal probability, params string[] sectors) => c.Sellers.Add(new SellerRule { Identifier = id, Identity = identity, BaseReliability = probability, Sectors = sectors.ToList() });
         Seller("shadyCustomerInformation", "情报商", .65m);
         Seller("pharmacist", "药剂师", .75m, "medical", "materials");
@@ -81,7 +81,19 @@ public sealed class MarketConfig
     }
 
     public string Serialize() => JsonSerializer.Serialize(this, MarketEngine.JsonOptions);
-    public static MarketConfig Deserialize(string json) { var c = JsonSerializer.Deserialize<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空"); c.Validate(); return c; }
+    public static MarketConfig Deserialize(string json) { var c = JsonSerializer.Deserialize<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空"); c.UpgradeLegacyDefaultEventRules(); c.Validate(); return c; }
+    // 仅完全匹配旧默认值时升级；用户编辑过的幅度、行业或文案始终作为显式配置保留。
+    public bool UpgradeLegacyDefaultEventRules()
+    {
+        var old = Events?.FirstOrDefault(e => e?.EventId == "rev_mobilization_secret");
+        if (old == null || old.ImpactSource != "" || old.DirectionVersion != 0 || old.Impacts == null || old.Sectors == null) return false;
+        var updated = CreateDefault().Events.First(e => e.EventId == "rev_mobilization_secret");
+        if (old.Description != updated.Description || old.TrueHint != updated.TrueHint || old.FalseHint != updated.FalseHint || !old.Sectors.SequenceEqual(updated.Sectors) || old.Impacts.Count != updated.Impacts.Count || old.Impacts.Any(p => !updated.Impacts.TryGetValue(p.Key, out var current) || p.Value != -current)) return false;
+        old.Impacts = new Dictionary<string, decimal>(updated.Impacts);
+        old.ImpactSource = updated.ImpactSource; old.DirectionVersion = updated.DirectionVersion;
+        return true;
+    }
+
     public void Validate()
     {
         if (TradeDailyLimit < 0 || TradeDailyLimit > .2m) throw new ArgumentException("每日成交影响幅度无效");
@@ -92,7 +104,7 @@ public sealed class MarketConfig
         if (Companies == null || Sectors == null || Events == null || Sellers == null || Companies.Count == 0 || Companies.Any(x => x == null || string.IsNullOrWhiteSpace(x.Id) || string.IsNullOrWhiteSpace(x.Name)) || Companies.Select(x => x.Id).Distinct().Count() != Companies.Count) throw new ArgumentException("公司配置不完整或标识重复");
         var ids = Companies.Select(x => x.Id).ToHashSet();
         if (Sectors.Any(s => s == null || string.IsNullOrWhiteSpace(s.Id) || s.ItemTypes == null || s.Weights == null || s.Weights.Count == 0 || s.Weights.Any(w => !ids.Contains(w.Key) || w.Value <= 0) || s.Weights.Values.Sum() != 1m) || Sectors.Select(x => x.Id).Distinct().Count() != Sectors.Count) throw new ArgumentException("行业权重必须为正且合计为 100%");
-        if (Events.Any(e => e == null || string.IsNullOrWhiteSpace(e.EventId) || e.Impacts == null || e.Sectors == null || e.Impacts.Any(w => !ids.Contains(w.Key) || Math.Abs(w.Value) > .5m) || e.Sectors.Any(s => !Sectors.Any(x => x.Id == s))) || Events.Select(x => x.EventId).Distinct().Count() != Events.Count) throw new ArgumentException("事件配置无效或重复");
+        if (Events.Any(e => e == null || e.ImpactSource == null || e.DirectionVersion < 0 || e.DirectionVersion > EventImpactResolver.CurrentDirectionVersion || string.IsNullOrWhiteSpace(e.EventId) || e.Impacts == null || e.Sectors == null || e.Impacts.Any(w => !ids.Contains(w.Key) || Math.Abs(w.Value) > .5m) || e.Sectors.Any(s => !Sectors.Any(x => x.Id == s))) || Events.Select(x => x.EventId).Distinct().Count() != Events.Count) throw new ArgumentException("事件配置无效或重复");
         if (Sellers.Any(s => s == null || string.IsNullOrWhiteSpace(s.Identifier) && string.IsNullOrWhiteSpace(s.Faction) || s.BaseReliability < .2m || s.BaseReliability > .9m || s.Sectors == null || s.Sectors.Any(id => !Sectors.Any(x => x.Id == id)))) throw new ArgumentException("售卖者身份配置无效");
     }
 }

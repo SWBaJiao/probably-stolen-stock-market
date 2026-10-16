@@ -25,6 +25,7 @@ public sealed partial class MarketEngine
             if (!State.Positions.ContainsKey(c.Id)) State.Positions[c.Id] = new Position();
         }
         ValidateState(State, config);
+        ReconcileEventDirections(State, config);
         MigrateTradeSignals(State);
         MigrateCandles(State, config);
         MigrateIntraday(State);
@@ -37,6 +38,7 @@ public sealed partial class MarketEngine
     {
         var state = JsonSerializer.Deserialize<MarketState>(json, JsonOptions) ?? throw new ArgumentException("股市存档为空");
         ValidateState(state, config);
+        ReconcileEventDirections(state, config);
         MigrateTradeSignals(state);
         MigrateCandles(state, config);
         MigrateIntraday(state);
@@ -49,7 +51,7 @@ public sealed partial class MarketEngine
         if (state.Companies.Any(x => x.Value == null || x.Value.Price < .01m || x.Value.Price > 10000000m || x.Value.DailyRetailImpact < 0 || x.Value.DailyRetailImpact > 1m || x.Value.History == null || x.Value.History.Any(p => p == null || p.Price < .01m)) || state.Positions.Any(x => x.Value == null || x.Value.Quantity < 0 || x.Value.Cost < 0 || !state.Companies.ContainsKey(x.Key))) throw new ArgumentException("股市存档行情或持仓无效");
         if (state.Companies.Values.Any(c => c.Candles == null || c.Candles.Any(k => !IsValidCandle(k, state.LastDay)) || c.Candles.Select(k => k.Day).Distinct().Count() != c.Candles.Count || !c.Candles.Select(k => k.Day).SequenceEqual(c.Candles.Select(k => k.Day).OrderBy(d => d)))) throw new ArgumentException("股市存档日 K 线无效");
         if (state.Companies.Values.Any(c => c.IntradayDay < -1 || c.IntradayDay > state.LastDay || c.IntradayPoints == null || c.IntradayPoints.Any(p => p == null || p.Day != c.IntradayDay || p.Day < 0 || p.Price < .01m || p.Price > 10000000m))) throw new ArgumentException("股市存档当日分时样本无效");
-        if (state.Sessions.Any(x => x.Value == null || x.Value.TradeIds == null || x.Value.Signals == null || x.Value.Signals.Keys.Any(k => !state.Companies.ContainsKey(k))) || state.Reputations.Any(x => x.Value == null || x.Value.Correct < 0 || x.Value.Incorrect < 0) || state.Rumors.Any(x => x.Value == null || x.Key != x.Value.Id || x.Value.Price < 0 || x.Value.Reliability < .2m || x.Value.Reliability > .9m || x.Value.CompanyIds == null)) throw new ArgumentException("股市存档成交或情报无效");
+        if (state.Sessions.Any(x => x.Value == null || x.Value.TradeIds == null || x.Value.Signals == null || x.Value.Signals.Keys.Any(k => !state.Companies.ContainsKey(k))) || state.Reputations.Any(x => x.Value == null || x.Value.Correct < 0 || x.Value.Incorrect < 0) || state.Rumors.Any(x => x.Value == null || x.Value.ImpactSource == null || x.Value.DirectionVersion < 0 || x.Value.DirectionVersion > EventImpactResolver.CurrentDirectionVersion || x.Key != x.Value.Id || x.Value.Price < 0 || x.Value.Reliability < .2m || x.Value.Reliability > .9m || x.Value.CompanyIds == null)) throw new ArgumentException("股市存档成交或情报无效");
         if (state.TradeSettlementVersion < 0 || state.TradeSettlementVersion > 1 || state.TradeSignalsByDay == null || state.TradeSettlementVersion == 0 && state.TradeSignalsByDay.Count > 0 || state.TradeSignalsByDay.Any(d => d.Key < 0 || d.Key > state.LastDay || d.Value == null || d.Value.Keys.Any(id => !state.Companies.ContainsKey(id)))) throw new ArgumentException("股市存档每日成交信号无效");
         ValidateBrokerState(state);
         ValidateEventLifecycles(state);
@@ -244,7 +246,7 @@ public sealed partial class MarketEngine
         var predictsOccurrence = NextRandom() < reliability;
         var companies = selected.rule.Impacts.Keys.ToList();
         var names = string.Join("、", companies.Select(id => Config.Companies.First(x => x.Id == id).Name));
-        var offer = new RumorOffer { Id = sessionId, SessionId = sessionId, SellerKey = seller.Key, SellerName = seller.Name, Identity = seller.Identity, IsGroupIdentity = seller.IsGroupIdentity, Reliability = reliability, PriorReliability = prior, Price = Config.RumorPrice, DueDay = selected.scheduled.Day, WindowEndDay = State.LastDay + Config.RumorHorizon, EventId = selected.scheduled.EventId, OccurrenceKey = selected.scheduled.OccurrenceKey, PredictsOccurrence = predictsOccurrence, CompanyIds = companies, Content = $"有人透露，未来数日{BuildRumorHint(selected.rule, predictsOccurrence)}；{names} 或受波及。" };
+        var offer = new RumorOffer { ImpactSource = selected.rule.ImpactSource, DirectionVersion = selected.rule.DirectionVersion, Id = sessionId, SessionId = sessionId, SellerKey = seller.Key, SellerName = seller.Name, Identity = seller.Identity, IsGroupIdentity = seller.IsGroupIdentity, Reliability = reliability, PriorReliability = prior, Price = Config.RumorPrice, DueDay = selected.scheduled.Day, WindowEndDay = State.LastDay + Config.RumorHorizon, EventId = selected.scheduled.EventId, OccurrenceKey = selected.scheduled.OccurrenceKey, PredictsOccurrence = predictsOccurrence, CompanyIds = companies, Content = $"有人透露，未来数日{BuildRumorHint(selected.rule, predictsOccurrence)}；{names} 或受波及。" };
         State.Rumors.Add(sessionId, offer);
         return View(offer);
     }

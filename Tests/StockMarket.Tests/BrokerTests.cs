@@ -71,6 +71,12 @@ static class BrokerTests
         p.engine.State.StorageVerified = false;
         check(!p.engine.BuyBrokerOffer(p.visit.OfferId, new[] { Future() }, new Wallet(), () => { }).Success, "专属情报购买受存档验证门控");
         p.engine.State.StorageVerified = true;
+        var enabled = Planned(); enabled.engine.MarkBrokerArrived(enabled.visit.VisitId); enabled.engine.State.StorageVerified = false; enabled.engine.ApplyStorageAccess(false);
+        var enabledWallet = new Wallet();
+        check(enabled.engine.BuyBrokerOffer(enabled.visit.OfferId, new[] { Future() }, enabledWallet, () => { }).Success && enabledWallet.Cash == 950, "默认配置无需保存重读验证即可通过真实专属报价购买情报");
+        var strict = Planned(); strict.engine.MarkBrokerArrived(strict.visit.VisitId); strict.engine.Config.RequireSaveReloadVerification = true; strict.engine.ApplyStorageAccess(false);
+        var strictWallet = new Wallet();
+        check(!strict.engine.BuyBrokerOffer(strict.visit.OfferId, new[] { Future() }, strictWallet, () => { }).Success && strictWallet.Cash == 1000 && !strict.engine.State.Rumors[strict.visit.OfferId].Purchased, "严格配置未完成保存重读时仍拒绝情报购买且不扣款");
         check(!p.engine.BuyBrokerOffer(p.visit.OfferId, new[] { Future() }, new Wallet { Cash = 49 }, () => { }).Success, "专属报价余额不足时拒绝下单");
         var wallet = new Wallet(); var saves = 0;
         var failed = p.engine.BuyBrokerOffer(p.visit.OfferId, new[] { Future() }, wallet, () => { if (saves++ == 0) throw new IOException("模拟情报保存失败"); });

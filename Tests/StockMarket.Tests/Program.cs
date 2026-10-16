@@ -209,7 +209,7 @@ Check(!failure.Success && wallet.Cash == 899 && engine.State.TradingFrozen && en
 
 engine = Engine();
 var derived = EventImpactResolver.EnsureRule(engine, "structured-event", new[] { new CommodityPriceModifier { ItemType = "MEDICAL", Percent = 100 }, new CommodityPriceModifier { ItemType = "ENERGY_CELL", Percent = -100 } });
-Check(derived != null && derived.Impacts.Count >= 5 && derived.Impacts["medical"] > 0 && derived.Impacts["energy"] < 0 && derived.Impacts.Values.All(x => Math.Abs(x) <= engine.Config.StructuredEventLimit), "真实商品价格修正为未知事件生成正负交叉影响并限制幅度");
+Check(derived != null && derived.Impacts.Count >= 5 && derived.Impacts["medical"] < 0 && derived.Impacts["energy"] > 0 && derived.Impacts.Values.All(x => Math.Abs(x) <= engine.Config.StructuredEventLimit), "商品涨价利空降价利好并为未知事件生成交叉影响及限幅");
 var explicitRule = engine.Config.Events.Single(x => x.EventId == "test-water");
 var resolved = EventImpactResolver.EnsureRule(engine, "test-water", new[] { new CommodityPriceModifier { ItemType = "MEDICAL", Percent = 100 } });
 Check(ReferenceEquals(resolved, explicitRule) && resolved.Impacts["water"] == -.1m && !resolved.Impacts.ContainsKey("medical"), "显式事件规则优先于自动推导且不被覆盖");
@@ -348,6 +348,7 @@ BrokerIntroductionTests.Run(Check);
 DailyTradeTests.Run(Check);
 EventLifecycleTests.Run(Check);
 EventShockTimingTests.Run(Check);
+EventDirectionTests.Run(Check);
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet

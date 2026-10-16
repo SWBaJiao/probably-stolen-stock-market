@@ -21,6 +21,8 @@ public sealed class SectorDefinition
 }
 public sealed class EventRule
 {
+    public string ImpactSource { get; set; } = "";
+    public int DirectionVersion { get; set; }
     public string EventId { get; set; } = "";
     public string Description { get; set; } = "";
     public string TrueHint { get; set; } = "";
@@ -95,6 +97,8 @@ public sealed class CustomerSession
 public sealed class SellerReputation { public int Correct { get; set; } public int Incorrect { get; set; } }
 public sealed class RumorOffer
 {
+    public string ImpactSource { get; set; } = "";
+    public int DirectionVersion { get; set; }
     public bool IsBrokerOffer { get; set; }
     public bool CalendarEligible { get; set; }
     public int PurchaseDay { get; set; } = -1;

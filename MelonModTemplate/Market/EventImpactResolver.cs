@@ -13,11 +13,18 @@ public sealed class CommodityPriceModifier
 // 已配置事件优先；其余仅使用游戏真实提供的商品价格修正，不根据事件名字猜测。
 public static class EventImpactResolver
 {
+    public const string DerivedPriceSource = "derived-price";
+    public const string BuiltinPriceSource = "builtin-price";
+    public const int CurrentDirectionVersion = 2;
     public static EventRule? EnsureRule(MarketEngine engine, string eventId,
         IEnumerable<CommodityPriceModifier> modifiers)
     {
         var configured = engine.Config.Events.FirstOrDefault(e => e.EventId == eventId);
-        if (configured != null) return configured;
+        if (configured != null && (configured.ImpactSource != DerivedPriceSource || configured.DirectionVersion >= CurrentDirectionVersion))
+        {
+            engine.ReconcileEventDirection(configured);
+            return configured;
+        }
         if (!engine.Config.EnableStructuredEventFallback || string.IsNullOrWhiteSpace(eventId)) return null;
 
         var impacts = new Dictionary<string, decimal>();
@@ -32,7 +39,7 @@ public static class EventImpactResolver
             types.Add(group.Key);
             foreach (var weight in weights)
                 impacts[weight.Key] = impacts.GetValueOrDefault(weight.Key)
-                    + percent * weight.Value * engine.Config.StructuredEventScale;
+                    - percent * weight.Value * engine.Config.StructuredEventScale;
         }
 
         var limit = engine.Config.StructuredEventLimit;
@@ -44,11 +51,15 @@ public static class EventImpactResolver
         var rule = new EventRule
         {
             EventId = eventId,
+            ImpactSource = DerivedPriceSource,
+            DirectionVersion = CurrentDirectionVersion,
             Description = string.Join("、", sectors.Select(s => s.Name)) + "供需变化",
             Sectors = sectors.Select(s => s.Id).ToList(),
             Impacts = impacts
         };
+        if (configured != null) engine.Config.Events.Remove(configured);
         engine.Config.Events.Add(rule);
+        engine.ReconcileEventDirection(rule);
         return rule;
     }
 }

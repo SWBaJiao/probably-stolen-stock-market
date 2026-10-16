@@ -227,6 +227,8 @@
   ],
   "Events": [
     {
+      "ImpactSource": "builtin-price",
+      "DirectionVersion": 1,
       "EventId": "badNutrifruitHarvest",
       "Description": "\u8425\u517B\u679C\u6B49\u6536\uFF0C\u98DF\u54C1\u4F9B\u5E94\u627F\u538B",
       "TrueHint": "\u98DF\u54C1\u4F9B\u5E94\u53EF\u80FD\u6536\u7D27\uFF0C\u76F8\u5173\u5546\u5BB6\u7684\u8FDB\u8D27\u538B\u529B\u6B63\u5728\u589E\u52A0",
@@ -241,6 +243,8 @@
       ]
     },
     {
+      "ImpactSource": "builtin-price",
+      "DirectionVersion": 1,
       "EventId": "bm_illegal_weapon_shipment",
       "Description": "\u975E\u6CD5\u6B66\u5668\u8D27\u7269\u5230\u6E2F\uFF0C\u9632\u52A1\u5E02\u573A\u51FA\u73B0\u6CE2\u52A8",
       "TrueHint": "\u4E00\u6279\u9632\u52A1\u7269\u8D44\u53EF\u80FD\u6D41\u5165\u5E02\u573A\uFF0C\u4F9B\u5E94\u6E20\u9053\u6B63\u5728\u6269\u5F20",
@@ -256,14 +260,16 @@
       ]
     },
     {
+      "ImpactSource": "builtin-price",
+      "DirectionVersion": 2,
       "EventId": "rev_mobilization_secret",
       "Description": "\u6B66\u5668\u9700\u6C42\u589E\u52A0",
       "TrueHint": "\u6709\u7EC4\u7EC7\u6B63\u5728\u7B79\u96C6\u88C5\u5907\uFF0C\u76F8\u5173\u91C7\u8D2D\u89C4\u6A21\u53EF\u80FD\u6269\u5927",
       "FalseHint": "\u6709\u7EC4\u7EC7\u6B63\u5728\u7F29\u51CF\u88C5\u5907\u91C7\u8D2D\uFF0C\u76F8\u5173\u8BA2\u5355\u89C4\u6A21\u53EF\u80FD\u56DE\u843D",
       "Impacts": {
-        "defense": 0.12,
-        "industrial": 0.07,
-        "technology": 0.05
+        "defense": -0.12,
+        "industrial": -0.07,
+        "technology": -0.05
       },
       "Sectors": [
         "weapons",

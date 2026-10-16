@@ -72,6 +72,7 @@ public sealed partial class MarketEngine
         var life = new EventLifecycleState
         {
             EventId = native.EventId, OccurrenceKey = native.OccurrenceKey, StartDay = native.StartDay,
+            ImpactSource = rule.ImpactSource, DirectionVersion = rule.DirectionVersion,
             FirstObservedDay = observedDay, LastAdvanceDay = legacy ? observedDay : observedDay - 1, ActiveConfirmedThroughDay = observedDay,
             ShockPlanVersion = 1, ShockApplied = legacy, ShockDay = observedDay,
             PreheatChance = Config.EventPreheatChance, PublicDescription = rule.Description,
@@ -261,7 +262,7 @@ public sealed partial class MarketEngine
                 life.ShockPlanVersion = 1; life.ShockApplied = true; life.ShockDay = life.FirstObservedDay;
             }
             if (life != null && (life.PreheatChance < 0 || life.PreheatChance > 1 || life.ShockPlanVersion != 1 || life.ShockDay < life.FirstObservedDay || !life.ShockApplied && life.PreheatSeed == 0)) throw new ArgumentException("事件冲击计划存档无效");
-            if (life == null || string.IsNullOrWhiteSpace(life.EventId) || string.IsNullOrWhiteSpace(life.OccurrenceKey) || pair.Key != EventKey(life.EventId, life.OccurrenceKey) || life.FirstObservedDay < 0 || life.LastAdvanceDay < life.FirstObservedDay || life.ActiveConfirmedThroughDay < -1 || life.RetentionRatio <= 0 || life.RetentionRatio >= 1 || !state.EventRetentions.TryGetValue(pair.Key, out var retained) || retained != life.RetentionRatio || life.Companies == null || life.Companies.Count == 0 || state.CompletedEventLifecycles.Contains(pair.Key)) throw new ArgumentException("事件生命周期存档无效");
+            if (life == null || life.ImpactSource == null || life.DirectionVersion < 0 || life.DirectionVersion > EventImpactResolver.CurrentDirectionVersion || string.IsNullOrWhiteSpace(life.EventId) || string.IsNullOrWhiteSpace(life.OccurrenceKey) || pair.Key != EventKey(life.EventId, life.OccurrenceKey) || life.FirstObservedDay < 0 || life.LastAdvanceDay < life.FirstObservedDay || life.ActiveConfirmedThroughDay < -1 || life.RetentionRatio <= 0 || life.RetentionRatio >= 1 || !state.EventRetentions.TryGetValue(pair.Key, out var retained) || retained != life.RetentionRatio || life.Companies == null || life.Companies.Count == 0 || state.CompletedEventLifecycles.Contains(pair.Key)) throw new ArgumentException("事件生命周期存档无效");
             if (life.Companies.Any(p => !state.Companies.ContainsKey(p.Key) || p.Value == null || p.Value.CurrentFactor < .000000000001m || p.Value.CurrentFactor > 1000000000000m || p.Value.RetainedTargetFactor < .000000000001m || p.Value.RetainedTargetFactor > 1000000000000m || Math.Abs(p.Value.ReferenceInitialImpact) > .5m || p.Value.ContinuationUsed < 0 || p.Value.RecoveryCarry < 0)) throw new ArgumentException("事件公司影响存档无效");
         }
     }
