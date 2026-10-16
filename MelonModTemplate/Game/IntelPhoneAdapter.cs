@@ -184,7 +184,12 @@ internal sealed class IntelPhoneAdapter : IDisposable
         var ticket = _pending;
         if (ticket != null) Consume(ticket, close);
     }
-    private static void Feedback(PhoneUIManager phone, string text) { if (phone != null && phone.statusDisplay != null) phone.statusDisplay.text = text; }
+    private static void Feedback(PhoneUIManager phone, string text)
+    {
+        // 原版听筒状态区只容纳短状态，详细结果保留日志，预约状态可在内幕档案查看。
+        if (phone != null && phone.statusDisplay != null) phone.statusDisplay.text = "通话中";
+        Current?._log.Msg("[股市预约电话] " + text);
+    }
 
     internal void Reset()
     {
