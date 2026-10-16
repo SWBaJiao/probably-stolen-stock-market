@@ -31,7 +31,6 @@ public sealed class NativeStockMarketPanel : IDisposable
     private readonly Dictionary<string, float> _minimumHeights = new(StringComparer.Ordinal);
     private readonly Dictionary<string, float> _measuredWidths = new(StringComparer.Ordinal);
     private NativeCandlestickChart? _chart;
-    private NativeIntradayChart? _intradayChart;
     private NativeCompanyDetailsWindow? _companyWindow;
     private GameObject? _companyBackdrop;
     private CanvasGroup? _parentInputGroup;
@@ -114,7 +113,7 @@ public sealed class NativeStockMarketPanel : IDisposable
                 if (Input.GetKeyDown(KeyCode.Escape)) CloseCompanyDetails();
                 else if (Time.unscaledTime >= _nextRefresh)
                 { _companyWindow.Refresh(engine, _companyId); _nextRefresh = Time.unscaledTime + .5f; }
-                _chart?.HideHover(); _intradayChart?.HideHover();
+                _chart?.HideHover();
                 return;
             }
             if (_companyWindow != null) CloseCompanyDetails();
@@ -127,8 +126,7 @@ public sealed class NativeStockMarketPanel : IDisposable
                 Refresh();
             }
             // 指针命中按帧更新，不受行情文字半秒刷新间隔限制。
-            if (_chartDays == 1) _intradayChart?.TickHover();
-            else _chart?.TickHover();
+            _chart?.TickHover();
         }
         catch (Exception ex) { Warn("tick", "原生股市窗口更新失败，已关闭并释放自己的控件。", ex); Hide(); }
     }
@@ -161,27 +159,37 @@ public sealed class NativeStockMarketPanel : IDisposable
         Button("nav.ledger", "资金与行情流水", "page:3", navWidth);
         _builder.End();
 
-        BeginPage();
-        _builder.BeginRow(12);
-        // 宽屏并排显示自选公司与图表，窄屏保持纵向可滚动。
         var wide = _width >= 820;
+        // 正常窗口固定委托区；极矮窗口保留整页滚动，避免强行裁掉交易控件。
+        var scrollMarket = wide ? _height < 640 : _height < 750;
+        if (scrollMarket) BeginPage();
+        else BeginFixedPage();
+        _builder.BeginRow(12);
+        // 公司列表独立滚动，不再用十家公司的总高度撑高行情页。
         if (!wide)
         {
             _builder.End();
             _builder.BeginColumn(8);
         }
+        if (!scrollMarket) FillHeight(_builder.CurrentParent);
         _builder.BeginColumn(4);
-        Container(_builder.CurrentParent, wide ? 218 : -1);
+        Container(_builder.CurrentParent, wide ? 218 : -1, wide ? -1 : 112);
+        if (wide && !scrollMarket) FillHeight(_builder.CurrentParent);
         Label("market.guide", "公司行情 · 点击切换", 28, true);
+        _builder.BeginScroll(wide ? 260 : 76);
+        Container(_builder.CurrentParent, -1);
+        ConfigureCompanyScroll(wide && !scrollMarket, wide ? 260 : 76);
         if (!wide) _builder.BeginGrid(2, (_width - 84) / 2, 38, 4);
         foreach (var company in engine.Config.Companies)
             Button("company." + company.Id, company.Name, "company:" + company.Id, -1, 38);
         if (!wide) _builder.End();
-        Label("market.legend", "涨红 / 跌绿 · 较昨收\n昨日成交日结 · 事件与余波", 54);
+        _builder.End();
+        if (wide) Label("market.legend", "涨红 / 跌绿 · 较昨收\n昨日成交日结 · 事件与余波", 54);
         _builder.End();
 
         _builder.BeginColumn(5);
         Container(_builder.CurrentParent, -1);
+        if (!scrollMarket) FillHeight(_builder.CurrentParent);
         _builder.BeginRow(5);
         // 名称和介绍入口紧邻，行情数字使用本行余下空间，不再占用图表高度。
         var companyName = Label("company.title", "", 30, true);
@@ -196,25 +204,28 @@ public sealed class NativeStockMarketPanel : IDisposable
         }
         _builder.End();
         _builder.BeginRow(5);
-        Button("chart.1", "当日分时", "chart:1", -1, 28);
         Button("chart.7", "近 7 日", "chart:7", -1, 28);
         Button("chart.14", "近 14 日", "chart:14", -1, 28);
         Button("chart.30", "近 30 日", "chart:30", -1, 28);
         _builder.End();
         _builder.BeginColumn(0);
         var chartRoot = _builder.CurrentParent;
-        Container(chartRoot, -1, 230);
+        Container(chartRoot, -1);
+        if (scrollMarket) Container(chartRoot, -1, 250);
+        else
+        {
+            // 图表吸收标题、周期和固定委托区之外的全部剩余高度。
+            FillHeight(chartRoot);
+            Get<LayoutElement>(chartRoot.gameObject)!.minHeight = 120;
+        }
         var chartLayout = Get<VerticalLayoutGroup>(chartRoot.gameObject);
         if (chartLayout != null) chartLayout.enabled = false;
         var font = _window.frame.titleText.font;
         _chart = new NativeCandlestickChart(chartRoot, font);
-        _intradayChart = new NativeIntradayChart(chartRoot, font);
         var hoverBounds = _window.root.transform.Cast<RectTransform>();
         _chart.SetHoverBounds(hoverBounds);
-        _intradayChart.SetHoverBounds(hoverBounds);
         _builder.End();
 
-        Label("order.title", "现货委托 · 整数股", 26, true);
         _builder.BeginRow(5);
         Button("mode.buy", "买入", "mode:buy", 72, 32);
         Button("mode.sell", "卖出", "mode:sell", 72, 32);
@@ -229,7 +240,8 @@ public sealed class NativeStockMarketPanel : IDisposable
         Button("order.submit", "确认委托", "order", -1, 34);
         _builder.End();
         _builder.End();
-        EndPage();
+        if (scrollMarket) EndPage();
+        else _builder.End();
 
         BeginPage();
         Label("portfolio.total", "", 62, true);
@@ -289,6 +301,35 @@ public sealed class NativeStockMarketPanel : IDisposable
                 Surface(scroll.gameObject, "ScrollFill", StockUiTheme.Background, 2, 2, 2, 2);
                 break;
             }
+    }
+
+    private void BeginFixedPage()
+    {
+        _builder!.BeginColumn(0);
+        var page = _builder.CurrentParent;
+        _pages.Add(page.gameObject);
+        Container(page, -1);
+        FillHeight(page);
+    }
+
+    private void ConfigureCompanyScroll(bool fill, float height)
+    {
+        for (Transform? ancestor = _builder!.CurrentParent; ancestor != null; ancestor = ancestor.parent)
+            if (Get<ScrollRect>(ancestor.gameObject) is { } scroll)
+            {
+                var root = scroll.transform.Cast<RectTransform>();
+                // 显式覆盖预制件遗留的最小高度，窄屏选择器才能真正保持紧凑。
+                if (fill) FillHeight(root);
+                else
+                {
+                    Container(root, -1, height);
+                    var fitter = Get<ContentSizeFitter>(root.gameObject);
+                    if (fitter != null) fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+                }
+                Surface(scroll.gameObject, "CompanyScrollFill", StockUiTheme.Background, 2, 2, 2, 2);
+                return;
+            }
+        throw new InvalidOperationException("公司列表缺少原生滚动容器。");
     }
 
     private void EndPage() { _builder!.End(); _builder.End(); }
@@ -407,13 +448,8 @@ public sealed class NativeStockMarketPanel : IDisposable
         var move = latest == 0 ? 0 : stock.Price / latest - 1;
         Text("company.title", company.Name);
         Text("company.quote", $"现价 {stock.Price:0.00} · 最新 {SignedPercent(move)}");
-        var intraday = _chartDays == 1;
-        _chart?.SetVisible(!intraday);
-        _intradayChart?.SetVisible(intraday);
-        if (intraday)
-            _intradayChart?.Render(stock.IntradayDay == engine.State.LastDay ? stock.IntradayPoints : Array.Empty<PricePoint>(), stock.Price, engine.State.LastDay, stock.IntradayIsPartial);
-        else _chart?.Render(stock.Candles, stock.Price, _chartDays, engine.State.LastDay);
-        foreach (var days in new[] { 1, 7, 14, 30 }) Tint("chart." + days, _chartDays == days);
+        _chart?.Render(stock.Candles, stock.Price, _chartDays, engine.State.LastDay);
+        foreach (var days in new[] { 7, 14, 30 }) Tint("chart." + days, _chartDays == days);
     }
 
     private void RefreshPortfolio(MarketEngine engine)
@@ -514,7 +550,7 @@ public sealed class NativeStockMarketPanel : IDisposable
             if (command.StartsWith("page:", StringComparison.Ordinal)) SetPage(int.Parse(command.Substring(5), CultureInfo.InvariantCulture));
             else if (command.StartsWith("company:", StringComparison.Ordinal)) { _companyId = command.Substring(8); SetPage(0); }
             else if (command.StartsWith("chart:", StringComparison.Ordinal))
-                _chartDays = command switch { "chart:1" => 1, "chart:7" => 7, "chart:14" => 14, _ => 30 };
+                _chartDays = command switch { "chart:7" => 7, "chart:14" => 14, _ => 30 };
             else if (command == "details") OpenCompanyDetails();
             else if (command == "mode:buy") _buy = true;
             else if (command == "mode:sell") _buy = false;
@@ -557,7 +593,6 @@ public sealed class NativeStockMarketPanel : IDisposable
     private void SetPage(int index)
     {
         _chart?.HideHover();
-        _intradayChart?.HideHover();
         _page = Math.Clamp(index, 0, 3);
         for (int i = 0; i < _pages.Count; i++) _pages[i].SetActive(i == _page);
     }
@@ -568,7 +603,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (_window == null || !IsCurrentContext() || _host.Engine == null) return;
         try
         {
-            _chart?.HideHover(); _intradayChart?.HideHover();
+            _chart?.HideHover();
             EventSystem.current?.SetSelectedGameObject(null);
             _window.closeOnEscape = false;
             _restoreEscapeAfterRelease = false;
@@ -784,7 +819,6 @@ public sealed class NativeStockMarketPanel : IDisposable
             try { binding.Dispose(); }
             catch (Exception ex) { Warn("unbind", "原生控件监听器移除失败，窗口销毁后将释放控件。", ex); }
         _chart?.Dispose(); _chart = null;
-        _intradayChart?.Dispose(); _intradayChart = null;
         _bindings.Clear(); _elements.Clear(); _pages.Clear(); _textCache.Clear(); _minimumHeights.Clear(); _measuredWidths.Clear(); _builder = null;
         _selectedButtons.Clear();
         _boundEngine = null; _saveIdentity = "";
