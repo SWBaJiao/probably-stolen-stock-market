@@ -182,14 +182,25 @@ public sealed class NativeStockMarketPanel : IDisposable
 
         _builder.BeginColumn(5);
         Container(_builder.CurrentParent, -1);
-        Label("company.title", "", 30, true);
+        _builder.BeginRow(5);
+        // 名称和介绍入口紧邻，行情数字使用本行余下空间，不再占用图表高度。
+        var companyName = Label("company.title", "", 30, true);
+        Container(companyName.root.transform.Cast<RectTransform>(), 88, 30);
+        if (companyName.text != null) companyName.text.enableWordWrapping = false;
+        Button("company.introduction", "介绍", "details", 48, 28);
+        var companyQuote = Label("company.quote", "", 30, true);
+        if (companyQuote.text != null)
+        {
+            companyQuote.text.fontSize = wide ? 18 : 15;
+            companyQuote.text.enableWordWrapping = false;
+        }
+        _builder.End();
         _builder.BeginRow(5);
         Button("chart.1", "当日分时", "chart:1", -1, 28);
         Button("chart.7", "近 7 日", "chart:7", -1, 28);
         Button("chart.14", "近 14 日", "chart:14", -1, 28);
         Button("chart.30", "近 30 日", "chart:30", -1, 28);
         _builder.End();
-        Button("company.toggle", "公司介绍与公开消息 ▸", "details", -1, 28);
         _builder.BeginColumn(0);
         var chartRoot = _builder.CurrentParent;
         Container(chartRoot, -1, 230);
@@ -394,7 +405,8 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (company == null || !engine.State.Companies.TryGetValue(company.Id, out var stock)) return;
         var latest = stock.History.Count > 1 ? stock.History[^2].Price : engine.Config.InitialPrice;
         var move = latest == 0 ? 0 : stock.Price / latest - 1;
-        Text("company.title", $"{company.Name}   {stock.Price:0.00}   最新变化 {SignedPercent(move)}");
+        Text("company.title", company.Name);
+        Text("company.quote", $"现价 {stock.Price:0.00} · 最新 {SignedPercent(move)}");
         var intraday = _chartDays == 1;
         _chart?.SetVisible(!intraday);
         _intradayChart?.SetVisible(intraday);
@@ -402,7 +414,6 @@ public sealed class NativeStockMarketPanel : IDisposable
             _intradayChart?.Render(stock.IntradayDay == engine.State.LastDay ? stock.IntradayPoints : Array.Empty<PricePoint>(), stock.Price, engine.State.LastDay, stock.IntradayIsPartial);
         else _chart?.Render(stock.Candles, stock.Price, _chartDays, engine.State.LastDay);
         foreach (var days in new[] { 1, 7, 14, 30 }) Tint("chart." + days, _chartDays == days);
-        Text("company.toggle", "查看公司介绍与公开消息 ▸");
     }
 
     private void RefreshPortfolio(MarketEngine engine)
@@ -584,6 +595,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     {
         if (!_visible || !IsCurrentContext()) { Hide(); return false; }
         _companyId = companyId;
+        RefreshCompany(_host.Engine!);
         return true;
     }
 
