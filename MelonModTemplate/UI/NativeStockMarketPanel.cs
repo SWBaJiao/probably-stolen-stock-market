@@ -11,6 +11,7 @@ using MelonLoader;
 using MelonModTemplate.Contracts;
 using MelonModTemplate.Market;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MelonModTemplate.UI;
@@ -31,9 +32,11 @@ public sealed class NativeStockMarketPanel : IDisposable
     private readonly Dictionary<string, float> _measuredWidths = new(StringComparer.Ordinal);
     private NativeCandlestickChart? _chart;
     private NativeIntradayChart? _intradayChart;
-    private GameObject? _companyDetails;
+    private NativeCompanyDetailsWindow? _companyWindow;
+    private GameObject? _companyBackdrop;
+    private CanvasGroup? _parentInputGroup;
+    private bool _parentWasInteractable, _parentBlockedRaycasts, _restoreEscapeAfterRelease;
     private int _chartDays = 30;
-    private bool _showDetails;
     private readonly List<IDisposable> _bindings = new();
     private readonly List<GameObject> _pages = new();
     private readonly HashSet<string> _warned = new(StringComparer.Ordinal);
@@ -64,7 +67,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         {
             if (_visible && IsAlive())
             {
-                if (IsCurrentContext()) { _window!.BringToFront(); return; }
+                if (IsCurrentContext()) { if (_companyWindow?.IsVisible == true) _companyWindow.BringToFront(); else _window!.BringToFront(); return; }
                 Hide();
             }
             var engine = _host.Engine;
@@ -106,6 +109,18 @@ public sealed class NativeStockMarketPanel : IDisposable
             { Hide(); return; }
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            if (_companyWindow?.IsVisible == true)
+            {
+                if (Input.GetKeyDown(KeyCode.Escape)) CloseCompanyDetails();
+                else if (Time.unscaledTime >= _nextRefresh)
+                { _companyWindow.Refresh(engine, _companyId); _nextRefresh = Time.unscaledTime + .5f; }
+                _chart?.HideHover(); _intradayChart?.HideHover();
+                return;
+            }
+            if (_companyWindow != null) CloseCompanyDetails();
+            // 子窗口处理过的 Escape 必须先松开，才能重新交给原生主窗口。
+            if (_restoreEscapeAfterRelease && !Input.GetKey(KeyCode.Escape))
+            { _window.closeOnEscape = true; _restoreEscapeAfterRelease = false; }
             if (Time.unscaledTime >= _nextRefresh)
             {
                 _nextRefresh = Time.unscaledTime + .5f;
@@ -188,12 +203,6 @@ public sealed class NativeStockMarketPanel : IDisposable
         _intradayChart.SetHoverBounds(hoverBounds);
         _builder.End();
 
-        _builder.BeginColumn(4);
-        _companyDetails = _builder.CurrentParent.gameObject;
-        Label("company.description", "", 36);
-        Label("company.news", "", 60);
-        _builder.End();
-        _companyDetails.SetActive(_showDetails);
         Label("order.title", "现货委托 · 整数股", 26, true);
         _builder.BeginRow(5);
         Button("mode.buy", "买入", "mode:buy", 72, 32);
@@ -386,7 +395,6 @@ public sealed class NativeStockMarketPanel : IDisposable
         var latest = stock.History.Count > 1 ? stock.History[^2].Price : engine.Config.InitialPrice;
         var move = latest == 0 ? 0 : stock.Price / latest - 1;
         Text("company.title", $"{company.Name}   {stock.Price:0.00}   最新变化 {SignedPercent(move)}");
-        Text("company.description", company.Description);
         var intraday = _chartDays == 1;
         _chart?.SetVisible(!intraday);
         _intradayChart?.SetVisible(intraday);
@@ -394,9 +402,7 @@ public sealed class NativeStockMarketPanel : IDisposable
             _intradayChart?.Render(stock.IntradayDay == engine.State.LastDay ? stock.IntradayPoints : Array.Empty<PricePoint>(), stock.Price, engine.State.LastDay, stock.IntradayIsPartial);
         else _chart?.Render(stock.Candles, stock.Price, _chartDays, engine.State.LastDay);
         foreach (var days in new[] { 1, 7, 14, 30 }) Tint("chart." + days, _chartDays == days);
-        Text("company.toggle", _showDetails ? "收起公司介绍与公开消息 ▾" : "公司介绍与公开消息 ▸");
-        var news = engine.State.Ledger.Where(e => e.Kind == "event" && (string.IsNullOrEmpty(e.CompanyId) || e.CompanyId == company.Id)).TakeLast(4).Reverse();
-        Text("company.news", "已公开事件：\n" + (news.Any() ? string.Join("\n\n", news.Select(e => $"第 {e.Day} 日  {e.Description}")) : "暂无已公开事件。"));
+        Text("company.toggle", "查看公司介绍与公开消息 ▸");
     }
 
     private void RefreshPortfolio(MarketEngine engine)
@@ -490,6 +496,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     {
         if (_disposed || !_visible) return;
         if (!IsCurrentContext()) { Hide(); return; }
+        if (_companyWindow?.IsVisible == true) { if (command == "details") _companyWindow.BringToFront(); return; }
         try
         {
             if (command == "close") { Hide(); return; }
@@ -497,7 +504,7 @@ public sealed class NativeStockMarketPanel : IDisposable
             else if (command.StartsWith("company:", StringComparison.Ordinal)) { _companyId = command.Substring(8); SetPage(0); }
             else if (command.StartsWith("chart:", StringComparison.Ordinal))
                 _chartDays = command switch { "chart:1" => 1, "chart:7" => 7, "chart:14" => 14, _ => 30 };
-            else if (command == "details") { _showDetails = !_showDetails; _companyDetails?.SetActive(_showDetails); }
+            else if (command == "details") OpenCompanyDetails();
             else if (command == "mode:buy") _buy = true;
             else if (command == "mode:sell") _buy = false;
             else if (command.StartsWith("quantity:", StringComparison.Ordinal))
@@ -516,7 +523,7 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     internal void HandleQuantityChanged(string value)
     {
-        if (_disposed || !_visible) return;
+        if (_disposed || !_visible || _companyWindow?.IsVisible == true) return;
         if (!IsCurrentContext()) { Hide(); return; }
         _quantity = value ?? "";
         try { RefreshOrder(); }
@@ -544,6 +551,67 @@ public sealed class NativeStockMarketPanel : IDisposable
         for (int i = 0; i < _pages.Count; i++) _pages[i].SetActive(i == _page);
     }
 
+    private void OpenCompanyDetails()
+    {
+        if (_companyWindow?.IsVisible == true) { _companyWindow.BringToFront(); return; }
+        if (_window == null || !IsCurrentContext() || _host.Engine == null) return;
+        try
+        {
+            _chart?.HideHover(); _intradayChart?.HideHover();
+            EventSystem.current?.SetSelectedGameObject(null);
+            _window.closeOnEscape = false;
+            _restoreEscapeAfterRelease = false;
+            var group = Get<CanvasGroup>(_window.root) ?? _window.root.AddComponent(Il2CppType.Of<CanvasGroup>()).Cast<CanvasGroup>();
+            _parentWasInteractable = group.interactable;
+            _parentBlockedRaycasts = group.blocksRaycasts;
+            _parentInputGroup = group;
+            group.interactable = false;
+            group.blocksRaycasts = false;
+            _companyWindow = new NativeCompanyDetailsWindow(SelectCompanyFromDetails, OnCompanyDetailsClosed);
+            _companyWindow.Show(_host.Engine, _companyId);
+            var childRoot = _companyWindow.Root ?? throw new InvalidOperationException("公司窗口缺少原生根节点。");
+            var layer = childRoot.transform.parent ?? throw new InvalidOperationException("公司窗口缺少原生覆盖层。");
+            var backdrop = Surface(layer.gameObject, "CompanyModalBackdrop", new Color(0, 0, 0, .65f), 0, 0, 0, 0);
+            _companyBackdrop = backdrop.gameObject;
+            backdrop.raycastTarget = true;
+            backdrop.transform.SetSiblingIndex(childRoot.transform.GetSiblingIndex());
+            _companyWindow.BringToFront();
+        }
+        catch { CloseCompanyDetails(); throw; }
+    }
+
+    private bool SelectCompanyFromDetails(string companyId)
+    {
+        if (!_visible || !IsCurrentContext()) { Hide(); return false; }
+        _companyId = companyId;
+        return true;
+    }
+
+    private void CloseCompanyDetails()
+    {
+        var child = _companyWindow;
+        _companyWindow = null;
+        try { child?.Dispose(); }
+        finally { OnCompanyDetailsClosed(); }
+    }
+
+    private void OnCompanyDetailsClosed()
+    {
+        _companyWindow = null;
+        if (_companyBackdrop != null) UnityEngine.Object.Destroy(_companyBackdrop);
+        _companyBackdrop = null;
+        if (_parentInputGroup != null)
+        {
+            _parentInputGroup.interactable = _parentWasInteractable;
+            _parentInputGroup.blocksRaycasts = _parentBlockedRaycasts;
+            _parentInputGroup = null;
+        }
+        EventSystem.current?.SetSelectedGameObject(null);
+        // 点击关闭同样延后恢复 Escape，避免原生窗口更新顺序导致连续关闭。
+        if (_window != null) _restoreEscapeAfterRelease = true;
+        _nextRefresh = 0;
+    }
+
     private void Text(string id, string value, Color? color = null)
     {
         if (!_elements.TryGetValue(id, out var element)) return;
@@ -569,7 +637,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (color.HasValue && element.text != null) element.text.color = color.Value;
     }
 
-    private static void Container(RectTransform root, float width, float height = -1)
+    internal static void Container(RectTransform root, float width, float height = -1)
     {
         var layout = Get<LayoutElement>(root.gameObject) ?? root.gameObject.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
         // 清除模板遗留的固定宽度；负值表示填充所在列。
@@ -589,7 +657,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (fitter != null) fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
     }
 
-    private static void NormalizeLayout(RectTransform root)
+    internal static void NormalizeLayout(RectTransform root)
     {
         foreach (var component in root.gameObject.GetComponentsInChildren(Il2CppType.Of<VerticalLayoutGroup>(), true))
         {
@@ -632,7 +700,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         }
     }
 
-    private static void SetButtonColors(Selectable button, bool selected)
+    internal static void SetButtonColors(Selectable button, bool selected)
     {
         button.transition = Selectable.Transition.ColorTint;
         var colors = button.colors;
@@ -659,7 +727,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (input.placeholder != null) input.placeholder.color = MutedColor;
     }
 
-    private static Image Surface(GameObject parent, string name, Color color, float left, float top, float right, float bottom)
+    internal static Image Surface(GameObject parent, string name, Color color, float left, float top, float right, float bottom)
     {
         var types = new Il2CppReferenceArray<Il2CppSystem.Type>(new[] { Il2CppType.Of<RectTransform>() });
         var go = new GameObject("StockMarket." + name, types);
@@ -696,13 +764,15 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     private void ReleaseWindow(bool close)
     {
+        CloseCompanyDetails();
+        _restoreEscapeAfterRelease = false;
         var window = _window;
         _window = null;
         foreach (var binding in _bindings)
             try { binding.Dispose(); }
             catch (Exception ex) { Warn("unbind", "原生控件监听器移除失败，窗口销毁后将释放控件。", ex); }
         _chart?.Dispose(); _chart = null;
-        _intradayChart?.Dispose(); _intradayChart = null; _companyDetails = null;
+        _intradayChart?.Dispose(); _intradayChart = null;
         _bindings.Clear(); _elements.Clear(); _pages.Clear(); _textCache.Clear(); _minimumHeights.Clear(); _measuredWidths.Clear(); _builder = null;
         _selectedButtons.Clear();
         _boundEngine = null; _saveIdentity = "";

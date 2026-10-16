@@ -1,6 +1,6 @@
 # 股市 Mod 开发与使用
 
-程序集保持 `MelonModTemplate.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.10.1`。覆盖旧模板 DLL 后只会加载一个入口；无需同时保留旧模板。
+程序集保持 `MelonModTemplate.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.10.2`。覆盖旧模板 DLL 后只会加载一个入口；无需同时保留旧模板。
 
 ## 安装与构建
 
@@ -47,7 +47,7 @@ dotnet build MelonModTemplate/MelonModTemplate.csproj -c Release
 
 默认 10 家公司：丰禾供给、清泉循环、白塔医疗、星锻工业、远星科技、环宇商贸、霆光能源、晨星物流、安盾防务、聚合材料。
 
-行情页展开“公司介绍与公开消息”后，每家公司以一段故事介绍主营商品、交叉业务与行业联系，不再显示商品影响比例明细。已有配置中仍与旧版默认短介绍完全一致的内容会在加载时升级，自定义介绍保留；商品影响权重继续用于内部行情计算。
+行情页点击“公司介绍与公开消息”后打开独立窗口，每家公司以一段故事介绍主营商品、交叉业务与行业联系，不再显示商品影响比例明细。介绍和公开消息在弹窗中滚动阅读，可用“上一家／下一家”切换；弹窗不再挤占 K 线与委托区域，Escape 先关闭介绍。已有配置中仍与旧版默认短介绍完全一致的内容会在加载时升级，自定义介绍保留；商品影响权重继续用于内部行情计算。
 
 商品只按真实类型映射，不通过显示名称猜测。已核实类型包括 FOOD、WATER、MEDICAL、MACHINE、MATERIAL、BASIC_MATERIAL、MODULE、ENERGY_CELL、CHEMICAL_SUPPLIES、LUXURY_ITEM、WATER_PURIFICATION_SUPPLY、FILTER、WEAPON。空瓶如果没有 WATER 类型，不会自动算作饮用水。
 

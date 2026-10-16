@@ -5,7 +5,7 @@ public static class ModInfo
 {
     public const string Id = "probably_stolen_stock_market";
     public const string Name = "Probably Stolen Stock Market";
-    public const string Version = "0.10.1";
+    public const string Version = "0.10.2";
     public const string Author = "ProbablyStolen Mods";
     public const string GameDeveloper = "Questing Goose Studio";
     public const string GameName = "Probably Stolen";
