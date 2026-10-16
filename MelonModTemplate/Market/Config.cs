@@ -41,11 +41,24 @@ public sealed class MarketConfig
     public List<EventRule> Events { get; set; } = new();
     public List<SellerRule> Sellers { get; set; } = new();
 
+    private static readonly (string Id, string Name, string PreviousDescription, string Description)[] CompanyProfiles = new[]
+    {
+        ("harvest", "丰禾供给", "食品、农产品与供应", "丰禾供给最早靠一辆往返种植区的小货车起家，如今替街角商店和食堂收购营养果、农产品与耐储食品。它会向清泉循环采购灌装用水，也借晨星物流的货舱把易腐货物赶在变质前送达。丰收时仓库忙于周转，缺水或运输受阻时，采购员则得为下一批货重新讨价还价。"),
+        ("water", "清泉循环", "饮水、净化与循环", "清泉循环接管过一座年久失修的净水站，靠检修管线、回收旧滤芯和分装饮用水慢慢站稳脚跟。如今它既供应日常用水，也经营过滤器和净水物资，处理药剂常要向聚合材料询价，设备故障时则离不开星锻工业的零件。对这家公司而言，水质、耗材和机器开工率总是同一本账上的事。"),
+        ("medical", "白塔医疗", "药品与医疗设备", "白塔医疗从一间替诊所分装药品的小作坊发展而来，柜台上既有常用药和医疗耗材，也有需要定期维修的诊疗设备。药剂师会向聚合材料采购配药与消毒原料，技术人员则寻找远星科技提供的电子模块。原料短缺、设备停摆或诊所集中补货，都会让仓库的出货安排随之改变。"),
+        ("industrial", "星锻工业", "机械、工具与矿产", "星锻工业的招牌挂在老矿区旁，车间里既收矿石和金属，也修工具、组装机械，出售能让旧设备继续运转的零件。霆光能源的电池与供电设备支撑着生产线，安盾防务的装备维修又带来另一类订单。矿料进价、机器停工和客户是否补充库存，决定了工头每天先开哪一张工单。"),
+        ("technology", "远星科技", "电子、模块与科研", "远星科技靠拆解旧终端和重新配制电子模块攒下第一批客户，后来才把业务伸向科研装置与设备控制系统。它为霆光能源的供电设备寻找控制部件，也向安盾防务提供装备所需的电子组件。看似不起眼的模块断货，往往会拖慢整台机器交付，仓库因此始终留着一排等待配件的空箱。"),
+        ("commerce", "环宇商贸", "综合贸易与奢侈品", "环宇商贸没有统一风格的货架：食品、医疗用品、电子设备与防护装备旁边，常摆着来自远处的奢侈品。采购员从丰禾供给这样的供应商手里凑齐货单，再借晨星物流把货分送到不同街区。它靠渠道和周转衔接买卖双方，货物涨价、商路中断或顾客口味转变，都会改写下一轮进货计划。"),
+        ("energy", "霆光能源", "燃料、电池与供电", "霆光能源起初只替修理铺补充电池，后来逐渐接手燃料、能源电池和供电设备的买卖。星锻工业的机械开工离不开稳定供能，远星科技的电子模块又影响着它的设备维护。业务看起来贯穿整个站区，仓库里却仍要逐件核算能源货物的进价、耗损与运输成本，一次缺货就可能打乱多家客户的排程。"),
+        ("logistics", "晨星物流", "运输、仓储与供应链", "晨星物流的员工习惯在别人关店后清点货箱，替各行业经营运输、仓储和补货衔接。丰禾供给的食品要赶在变质前送达，白塔医疗的药品与耗材则需要分清批次妥善存放；机械、能源与奢侈品也挤在同一张调度表上。商路畅通时它忙着周转，通道受阻时便得协调改道、退货和堆积的库存。"),
+        ("defense", "安盾防务", "武器、防护与安全", "安盾防务最早替巡逻人员修补防护装备，后来才扩展到武器、安全器材和配套零件的供应。它向星锻工业寻找金属和机械部件，也通过环宇商贸接触分散在各处的买家。新订单会带动车间备料，运输限制和部件短缺则可能拖延交付；柜台后的采购单，往往比门前的招牌更早反映生意冷暖。"),
+        ("materials", "聚合材料", "化学品与工业材料", "聚合材料把一间旧仓库改成分装车间，经营化学品、工业原料和供下游加工使用的材料。白塔医疗需要配药与消毒原料，清泉循环需要水处理药剂，维修和电子行业也会来找适用的耗材。同一批原料有时会被几类客户同时询价，采购员必须在供应、存放条件和不同订单之间反复安排。"),
+    };
+
     public static MarketConfig CreateDefault()
     {
         var c = new MarketConfig();
-        var names = new[] { ("harvest", "丰禾供给", "食品、农产品与供应"), ("water", "清泉循环", "饮水、净化与循环"), ("medical", "白塔医疗", "药品与医疗设备"), ("industrial", "星锻工业", "机械、工具与矿产"), ("technology", "远星科技", "电子、模块与科研"), ("commerce", "环宇商贸", "综合贸易与奢侈品"), ("energy", "霆光能源", "燃料、电池与供电"), ("logistics", "晨星物流", "运输、仓储与供应链"), ("defense", "安盾防务", "武器、防护与安全"), ("materials", "聚合材料", "化学品与工业材料") };
-        c.Companies = names.Select(x => new CompanyDefinition { Id = x.Item1, Name = x.Item2, Description = x.Item3 }).ToList();
+        c.Companies = CompanyProfiles.Select(p => new CompanyDefinition { Id = p.Id, Name = p.Name, Description = p.Description }).ToList();
         void Sector(string id, string name, string[] aliases, params (string id, decimal weight)[] weights) => c.Sectors.Add(new SectorDefinition { Id = id, Name = name, ItemTypes = aliases.ToList(), Weights = weights.ToDictionary(x => x.id, x => x.weight) });
         // 别名仅精确匹配；游戏适配层应以运行时记录补充实际类型，禁止通过物品显示名猜测。
         Sector("food", "食品、农产品", new[] { "food", "agriculture" }, ("harvest", .65m), ("commerce", .20m), ("logistics", .15m));
@@ -81,7 +94,25 @@ public sealed class MarketConfig
     }
 
     public string Serialize() => JsonSerializer.Serialize(this, MarketEngine.JsonOptions);
-    public static MarketConfig Deserialize(string json) { var c = JsonSerializer.Deserialize<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空"); c.UpgradeLegacyDefaultEventRules(); c.Validate(); return c; }
+    public static MarketConfig Deserialize(string json) { var c = JsonSerializer.Deserialize<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空"); c.UpgradeLegacyDefaultEventRules(); c.UpgradeLegacyCompanyDescriptions(); c.Validate(); return c; }
+    // 只替换原有短介绍；公司数值、行业映射及玩家自写的故事均不参与本次升级。
+    public bool UpgradeLegacyCompanyDescriptions()
+    {
+        if (Companies == null) return false;
+        var changed = false;
+        foreach (var company in Companies)
+        {
+            if (company == null) continue;
+            foreach (var profile in CompanyProfiles)
+            {
+                if (company.Id != profile.Id || company.Description != profile.PreviousDescription) continue;
+                company.Description = profile.Description; changed = true;
+                break;
+            }
+        }
+        return changed;
+    }
+
     // 仅完全匹配旧默认值时升级；用户编辑过的幅度、行业或文案始终作为显式配置保留。
     public bool UpgradeLegacyDefaultEventRules()
     {

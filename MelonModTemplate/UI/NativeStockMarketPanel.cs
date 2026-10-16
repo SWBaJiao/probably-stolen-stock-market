@@ -174,7 +174,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         Button("chart.14", "近 14 日", "chart:14", -1, 28);
         Button("chart.30", "近 30 日", "chart:30", -1, 28);
         _builder.End();
-        Button("company.toggle", "公司与商品关联 ▸", "details", -1, 28);
+        Button("company.toggle", "公司介绍与公开消息 ▸", "details", -1, 28);
         _builder.BeginColumn(0);
         var chartRoot = _builder.CurrentParent;
         Container(chartRoot, -1, 230);
@@ -191,8 +191,6 @@ public sealed class NativeStockMarketPanel : IDisposable
         _builder.BeginColumn(4);
         _companyDetails = _builder.CurrentParent.gameObject;
         Label("company.description", "", 36);
-        Label("company.sectors", "", 58);
-        Label("company.peers", "", 44);
         Label("company.news", "", 60);
         _builder.End();
         _companyDetails.SetActive(_showDetails);
@@ -389,10 +387,6 @@ public sealed class NativeStockMarketPanel : IDisposable
         var move = latest == 0 ? 0 : stock.Price / latest - 1;
         Text("company.title", $"{company.Name}   {stock.Price:0.00}   最新变化 {SignedPercent(move)}");
         Text("company.description", company.Description);
-        var sectors = engine.Config.Sectors.Where(s => s.Weights.ContainsKey(company.Id)).ToArray();
-        Text("company.sectors", "关联商品及成交影响分配：\n" + string.Join("  ·  ", sectors.Select(s => $"{s.Name} {s.Weights[company.Id]:0%}")));
-        var peers = sectors.SelectMany(s => s.Weights.Keys).Where(id => id != company.Id).Distinct();
-        Text("company.peers", "共同关联公司：\n" + string.Join("、", peers.Select(id => engine.Config.Companies.FirstOrDefault(c => c.Id == id)?.Name ?? id)));
         var intraday = _chartDays == 1;
         _chart?.SetVisible(!intraday);
         _intradayChart?.SetVisible(intraday);
@@ -400,7 +394,7 @@ public sealed class NativeStockMarketPanel : IDisposable
             _intradayChart?.Render(stock.IntradayDay == engine.State.LastDay ? stock.IntradayPoints : Array.Empty<PricePoint>(), stock.Price, engine.State.LastDay, stock.IntradayIsPartial);
         else _chart?.Render(stock.Candles, stock.Price, _chartDays, engine.State.LastDay);
         foreach (var days in new[] { 1, 7, 14, 30 }) Tint("chart." + days, _chartDays == days);
-        Text("company.toggle", _showDetails ? "收起公司与商品关联 ▾" : "公司与商品关联 ▸");
+        Text("company.toggle", _showDetails ? "收起公司介绍与公开消息 ▾" : "公司介绍与公开消息 ▸");
         var news = engine.State.Ledger.Where(e => e.Kind == "event" && (string.IsNullOrEmpty(e.CompanyId) || e.CompanyId == company.Id)).TakeLast(4).Reverse();
         Text("company.news", "已公开事件：\n" + (news.Any() ? string.Join("\n\n", news.Select(e => $"第 {e.Day} 日  {e.Description}")) : "暂无已公开事件。"));
     }
