@@ -25,6 +25,7 @@ public sealed partial class MarketEngine
             if (!State.Positions.ContainsKey(c.Id)) State.Positions[c.Id] = new Position();
         }
         ValidateState(State, config);
+        MigrateTradeSignals(State);
         MigrateCandles(State, config);
         MigrateIntraday(State);
     }
@@ -36,6 +37,7 @@ public sealed partial class MarketEngine
     {
         var state = JsonSerializer.Deserialize<MarketState>(json, JsonOptions) ?? throw new ArgumentException("股市存档为空");
         ValidateState(state, config);
+        MigrateTradeSignals(state);
         MigrateCandles(state, config);
         MigrateIntraday(state);
         return state;
@@ -48,6 +50,7 @@ public sealed partial class MarketEngine
         if (state.Companies.Values.Any(c => c.Candles == null || c.Candles.Any(k => !IsValidCandle(k, state.LastDay)) || c.Candles.Select(k => k.Day).Distinct().Count() != c.Candles.Count || !c.Candles.Select(k => k.Day).SequenceEqual(c.Candles.Select(k => k.Day).OrderBy(d => d)))) throw new ArgumentException("股市存档日 K 线无效");
         if (state.Companies.Values.Any(c => c.IntradayDay < -1 || c.IntradayDay > state.LastDay || c.IntradayPoints == null || c.IntradayPoints.Any(p => p == null || p.Day != c.IntradayDay || p.Day < 0 || p.Price < .01m || p.Price > 10000000m))) throw new ArgumentException("股市存档当日分时样本无效");
         if (state.Sessions.Any(x => x.Value == null || x.Value.TradeIds == null || x.Value.Signals == null || x.Value.Signals.Keys.Any(k => !state.Companies.ContainsKey(k))) || state.Reputations.Any(x => x.Value == null || x.Value.Correct < 0 || x.Value.Incorrect < 0) || state.Rumors.Any(x => x.Value == null || x.Key != x.Value.Id || x.Value.Price < 0 || x.Value.Reliability < .2m || x.Value.Reliability > .9m || x.Value.CompanyIds == null)) throw new ArgumentException("股市存档成交或情报无效");
+        if (state.TradeSettlementVersion < 0 || state.TradeSettlementVersion > 1 || state.TradeSignalsByDay == null || state.TradeSettlementVersion == 0 && state.TradeSignalsByDay.Count > 0 || state.TradeSignalsByDay.Any(d => d.Key < 0 || d.Key > state.LastDay || d.Value == null || d.Value.Keys.Any(id => !state.Companies.ContainsKey(id)))) throw new ArgumentException("股市存档每日成交信号无效");
         ValidateBrokerState(state);
         // 持仓公司不能被配置删除，否则无法出售已有股份。
         if (state.Positions.Any(x => x.Value.Quantity > 0 && !config.Companies.Any(c => c.Id == x.Key))) throw new ArgumentException("公司配置删除了仍有持仓的公司");
@@ -98,6 +101,20 @@ public sealed partial class MarketEngine
         }
     }
 
+    private static void MigrateTradeSignals(MarketState state)
+    {
+        if (state.TradeSettlementVersion == 1) return;
+        if (state.LastDay >= 0)
+        {
+            var pending = new Dictionary<string, decimal>();
+            // 旧档只有未结束会话尚未影响过行情；无法还原逐笔日期，统一归入已知当前日一次。
+            foreach (var session in state.Sessions.Values.Where(s => !s.Closed))
+                foreach (var signal in session.Signals) pending[signal.Key] = pending.GetValueOrDefault(signal.Key) + signal.Value;
+            if (pending.Count > 0) state.TradeSignalsByDay[state.LastDay] = pending;
+        }
+        state.TradeSettlementVersion = 1;
+    }
+
     public Dictionary<string, decimal> GetWeights(IEnumerable<string> types)
     {
         var tags = types.Where(x => !string.IsNullOrWhiteSpace(x)).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -112,9 +129,16 @@ public sealed partial class MarketEngine
     public bool RecordTrade(string sessionId, string tradeId, IEnumerable<string> types, decimal signedValue)
     {
         if (string.IsNullOrWhiteSpace(sessionId) || string.IsNullOrWhiteSpace(tradeId) || signedValue == 0) return false;
+        if (State.LastDay < 0) { Diagnostic?.Invoke("游戏日期尚未接入，跳过无法归日的成交信号。"); return false; }
         if (!State.Sessions.TryGetValue(sessionId, out var session)) State.Sessions[sessionId] = session = new CustomerSession();
         if (session.Closed || !session.TradeIds.Add(tradeId)) return false;
-        foreach (var w in GetWeights(types)) session.Signals[w.Key] = session.Signals.GetValueOrDefault(w.Key) + Math.Clamp(signedValue, -int.MaxValue, int.MaxValue) * w.Value;
+        if (!State.TradeSignalsByDay.TryGetValue(State.LastDay, out var daily)) State.TradeSignalsByDay[State.LastDay] = daily = new Dictionary<string, decimal>();
+        foreach (var w in GetWeights(types))
+        {
+            var signal = Math.Clamp(signedValue, -int.MaxValue, int.MaxValue) * w.Value;
+            session.Signals[w.Key] = session.Signals.GetValueOrDefault(w.Key) + signal;
+            daily[w.Key] = daily.GetValueOrDefault(w.Key) + signal;
+        }
         return true;
     }
 
@@ -124,17 +148,8 @@ public sealed partial class MarketEngine
         if (!State.Sessions.TryGetValue(sessionId, out var session)) State.Sessions[sessionId] = session = new CustomerSession();
         if (session.Closed) return false;
         session.Closed = true;
-        foreach (var signal in session.Signals)
-        {
-            var company = State.Companies[signal.Key];
-            var impact = Config.CustomerLimit * signal.Value / (Config.SignalScale + Math.Abs(signal.Value));
-            var remaining = Math.Max(0, Config.RetailDailyLimit - company.DailyRetailImpact);
-            impact = Math.Clamp(impact, -remaining, remaining);
-            company.DailyRetailImpact += Math.Abs(impact);
-            MovePrice(signal.Key, impact, "顾客成交结算");
-        }
         foreach (var rumor in State.Rumors.Values.Where(x => x.SessionId == sessionId && !x.Purchased)) rumor.Expired = true;
-        if (session.Signals.Any(x => x.Value != 0)) Log("customer", "顾客遣散，已按商品交叉权重结算行情。");
+        if (session.Signals.Any(x => x.Value != 0)) Log("customer", "顾客会话已封存；成交按原成交日汇总，在次日行情统一结算。");
         return true;
     }
 
@@ -147,6 +162,7 @@ public sealed partial class MarketEngine
         if ((long)day - first > 10000) throw new ArgumentException("游戏日期跨度异常");
         for (var d = first; d <= day; d++)
         {
+            State.TradeSignalsByDay.TryGetValue(d - 1, out var previousTrades);
             State.LastDay = d;
             foreach (var company in Config.Companies)
             {
@@ -156,8 +172,17 @@ public sealed partial class MarketEngine
                 s.DailyRetailImpact = 0;
                 var noise = (NextRandom() * 2m - 1m) * Config.DailyLimit * .75m;
                 var reversion = (Config.InitialPrice / s.Price - 1m) * .01m;
-                MovePrice(company.Id, Math.Clamp(noise + reversion, -Config.DailyLimit, Config.DailyLimit), "每日行情");
+                var signal = previousTrades?.GetValueOrDefault(company.Id) ?? 0m;
+                var magnitude = Math.Abs(signal);
+                var ratio = magnitude == 0 ? 0m : magnitude >= Config.SignalScale ? 1m / (1m + Config.SignalScale / magnitude) : (magnitude / Config.SignalScale) / (1m + magnitude / Config.SignalScale);
+                var tradeInfluence = Config.TradeDailyLimit * Math.Sign(signal) * ratio;
+                var baseline = Math.Clamp(noise + reversion, -Config.DailyLimit, Config.DailyLimit);
+                var total = Math.Clamp(noise + reversion + tradeInfluence, -Config.DailyLimit, Config.DailyLimit);
+                s.DailyRetailImpact = Math.Abs(total - baseline);
+                var reason = $"每日行情；前一日（第 {d - 1} 日）成交结算影响 {total - baseline:+0.00%;-0.00%;0.00%}，合计日变动 {total:+0.00%;-0.00%;0.00%}";
+                MovePrice(company.Id, total, reason, Config.DailyLimit);
             }
+            foreach (var oldDay in State.TradeSignalsByDay.Keys.Where(k => k < d).ToArray()) State.TradeSignalsByDay.Remove(oldDay);
         }
         Log("day", $"第 {day} 日行情已更新。");
         return true;
@@ -347,12 +372,19 @@ public sealed partial class MarketEngine
         finally { _busy = false; }
     }
 
-    private void MovePrice(string id, decimal change, string reason)
+    private void MovePrice(string id, decimal change, string reason, decimal? maxAbsoluteChange = null)
     {
         var c = State.Companies[id];
         var candle = State.LastDay >= 0 ? EnsureCandle(c, State.LastDay, false) : null;
         if (State.LastDay >= 0 && (c.IntradayDay != State.LastDay || c.IntradayPoints.Count == 0)) BeginIntraday(c, State.LastDay, true);
-        c.Price = Math.Clamp(decimal.Round(c.Price * (1m + change), 2, MidpointRounding.AwayFromZero), .01m, 10000000m);
+        var price = Math.Clamp(decimal.Round(c.Price * (1m + change), 2, MidpointRounding.AwayFromZero), .01m, 10000000m);
+        if (maxAbsoluteChange.HasValue)
+        {
+            var lower = Math.Max(.01m, decimal.Ceiling(c.Price * (1m - maxAbsoluteChange.Value) * 100m) / 100m);
+            var upper = Math.Min(10000000m, decimal.Floor(c.Price * (1m + maxAbsoluteChange.Value) * 100m) / 100m);
+            price = lower <= upper ? Math.Clamp(price, lower, upper) : c.Price;
+        }
+        c.Price = price;
         if (candle != null)
         {
             candle.Close = c.Price;

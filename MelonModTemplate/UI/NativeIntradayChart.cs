@@ -53,7 +53,7 @@ public sealed class NativeIntradayChart : IDisposable
             background.raycastTarget = false;
             _title = Text("Title", 13, TextAlignmentOptions.TopLeft, Ink);
             _legend = Text("Legend", 11, TextAlignmentOptions.TopRight, Ink);
-            _legend.Text!.text = "青：走势  橙：顾客  紫：事件/异动";
+            _legend.Text!.text = "青：走势/日结  橙：成交记录  紫：事件/异动";
             _summary = Text("Summary", 11, TextAlignmentOptions.TopLeft, Ink);
             _note = Text("Note", 10, TextAlignmentOptions.TopLeft, StockUiTheme.Muted);
             _note.Text!.enableWordWrapping = true;
@@ -280,6 +280,7 @@ public sealed class NativeIntradayChart : IDisposable
 
     private static int PointKind(string reason)
     {
+        if (reason.Contains("昨日成交", StringComparison.Ordinal) || reason.Contains("成交汇总", StringComparison.Ordinal)) return 0;
         if (reason.Contains("顾客", StringComparison.Ordinal)) return 1;
         if (reason.Length == 0 || reason.Contains("开盘", StringComparison.Ordinal) || reason.Contains("每日", StringComparison.Ordinal)
             || reason.Contains("采样", StringComparison.Ordinal) || reason.Contains("接入", StringComparison.Ordinal)) return 0;

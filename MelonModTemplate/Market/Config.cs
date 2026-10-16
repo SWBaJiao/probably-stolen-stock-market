@@ -10,6 +10,8 @@ public sealed class MarketConfig
     public bool RequireSaveReloadVerification { get; set; }
     public decimal InitialPrice { get; set; } = 100m;
     public decimal DailyLimit { get; set; } = .03m;
+    public decimal TradeDailyLimit { get; set; } = .02m;
+    // 保留旧配置字段以兼容存档与本地配置；成交影响现由 TradeDailyLimit 在次日统一结算。
     public decimal CustomerLimit { get; set; } = .02m;
     public decimal RetailDailyLimit { get; set; } = .08m;
     public decimal SignalScale { get; set; } = 1000m;
@@ -71,6 +73,7 @@ public sealed class MarketConfig
     public static MarketConfig Deserialize(string json) { var c = JsonSerializer.Deserialize<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空"); c.Validate(); return c; }
     public void Validate()
     {
+        if (TradeDailyLimit < 0 || TradeDailyLimit > .2m) throw new ArgumentException("每日成交影响幅度无效");
         if (BrokerCooldownDays < 1 || BrokerCooldownDays > 100) throw new ArgumentException("情报商到访间隔无效");
         if (InitialPrice < .01m || InitialPrice > 10000000m || DailyLimit < 0 || DailyLimit > .2m || CustomerLimit < 0 || CustomerLimit > .2m || RetailDailyLimit < 0 || RetailDailyLimit > .5m || SignalScale <= 0 || FeeRate < 0 || FeeRate > .5m || MinimumFee < 0 || RumorPrice < 0 || RumorHorizon < 1 || HistoryLimit < 2 || LedgerLimit < 1 || StructuredEventScale < 0 || StructuredEventScale > 1 || StructuredEventLimit < 0 || StructuredEventLimit > .5m) throw new ArgumentException("行情参数超出允许范围");
         if (Companies == null || Sectors == null || Events == null || Sellers == null || Companies.Count == 0 || Companies.Any(x => x == null || string.IsNullOrWhiteSpace(x.Id) || string.IsNullOrWhiteSpace(x.Name)) || Companies.Select(x => x.Id).Distinct().Count() != Companies.Count) throw new ArgumentException("公司配置不完整或标识重复");

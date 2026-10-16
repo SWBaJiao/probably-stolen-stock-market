@@ -145,6 +145,8 @@ public sealed class MarketState
     public int Version { get; set; } = 1;
     public string SaveIdentity { get; set; } = "";
     public int LastDay { get; set; } = -1;
+    public int TradeSettlementVersion { get; set; }
+    public Dictionary<int, Dictionary<string, decimal>> TradeSignalsByDay { get; set; } = new();
     public ulong RandomState { get; set; } = 123456789;
     public bool StorageVerified { get; set; }
     public bool TradingFrozen { get; set; }

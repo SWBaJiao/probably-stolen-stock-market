@@ -208,7 +208,7 @@ public sealed class NativeCandlestickChart : IDisposable
         var hasPartial = candles.Any(c => !c.IsComplete);
         var live = currentDay.HasValue && candles.Any(c => c.Day == currentDay.Value);
         var messages = new List<string>();
-        if (live) messages.Add("当日未收盘，随实际成交及事件更新");
+        if (live) messages.Add("当日未收盘，反映每日结算及事件变价");
         if (hasPartial) messages.Add("灰色收盘标记：旧档或首次接入采样，开/高/低未知");
         if (!live && !hasPartial) messages.Add("实体为开盘至收盘，影线为当日最低至最高");
         var latest = candles[^1];

@@ -128,10 +128,10 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
                 Attach(store, identity, actualLoad);
             }
             ObserveStoreState();
+            if (Engine != null && Engine.AdvanceDay(StoreStation.GetDayCounter())) Persist();
             RefreshCustomer();
             if (Engine != null)
             {
-                if (Engine.AdvanceDay(StoreStation.GetDayCounter())) Persist();
                 Engine.ResolveRumors(ScheduledEvents());
                 _broker?.Tick();
                 _intelDelivery?.Tick();
@@ -319,7 +319,11 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         if (!CanTrade) return Status;
         if (Environment.CurrentManagedThreadId != _threadId || _monetaryOperation) return "操作繁忙，请稍后再试。";
         _monetaryOperation = true;
-        try { return action(); }
+        try
+        {
+            if (Engine!.AdvanceDay(StoreStation.GetDayCounter())) Persist();
+            return action();
+        }
         catch (Exception ex) { Fault("现金操作异常，交易已冻结", ex); return Status; }
         finally { _monetaryOperation = false; }
     }
@@ -552,26 +556,27 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         try
         {
             if (_store == null || Engine == null || previousPointer == IntPtr.Zero || _save.SessionClosed) return;
-            if (_store.currentClientInstance?.Pointer == previousPointer) { _dismissPending = previousPointer; _log.Msg("[股市探针] 遣散后实例尚未移除，延后至下一次顾客变化结算。"); return; }
+            if (_store.currentClientInstance?.Pointer == previousPointer) { _dismissPending = previousPointer; _log.Msg("[股市探针] 遣散后实例尚未移除，延后至下一次顾客变化封存会话。"); return; }
             SettleSession();
         }
-        catch (Exception ex) { Fault("遣散结算失败", ex); }
+        catch (Exception ex) { Fault("遣散会话封存失败", ex); }
     }
     private void SettleSession()
     {
         if (Engine == null || _save.SessionClosed || _save.SessionId.Length == 0) return;
         Engine.AdvanceDay(StoreStation.GetDayCounter());
         Engine.CloseCustomer(_save.SessionId); _save.SessionClosed = true; _offer = null; Persist();
-        _log.Msg($"[股市遣散] 已结算 session={_save.SessionId}");
+        _log.Msg($"[股市遣散] 已封存会话，成交按原成交日汇总，不即时变价 session={_save.SessionId}");
     }
     internal TradeCapture? BeginTrade(string method, GameItem? item, bool? buy)
     {
         try
         {
             if (_store == null || Engine == null || _monetaryOperation || !IsCurrentStore()) return null;
+            if (Engine.AdvanceDay(StoreStation.GetDayCounter())) Persist();
             RefreshCustomer();
             if (Client == null || _save.SessionClosed) return null;
-            var capture = new TradeCapture { Method = method, CashBefore = Cash, Buy = buy, Session = _save.SessionId };
+            var capture = new TradeCapture { Method = method, CashBefore = Cash, Buy = buy, Session = _save.SessionId, Day = Engine.State.LastDay };
             if (method == "OnWholesaleClick") capture.ExpectedWholesaleCost = _store.GetWholesalePrice();
             if (item != null && !IsTerminal(item)) capture.Items.Add(ItemCapture.Of(item));
             return capture;
@@ -583,6 +588,9 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         if (capture == null || exception != null || Engine == null || _store == null) return;
         try
         {
+            // 原版交易应同步完成；异常跨日的快照不能误记入另一日汇总。
+            if (capture.Day != Engine.State.LastDay || capture.Day != StoreStation.GetDayCounter())
+            { _log.Warning($"[股市探针] {capture.Method} 成交快照跨日，无法确认归属，未记行情：captureDay={capture.Day} marketDay={Engine.State.LastDay} gameDay={StoreStation.GetDayCounter()}"); return; }
             int delta = Cash - capture.CashBefore;
             if (capture.Items.Count == 0 || delta == 0 || (capture.Buy == true && delta >= 0) || (capture.Buy == false && delta <= 0))
             { _log.Msg($"[股市探针] {capture.Method} 未确认成交，现金变化={delta}，items={capture.Items.Count}"); return; }
@@ -635,6 +643,7 @@ internal sealed class TradeCapture
     public string Method = "";
     public string Session = "";
     public int CashBefore;
+    public int Day;
     public int? ExpectedWholesaleCost;
     public bool? Buy;
     public List<ItemCapture> Items = new();

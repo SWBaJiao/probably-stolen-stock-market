@@ -2,6 +2,7 @@
   "RequireSaveReloadVerification": false,
   "InitialPrice": 100,
   "DailyLimit": 0.03,
+  "TradeDailyLimit": 0.02,
   "CustomerLimit": 0.02,
   "RetailDailyLimit": 0.08,
   "SignalScale": 1000,
