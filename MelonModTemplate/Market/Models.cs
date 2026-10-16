@@ -64,6 +64,7 @@ public sealed class DailyCandle
 }
 public sealed class CompanyState
 {
+    public decimal PersistentEventFactor { get; set; } = 1m;
     public decimal Price { get; set; } = 100m;
     public decimal DailyRetailImpact { get; set; }
     public List<PricePoint> History { get; set; } = new();
@@ -141,6 +142,9 @@ public sealed class RumorView
 }
 public sealed class MarketState
 {
+    public Dictionary<string, EventLifecycleState> EventLifecycles { get; set; } = new();
+    public Dictionary<string, decimal> EventRetentions { get; set; } = new();
+    public HashSet<string> CompletedEventLifecycles { get; set; } = new();
     public BrokerVisitState Broker { get; set; } = new();
     public int Version { get; set; } = 1;
     public string SaveIdentity { get; set; } = "";

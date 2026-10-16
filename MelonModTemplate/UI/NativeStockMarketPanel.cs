@@ -162,7 +162,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         foreach (var company in engine.Config.Companies)
             Button("company." + company.Id, company.Name, "company:" + company.Id, -1, 38);
         if (!wide) _builder.End();
-        Label("market.legend", "涨红 / 跌绿 · 较昨收\n昨日成交日结 · 事件跳价", 54);
+        Label("market.legend", "涨红 / 跌绿 · 较昨收\n昨日成交日结 · 事件与余波", 54);
         _builder.End();
 
         _builder.BeginColumn(5);

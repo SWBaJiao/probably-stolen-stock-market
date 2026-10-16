@@ -16,6 +16,8 @@ void Check(bool ok, string description)
 MarketEngine Engine()
 {
     var c = MarketConfig.CreateDefault();
+    // 通用旧场景只验证原有交易、存档和图表；持续事件行为由专用生命周期用例覆盖。
+    c.EventContinuationScale = 0m;
     c.Events.Add(new EventRule { EventId = "test-water", Description = "净水设施故障", Sectors = new() { "water" }, Impacts = new() { ["water"] = -.1m, ["industrial"] = .05m } });
     return new MarketEngine(c) { State = { StorageVerified = true } };
 }
@@ -123,8 +125,9 @@ invalid = false;
 try { var c = MarketConfig.CreateDefault(); c.Sectors[0].Weights["harvest"] = .9m; c.Validate(); } catch (ArgumentException) { invalid = true; }
 Check(invalid, "配置权重异常拒绝启用");
 engine = Engine();
+engine.Config.DailyLimit = 0m; engine.AdvanceDay(1);
 engine.ActivateEvent("test-water", "secret", 1, false);
-Check(engine.State.Ledger.All(x => x.Kind != "event") && engine.State.Companies["water"].History.All(x => x.Reason == "市场异动"), "隐藏事件影响价格但不公开原因");
+Check(engine.State.Ledger.All(x => x.Kind != "event") && engine.State.Companies["water"].History.Last().Reason == "市场异动", "隐藏事件影响价格但不公开原因");
 engine.State.Companies["water"].Price = .01m;
 engine.State.Positions["water"].Quantity = 1;
 Check(!engine.QuoteOrder("water", OrderSide.Sell, 1, 1000).Success, "拒绝手续费超过卖出收入的订单");
@@ -342,6 +345,7 @@ TradeAllocationTests.Run(Check);
 PhoneBookingTests.Run(Check);
 BrokerIntroductionTests.Run(Check);
 DailyTradeTests.Run(Check);
+EventLifecycleTests.Run(Check);
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet

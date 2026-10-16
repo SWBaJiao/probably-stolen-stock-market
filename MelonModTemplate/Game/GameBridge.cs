@@ -43,6 +43,12 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private TerminalGrantPolicy _terminalGrant = new();
     private GameItem? _trackedTerminal;
     private string _lastInventoryProbe = "";
+    private IntPtr _eventManagerPointer;
+    private bool _eventManagerTrusted;
+    private int _eventDayStartDepth;
+    private string _lastEventSnapshotWarning = "";
+    private readonly List<ActiveMarketEvent> _pendingEventActivations = new();
+    private readonly List<EventLifecycleCapture> _pendingEventEndings = new();
     private RumorView? _offer;
     internal static GameBridge? Current { get; private set; }
     public MarketEngine? Engine { get; private set; }
@@ -128,7 +134,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
                 Attach(store, identity, actualLoad);
             }
             ObserveStoreState();
-            if (Engine != null && Engine.AdvanceDay(StoreStation.GetDayCounter())) Persist();
+            if (Engine != null && EnsureMarketDay()) Persist();
             RefreshCustomer();
             if (Engine != null)
             {
@@ -146,16 +152,19 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private void Attach(PlayerStore store, string identity, bool actualLoad)
     {
         ResetBrokerRuntime();
+        ResetEventRuntime();
         _observedStoreState = null;
         _store = store; _identity = identity; _fault = ""; _offer = null;
         _terminalGrant = new TerminalGrantPolicy(); _trackedTerminal = null; _lastInventoryProbe = ""; _nextTerminalScan = 0;
         bool restored = false;
+        bool hasSavedMarketState = false;
         if (store.modData != null && store.modData.ContainsKey(SaveKey))
         {
             var serialized = store.modData[SaveKey];
             _save = JsonSerializer.Deserialize<AdapterSave>(serialized) ?? throw new InvalidOperationException("股市存档为空。");
             if (_save.Version != 1 || _save.SaveIdentity != identity) throw new InvalidOperationException("股市存档版本或身份不匹配，已关闭交易。");
             Engine = new MarketEngine(MarketConfig.Deserialize(_config.Serialize()), MarketEngine.Deserialize(_save.MarketJson, _config));
+            hasSavedMarketState = true;
             bool freshDictionary = _loadDictionaryPointer == IntPtr.Zero || store.modData.Pointer != _loadDictionaryPointer;
             restored = actualLoad && freshDictionary && _save.WrittenBySave && !string.IsNullOrWhiteSpace(_save.ProbeNonce) && _save.SavedCash == store.GetCash();
         }
@@ -171,9 +180,8 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         Engine.ApplyStorageAccess(restored);
         if (actualLoad && _save.WrittenBySave && _save.SavedCash != store.GetCash())
             _log.Warning($"[股市探针] 读回现金不匹配：记录 {_save.SavedCash}，当前 {store.GetCash()}，严格验证={_config.RequireSaveReloadVerification}。");
-        Engine.AdvanceDay(StoreStation.GetDayCounter());
-        var manager = StoreStation.Instance?.storeEventManager;
-        if (manager != null) foreach (var active in manager.GetActiveEvents()) EventActivated(manager, active, false);
+        // 恢复旧行情但未观察到原版载入完成时，不采信可能尚未填充的事件空列表。
+        EnsureMarketDay(authorizeManager: actualLoad || !hasSavedMarketState, initialLoad: true);
         _log.Msg("[股市背包探针] 发放入口改为 EmporiumEntry.Instance.invElement；PlayerStore.gridInv 不再用于发放。");
         _log.Msg($"[股市探针] 存档 {identity}，原版 LoadGame={actualLoad}，nonce={_save.ProbeNonce}，读回验证={restored}，cash={store.GetCash()}");
         Persist();
@@ -188,6 +196,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     internal void BeginLoad()
     {
         ResetBrokerRuntime();
+        ResetEventRuntime();
         _terminalVisual.ResetTracking();
         _trackedTerminal = null; _terminalGrant = new TerminalGrantPolicy();
         _loadDictionaryPointer = _store?.modData?.Pointer ?? IntPtr.Zero;
@@ -196,7 +205,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     public void OnSceneChanged(string sceneName)
     {
         _inMenu = sceneName.IndexOf("Menu", StringComparison.OrdinalIgnoreCase) >= 0;
-        if (_inMenu) { ResetBrokerRuntime(); _terminalVisual.ResetTracking(); _trackedTerminal = null; _terminalGrant = new TerminalGrantPolicy(); _store = null; Engine = null; _offer = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero; }
+        if (_inMenu) { ResetBrokerRuntime(); ResetEventRuntime(); _terminalVisual.ResetTracking(); _trackedTerminal = null; _terminalGrant = new TerminalGrantPolicy(); _store = null; Engine = null; _offer = null; _clientPointer = IntPtr.Zero; _dismissPending = IntPtr.Zero; }
         _nextPoll = 0;
     }
     internal void EndLoad(bool success)
@@ -250,8 +259,8 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         try
         {
             _log.Msg("[股市电话预约] 请求开始 " + BrokerQueueSnapshot());
-            Engine!.AdvanceDay(StoreStation.GetDayCounter());
-            var result = Engine.BookBrokerByPhone(ScheduledEvents());
+            EnsureMarketDay();
+            var result = Engine!.BookBrokerByPhone(ScheduledEvents());
             Persist();
             _log.Msg("[股市电话预约] 请求结束 " + BrokerQueueSnapshot() + " result=" + result.Message);
             return result.Message;
@@ -321,7 +330,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         _monetaryOperation = true;
         try
         {
-            if (Engine!.AdvanceDay(StoreStation.GetDayCounter())) Persist();
+            if (EnsureMarketDay()) Persist();
             return action();
         }
         catch (Exception ex) { Fault("现金操作异常，交易已冻结", ex); return Status; }
@@ -403,17 +412,185 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     {
         try
         {
-            if (Engine == null || wasActive || !manager.IsEventActive(ev)) return;
-            int day = StoreStation.GetDayCounter();
-            Engine.AdvanceDay(day);
+            if (!CanObserveEventManager(manager) || Engine == null || wasActive || !manager.IsEventActive(ev)) return;
             EnsureEventRule(ev);
-            // 隐藏事件可以影响价格，但公开界面仅显示市场异动。
-            bool isPublic = !ev.isHidden && ev.IsKnown && !ev.isHiddenFromNewsPaper;
-            bool processed = Engine.ActivateEvent(ev.identifier, Occurrence(ev.identifier, ev.startDay > 0 ? ev.startDay : day), day, isPublic);
+            if (!TryDescribeActiveEvent(ev, out var observation)) return;
+            if (_eventDayStartDepth > 0)
+            {
+                _pendingEventActivations.Add(observation);
+                return;
+            }
+            int day = StoreStation.GetDayCounter();
+            EnsureMarketDay(manager, authorizeManager: true);
+            bool processed = Engine.ActivateEvent(observation.EventId, observation.OccurrenceKey, day, observation.IsPublic,
+                observation.ExpectedEndDayExclusive, observation.IsPermanent);
             int impacts = Engine.Config.Events.FirstOrDefault(r => r.EventId == ev.identifier)?.Impacts.Count(p => p.Value != 0) ?? 0;
-            _log.Msg($"[股市事件] id={ev.identifier} day={day} processed={processed} mappedCompanies={impacts}"); Persist();
+            _log.Msg($"[股市事件] id={ev.identifier} day={day} lifecycleSynced=true directApplied={processed} mappedCompanies={impacts}"); Persist();
         }
         catch (Exception ex) { Fault("事件适配失败", ex); }
+    }
+
+    // 有效快照先校正已结束事件，再由领域推进日期及接入新事件。
+    private bool EnsureMarketDay(StoreEventManager? expectedManager = null, bool authorizeManager = false, bool initialLoad = false)
+    {
+        if (Engine == null || _eventDayStartDepth > 0) return false;
+        int day = StoreStation.GetDayCounter();
+        if (TryReadActiveEventSnapshot(expectedManager, authorizeManager, out var active))
+            return Engine.SyncActiveEvents(active, day, initialLoad);
+        // 尚未就绪或无效的数据不能冒充空集；保留已知生命周期，允许领域按已知截止日处理。
+        return Engine.AdvanceDay(day);
+    }
+
+    private bool CanObserveEventManager(StoreEventManager? manager)
+    {
+        if (_disposed || _inMenu || _loading || Engine == null || manager == null || !IsCurrentStore()) return false;
+        var native = StoreStation.Instance?.storeEventManager;
+        return native != null && native.Pointer == manager.Pointer;
+    }
+
+    private bool TryReadActiveEventSnapshot(StoreEventManager? expectedManager, bool authorizeManager, out List<ActiveMarketEvent> observations)
+    {
+        observations = new List<ActiveMarketEvent>();
+        try
+        {
+            var manager = StoreStation.Instance?.storeEventManager;
+            if (!CanObserveEventManager(manager) || expectedManager != null && expectedManager.Pointer != manager!.Pointer) return false;
+            if (manager!.activeEvents == null) return false;
+            if (_eventManagerPointer != manager.Pointer)
+            {
+                _eventManagerPointer = manager.Pointer;
+                _eventManagerTrusted = authorizeManager;
+            }
+            else if (authorizeManager) _eventManagerTrusted = true;
+            if (!_eventManagerTrusted) { EventSnapshotWarning("原版事件管理器已更换，等待载入或原生事件流程完成后再采信快照。"); return false; }
+            var events = manager.GetActiveEvents();
+            if (events == null) return false;
+            foreach (var ev in events)
+            {
+                if (ev == null)
+                { observations.Clear(); EventSnapshotWarning("原版生效事件列表含缺失或无效条目，本次不以空集清除事件。"); return false; }
+                if (!TryDescribeActiveEvent(ev, out var observation)) { observations.Clear(); return false; }
+                observations.Add(observation);
+            }
+            foreach (var ev in events) EnsureEventRule(ev);
+            _lastEventSnapshotWarning = "";
+            return true;
+        }
+        catch (Exception ex)
+        {
+            observations.Clear();
+            EventSnapshotWarning("原版生效事件快照暂不可读，保留已有生命周期：" + ex.Message);
+            return false;
+        }
+    }
+
+    private bool TryDescribeActiveEvent(StoreEvent ev, out ActiveMarketEvent observation)
+    {
+        observation = new ActiveMarketEvent();
+        // 原版激活函数写入实际游戏日，0 是合法首日；负值不能改用每次观察日构造新 key。
+        if (string.IsNullOrWhiteSpace(ev.identifier) || ev.startDay < 0)
+        { EventSnapshotWarning("生效事件缺少有效标识或 startDay 为负，本次不新造发生键、不施首冲，等待原生数据恢复。"); return false; }
+        int? end = ev.totalDuration > 0 && ev.startDay <= int.MaxValue - ev.totalDuration
+            ? ev.startDay + ev.totalDuration : null;
+        observation = new ActiveMarketEvent
+        {
+            EventId = ev.identifier, OccurrenceKey = Occurrence(ev.identifier, ev.startDay), StartDay = ev.startDay,
+            ExpectedEndDayExclusive = end, IsPermanent = ev.isPermanent,
+            IsPublic = !ev.isHidden && ev.IsKnown && !ev.isHiddenFromNewsPaper
+        };
+        return true;
+    }
+
+    private void EventSnapshotWarning(string message)
+    {
+        if (_lastEventSnapshotWarning == message) return;
+        _lastEventSnapshotWarning = message; _log.Warning("[股市事件探针] " + message);
+    }
+
+    internal EventLifecycleCapture? BeforeEventDeactivated(StoreEventManager manager, StoreEvent ev)
+    {
+        try
+        {
+            if (!CanObserveEventManager(manager) || !manager.IsEventActive(ev) || !TryDescribeActiveEvent(ev, out var observation)) return null;
+            if (_eventDayStartDepth == 0 && EnsureMarketDay(manager, authorizeManager: true)) Persist();
+            int day = StoreStation.GetDayCounter();
+            // 日开始替换旧事件时，新日尚未结算；旧事件最后生效日为前一日。
+            // 同批刚激活又移除的事件保留当日，避免抹掉其真实首冲。
+            int lastActiveDay = _eventDayStartDepth > 0 && observation.StartDay < day ? day - 1 : day;
+            return new EventLifecycleCapture(manager, ev, observation, lastActiveDay, Engine!, _identity);
+        }
+        catch (Exception ex) { Fault("事件结束观察失败", ex); return null; }
+    }
+
+    internal void AfterEventDeactivated(EventLifecycleCapture? capture, bool success)
+    {
+        try
+        {
+            if (!success || capture == null || !ReferenceEquals(capture.Engine, Engine) || capture.SaveIdentity != _identity
+                || !CanObserveEventManager(capture.Manager) || capture.Manager.IsEventActive(capture.Event)) return;
+            if (_eventDayStartDepth > 0) { _pendingEventEndings.Add(capture); return; }
+            var ev = capture.Observation;
+            // 日末原生计数尚未进入下一日，D 日移除从 D+1 才开始缓慢回归。
+            Engine!.EndEvent(ev.EventId, ev.OccurrenceKey, capture.Day);
+            EnsureMarketDay(capture.Manager, authorizeManager: true); Persist();
+            _log.Msg($"[股市事件探针] 原生结束已确认 id={ev.EventId} lastActiveDay={capture.Day}，下一日起逐步回归。");
+        }
+        catch (Exception ex) { Fault("事件结束同步失败", ex); }
+    }
+
+    internal bool BeginEventDayStart(StoreEventManager manager)
+    {
+        try
+        {
+            if (!CanObserveEventManager(manager)) return false;
+            _eventDayStartDepth++; return true;
+        }
+        catch (Exception ex) { Fault("原生日开始观察失败", ex); return false; }
+    }
+
+    internal void CompleteEventDayStart(StoreEventManager manager, bool entered, bool success)
+    {
+        if (!entered) return;
+        if (_eventDayStartDepth > 0) _eventDayStartDepth--;
+        if (_eventDayStartDepth > 0) return;
+        try
+        {
+            if (!success || !CanObserveEventManager(manager)) { _eventManagerTrusted = false; return; }
+            foreach (var ending in _pendingEventEndings)
+                Engine!.EndEvent(ending.Observation.EventId, ending.Observation.OccurrenceKey, ending.Day);
+            EnsureMarketDay(manager, authorizeManager: true);
+            int day = StoreStation.GetDayCounter();
+            foreach (var active in _pendingEventActivations)
+                Engine!.ActivateEvent(active.EventId, active.OccurrenceKey, day, active.IsPublic, active.ExpectedEndDayExclusive, active.IsPermanent);
+            // 同一次日开始流程中激活又结束的事件仍保留一次首冲及真实结束日。
+            foreach (var ending in _pendingEventEndings)
+                Engine!.EndEvent(ending.Observation.EventId, ending.Observation.OccurrenceKey, ending.Day);
+            Persist();
+        }
+        catch (Exception ex) { Fault("原生日开始事件同步失败", ex); }
+        finally { _pendingEventActivations.Clear(); _pendingEventEndings.Clear(); }
+    }
+
+    internal void PrepareEventDayEnd(StoreEventManager manager)
+    {
+        try { if (CanObserveEventManager(manager) && EnsureMarketDay(manager, authorizeManager: true)) Persist(); }
+        catch (Exception ex) { Fault("原生日末事件同步失败", ex); }
+    }
+
+    internal void CompleteEventDayEnd(StoreEventManager manager, bool success)
+    {
+        try
+        {
+            if (!success || !CanObserveEventManager(manager)) return;
+            if (EnsureMarketDay(manager, authorizeManager: true)) Persist();
+        }
+        catch (Exception ex) { Fault("原生日末事件快照失败", ex); }
+    }
+
+    private void ResetEventRuntime()
+    {
+        _eventManagerPointer = IntPtr.Zero; _eventManagerTrusted = false; _eventDayStartDepth = 0;
+        _lastEventSnapshotWarning = ""; _pendingEventActivations.Clear(); _pendingEventEndings.Clear();
     }
 
     public string RecoverTerminal() => EnsureTerminal(true);
@@ -564,7 +741,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private void SettleSession()
     {
         if (Engine == null || _save.SessionClosed || _save.SessionId.Length == 0) return;
-        Engine.AdvanceDay(StoreStation.GetDayCounter());
+        EnsureMarketDay();
         Engine.CloseCustomer(_save.SessionId); _save.SessionClosed = true; _offer = null; Persist();
         _log.Msg($"[股市遣散] 已封存会话，成交按原成交日汇总，不即时变价 session={_save.SessionId}");
     }
@@ -573,7 +750,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         try
         {
             if (_store == null || Engine == null || _monetaryOperation || !IsCurrentStore()) return null;
-            if (Engine.AdvanceDay(StoreStation.GetDayCounter())) Persist();
+            if (EnsureMarketDay()) Persist();
             RefreshCustomer();
             if (Client == null || _save.SessionClosed) return null;
             var capture = new TradeCapture { Method = method, CashBefore = Cash, Buy = buy, Session = _save.SessionId, Day = Engine.State.LastDay };
@@ -630,12 +807,25 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     public void Dispose()
     {
         if (_disposed) return; _disposed = true;
+        ResetEventRuntime();
         if (Current == this) Current = null;
         _intelPhone?.Dispose(); _broker?.Dispose(); _intelCalendar?.Dispose(); _intelDelivery?.Dispose();
         _intelPhone = null; _broker = null; _intelCalendar = null; _intelDelivery = null;
         GamePatches.Uninstall(_harmony); _terminalVisual.Dispose(); IconRenderPatches.Uninstall(_harmony);
         _trackedTerminal = null; _store = null; Engine = null; _offer = null; OpenPanelRequested = null;
     }
+}
+
+internal sealed class EventLifecycleCapture
+{
+    internal readonly StoreEventManager Manager;
+    internal readonly StoreEvent Event;
+    internal readonly ActiveMarketEvent Observation;
+    internal readonly int Day;
+    internal readonly MarketEngine Engine;
+    internal readonly string SaveIdentity;
+    internal EventLifecycleCapture(StoreEventManager manager, StoreEvent ev, ActiveMarketEvent observation, int day, MarketEngine engine, string saveIdentity)
+    { Manager = manager; Event = ev; Observation = observation; Day = day; Engine = engine; SaveIdentity = saveIdentity; }
 }
 
 internal sealed class TradeCapture

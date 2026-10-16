@@ -52,6 +52,7 @@ public sealed partial class MarketEngine
         if (state.Sessions.Any(x => x.Value == null || x.Value.TradeIds == null || x.Value.Signals == null || x.Value.Signals.Keys.Any(k => !state.Companies.ContainsKey(k))) || state.Reputations.Any(x => x.Value == null || x.Value.Correct < 0 || x.Value.Incorrect < 0) || state.Rumors.Any(x => x.Value == null || x.Key != x.Value.Id || x.Value.Price < 0 || x.Value.Reliability < .2m || x.Value.Reliability > .9m || x.Value.CompanyIds == null)) throw new ArgumentException("股市存档成交或情报无效");
         if (state.TradeSettlementVersion < 0 || state.TradeSettlementVersion > 1 || state.TradeSignalsByDay == null || state.TradeSettlementVersion == 0 && state.TradeSignalsByDay.Count > 0 || state.TradeSignalsByDay.Any(d => d.Key < 0 || d.Key > state.LastDay || d.Value == null || d.Value.Keys.Any(id => !state.Companies.ContainsKey(id)))) throw new ArgumentException("股市存档每日成交信号无效");
         ValidateBrokerState(state);
+        ValidateEventLifecycles(state);
         // 持仓公司不能被配置删除，否则无法出售已有股份。
         if (state.Positions.Any(x => x.Value.Quantity > 0 && !config.Companies.Any(c => c.Id == x.Key))) throw new ArgumentException("公司配置删除了仍有持仓的公司");
     }
@@ -171,7 +172,7 @@ public sealed partial class MarketEngine
                 BeginIntraday(s, d, firstObservation);
                 s.DailyRetailImpact = 0;
                 var noise = (NextRandom() * 2m - 1m) * Config.DailyLimit * .75m;
-                var reversion = (Config.InitialPrice / s.Price - 1m) * .01m;
+                var reversion = (GetEventAdjustedAnchor(company.Id) / s.Price - 1m) * .01m;
                 var signal = previousTrades?.GetValueOrDefault(company.Id) ?? 0m;
                 var magnitude = Math.Abs(signal);
                 var ratio = magnitude == 0 ? 0m : magnitude >= Config.SignalScale ? 1m / (1m + Config.SignalScale / magnitude) : (magnitude / Config.SignalScale) / (1m + magnitude / Config.SignalScale);
@@ -182,23 +183,40 @@ public sealed partial class MarketEngine
                 var reason = $"每日行情；前一日（第 {d - 1} 日）成交结算影响 {total - baseline:+0.00%;-0.00%;0.00%}，合计日变动 {total:+0.00%;-0.00%;0.00%}";
                 MovePrice(company.Id, total, reason, Config.DailyLimit);
             }
+            AdvanceEventLifecycles(d);
             foreach (var oldDay in State.TradeSignalsByDay.Keys.Where(k => k < d).ToArray()) State.TradeSignalsByDay.Remove(oldDay);
         }
         Log("day", $"第 {day} 日行情已更新。");
         return true;
     }
 
-    public bool ActivateEvent(string eventId, string occurrenceKey, int day, bool isPublic = true)
+    // 缺少结束元数据时不会猜测事件时长，须由 EndEvent 或权威活动快照结束。
+    public bool ActivateEvent(string eventId, string occurrenceKey, int day, bool isPublic = true, int? endExclusive = null, bool isPermanent = false)
     {
         if (string.IsNullOrWhiteSpace(eventId) || string.IsNullOrWhiteSpace(occurrenceKey)) return false;
+        if (State.LastDay < 0) { Diagnostic?.Invoke("游戏日期尚未接入，跳过无法归日的事件激活。"); return false; }
         var key = EventKey(eventId, occurrenceKey);
-        if (!State.ProcessedEvents.Add(key)) return false;
+        var observedDay = State.LastDay >= 0 ? State.LastDay : Math.Max(0, day);
+        var native = new ActiveMarketEvent { EventId = eventId, OccurrenceKey = occurrenceKey, StartDay = day, ExpectedEndDayExclusive = endExclusive, IsPermanent = isPermanent, IsPublic = isPublic };
+        if (!State.ProcessedEvents.Add(key))
+        {
+            // 重复回调不重放冲击；旧档仍在生效的事件只接续今后的影响。
+            if (!State.EventLifecycles.ContainsKey(key)) RegisterEventLifecycle(native, observedDay, null, true);
+            return false;
+        }
         State.OccurredEvents.Add(key);
         var rule = Config.Events.FirstOrDefault(x => x.EventId == eventId);
         State.ObservedEventDirections[key] = rule == null ? new() : rule.Impacts.Where(p => p.Value != 0 && State.Companies.ContainsKey(p.Key)).ToDictionary(p => p.Key, p => Math.Sign(p.Value));
         if (rule != null)
         {
-            foreach (var impact in rule.Impacts) MovePrice(impact.Key, impact.Value, isPublic ? rule.Description : "市场异动");
+            var applied = new Dictionary<string, decimal>();
+            foreach (var impact in rule.Impacts)
+            {
+                var before = State.Companies[impact.Key].Price;
+                MovePrice(impact.Key, impact.Value, isPublic ? rule.Description : "市场异动");
+                applied[impact.Key] = State.Companies[impact.Key].Price / before;
+            }
+            RegisterEventLifecycle(native, observedDay, applied, false);
             if (isPublic) Log("event", string.IsNullOrEmpty(rule.Description) ? "公开事件已影响关联公司。" : rule.Description);
         }
         else Diagnostic?.Invoke("未映射事件标识：" + eventId);

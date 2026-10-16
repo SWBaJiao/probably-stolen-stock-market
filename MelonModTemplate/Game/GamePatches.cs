@@ -26,6 +26,9 @@ internal static class GamePatches
         Patch(harmony, typeof(StoreClient), "OnItemBought", prefix: nameof(ObserveCallback));
         Patch(harmony, typeof(StoreClient), "OnItemSold", prefix: nameof(ObserveCallback));
         Patch(harmony, typeof(StoreEventManager), "ActivateEvent", prefix: nameof(EventPrefix), postfix: nameof(EventPostfix));
+        Patch(harmony, typeof(StoreEventManager), "DeactivateEvent", prefix: nameof(EventDeactivatePrefix), finalizer: nameof(EventDeactivateFinalizer));
+        Patch(harmony, typeof(StoreEventManager), "OnDayStart", prefix: nameof(EventDayStartPrefix), finalizer: nameof(EventDayStartFinalizer));
+        Patch(harmony, typeof(StoreEventManager), "OnDayEnd", prefix: nameof(EventDayEndPrefix), finalizer: nameof(EventDayEndFinalizer));
         Patch(harmony, typeof(ItemMouseDoubleClickHandler), "DoubleClickAction", prefix: nameof(DoubleClickPrefix));
         Patch(harmony, typeof(PlayerStore), "CanSellThisItem", prefix: nameof(CanSellPrefix));
         Patch(harmony, typeof(PlayerStore), "PlacedItemForSelling", prefix: nameof(ProtectItemPrefix));
@@ -109,6 +112,17 @@ internal static class GamePatches
     }
     private static void EventPrefix(StoreEventManager __instance, StoreEvent __0, out bool __state) => __state = __instance.IsEventActive(__0);
     private static void EventPostfix(StoreEventManager __instance, StoreEvent __0, bool __state) => GameBridge.Current?.EventActivated(__instance, __0, __state);
+    private static void EventDeactivatePrefix(StoreEventManager __instance, StoreEvent __0, out EventLifecycleCapture? __state)
+        => __state = GameBridge.Current?.BeforeEventDeactivated(__instance, __0);
+    private static Exception? EventDeactivateFinalizer(EventLifecycleCapture? __state, Exception? __exception)
+    { GameBridge.Current?.AfterEventDeactivated(__state, __exception == null); return __exception; }
+    private static void EventDayStartPrefix(StoreEventManager __instance, out bool __state)
+        => __state = GameBridge.Current?.BeginEventDayStart(__instance) == true;
+    private static Exception? EventDayStartFinalizer(StoreEventManager __instance, bool __state, Exception? __exception)
+    { GameBridge.Current?.CompleteEventDayStart(__instance, __state, __exception == null); return __exception; }
+    private static void EventDayEndPrefix(StoreEventManager __instance) => GameBridge.Current?.PrepareEventDayEnd(__instance);
+    private static Exception? EventDayEndFinalizer(StoreEventManager __instance, Exception? __exception)
+    { GameBridge.Current?.CompleteEventDayEnd(__instance, __exception == null); return __exception; }
     private static bool DoubleClickPrefix(GameItem __0)
     {
         if (GameBridge.Current?.BlocksGameInput == true) return false;

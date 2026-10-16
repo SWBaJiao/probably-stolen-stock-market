@@ -11,6 +11,13 @@ public sealed class MarketConfig
     public decimal InitialPrice { get; set; } = 100m;
     public decimal DailyLimit { get; set; } = .03m;
     public decimal TradeDailyLimit { get; set; } = .02m;
+    public decimal EventContinuationScale { get; set; } = .10m;
+    public decimal EventContinuationLimit { get; set; } = .0075m;
+    public decimal EventContinuationBudget { get; set; } = .25m;
+    public decimal EventRecoveryRate { get; set; } = .25m;
+    public decimal EventDailyDriftLimit { get; set; } = .01m;
+    public decimal EventRetentionMin { get; set; } = .20m;
+    public decimal EventRetentionMax { get; set; } = .50m;
     // 保留旧配置字段以兼容存档与本地配置；成交影响现由 TradeDailyLimit 在次日统一结算。
     public decimal CustomerLimit { get; set; } = .02m;
     public decimal RetailDailyLimit { get; set; } = .08m;
@@ -74,6 +81,7 @@ public sealed class MarketConfig
     public void Validate()
     {
         if (TradeDailyLimit < 0 || TradeDailyLimit > .2m) throw new ArgumentException("每日成交影响幅度无效");
+        if (EventContinuationScale < 0 || EventContinuationScale > 1 || EventContinuationLimit < 0 || EventContinuationLimit > .1m || EventContinuationBudget < 0 || EventContinuationBudget > 1 || EventRecoveryRate <= 0 || EventRecoveryRate > 1 || EventDailyDriftLimit < 0 || EventDailyDriftLimit > .1m || EventRetentionMin <= 0 || EventRetentionMax >= 1 || EventRetentionMin > EventRetentionMax) throw new ArgumentException("事件持续与保留参数无效");
         if (BrokerCooldownDays < 1 || BrokerCooldownDays > 100) throw new ArgumentException("情报商到访间隔无效");
         if (InitialPrice < .01m || InitialPrice > 10000000m || DailyLimit < 0 || DailyLimit > .2m || CustomerLimit < 0 || CustomerLimit > .2m || RetailDailyLimit < 0 || RetailDailyLimit > .5m || SignalScale <= 0 || FeeRate < 0 || FeeRate > .5m || MinimumFee < 0 || RumorPrice < 0 || RumorHorizon < 1 || HistoryLimit < 2 || LedgerLimit < 1 || StructuredEventScale < 0 || StructuredEventScale > 1 || StructuredEventLimit < 0 || StructuredEventLimit > .5m) throw new ArgumentException("行情参数超出允许范围");
         if (Companies == null || Sectors == null || Events == null || Sellers == null || Companies.Count == 0 || Companies.Any(x => x == null || string.IsNullOrWhiteSpace(x.Id) || string.IsNullOrWhiteSpace(x.Name)) || Companies.Select(x => x.Id).Distinct().Count() != Companies.Count) throw new ArgumentException("公司配置不完整或标识重复");
