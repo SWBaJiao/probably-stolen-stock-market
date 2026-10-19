@@ -29,6 +29,7 @@ public sealed class MarketConfig
     public decimal FeeRate { get; set; } = .005m;
     public int MinimumFee { get; set; } = 1;
     public int RumorPrice { get; set; } = 50;
+    public decimal JianqingReverseProbability { get; set; } = .70m;
     public int RumorHorizon { get; set; } = 3;
     public int BrokerCooldownDays { get; set; } = 3;
     public int HistoryLimit { get; set; } = 240;
@@ -130,6 +131,7 @@ public sealed class MarketConfig
         if (TradeDailyLimit < 0 || TradeDailyLimit > .2m) throw new ArgumentException("每日成交影响幅度无效");
         if (EventShockWindowDays < 1 || EventShockWindowDays > 3650 || EventPreheatChance < 0 || EventPreheatChance > 1 || EventPreheatScale < 0 || EventPreheatScale > 1 || EventPreheatLimit < 0 || EventPreheatLimit > .1m) throw new ArgumentException("事件冲击窗口与预热参数无效");
         if (EventContinuationScale < 0 || EventContinuationScale > 1 || EventContinuationLimit < 0 || EventContinuationLimit > .1m || EventContinuationBudget < 0 || EventContinuationBudget > 1 || EventRecoveryRate <= 0 || EventRecoveryRate > 1 || EventDailyDriftLimit < 0 || EventDailyDriftLimit > .1m || EventRetentionMin <= 0 || EventRetentionMax >= 1 || EventRetentionMin > EventRetentionMax) throw new ArgumentException("事件持续与保留参数无效");
+        if (JianqingReverseProbability < 0m || JianqingReverseProbability > 1m) throw new ArgumentException("剑清酱的反向消息概率须在零到一之间");
         if (BrokerCooldownDays < 1 || BrokerCooldownDays > 100) throw new ArgumentException("情报商到访间隔无效");
         if (InitialPrice < .01m || InitialPrice > 10000000m || DailyLimit < 0 || DailyLimit > .2m || CustomerLimit < 0 || CustomerLimit > .2m || RetailDailyLimit < 0 || RetailDailyLimit > .5m || SignalScale <= 0 || FeeRate < 0 || FeeRate > .5m || MinimumFee < 0 || RumorPrice < 0 || RumorHorizon < 1 || HistoryLimit < 2 || LedgerLimit < 1 || StructuredEventScale < 0 || StructuredEventScale > 1 || StructuredEventLimit < 0 || StructuredEventLimit > .5m) throw new ArgumentException("行情参数超出允许范围");
         if (Companies == null || Sectors == null || Events == null || Sellers == null || Companies.Count == 0 || Companies.Any(x => x == null || string.IsNullOrWhiteSpace(x.Id) || string.IsNullOrWhiteSpace(x.Name)) || Companies.Select(x => x.Id).Distinct().Count() != Companies.Count) throw new ArgumentException("公司配置不完整或标识重复");

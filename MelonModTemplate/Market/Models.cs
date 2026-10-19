@@ -97,6 +97,7 @@ public sealed class CustomerSession
 public sealed class SellerReputation { public int Correct { get; set; } public int Incorrect { get; set; } }
 public sealed class RumorOffer
 {
+    public string BrokerId { get; set; } = BrokerIds.Wenzhou;
     public string ImpactSource { get; set; } = "";
     public int DirectionVersion { get; set; }
     public bool IsBrokerOffer { get; set; }
@@ -131,6 +132,7 @@ public sealed class RumorOffer
 // 界面仅接收投影，未购买时不暴露事件与真假依据。
 public sealed class RumorView
 {
+    public string BrokerId { get; set; } = BrokerIds.Wenzhou;
     public string Id { get; set; } = "";
     public string SellerName { get; set; } = "";
     public string Identity { get; set; } = "";
@@ -152,6 +154,7 @@ public sealed class MarketState
     public Dictionary<string, decimal> EventRetentions { get; set; } = new();
     public HashSet<string> CompletedEventLifecycles { get; set; } = new();
     public BrokerVisitState Broker { get; set; } = new();
+    public Dictionary<string, BrokerVisitState> AdditionalBrokers { get; set; } = new();
     public int Version { get; set; } = 1;
     public string SaveIdentity { get; set; } = "";
     public int LastDay { get; set; } = -1;

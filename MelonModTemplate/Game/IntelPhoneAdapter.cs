@@ -29,7 +29,7 @@ internal sealed class IntelPhoneAdapter : IDisposable
     internal IntelPhoneAdapter(GameBridge host, MelonLogger.Instance log)
     {
         _host = host; _log = log;
-        _quickDial = new IntelPhoneQuickDial(log, CanShowQuickDial, StartQuickDial);
+        _quickDial = new IntelPhoneQuickDial(log, "行情消息专线", PhoneNumber, CanShowQuickDial, StartQuickDial);
     }
 
     internal bool BlocksGameInput
@@ -70,21 +70,21 @@ internal sealed class IntelPhoneAdapter : IDisposable
         catch { Dispose(); throw; }
     }
 
-    private bool HasNumberConflict()
+    private bool HasNumberConflict(long number)
     {
         var store = PlayerStore.IsInstanceExist() ? PlayerStore.Instance : null;
         if (store?.PhoneClientDict == null) return true;
-        if (!store.PhoneClientDict.ContainsKey(PhoneNumber)) return false;
-        string identity = $"{store.saveSlotId}:{store.runID}:{store.runNumber}";
+        if (!store.PhoneClientDict.ContainsKey(number)) return false;
+        string identity = $"{store.saveSlotId}:{store.runID}:{store.runNumber}:{number}";
         if (_reportedConflictIdentity != identity)
         {
             _reportedConflictIdentity = identity;
-            _log.Warning($"[股市预约电话探针] 号码 {PhoneNumber} 已有联系人，保留原版处理，不覆盖号码。");
+            _log.Warning($"[股市预约电话探针] 号码 {number} 已有联系人，保留原版处理，不覆盖号码。");
         }
         return true;
     }
 
-    private bool CanShowQuickDial() => !_disposed && _host.BrokerReady && _host.OwnsStockTerminal() && !HasNumberConflict();
+    private bool CanShowQuickDial() => !_disposed && _host.BrokerReady && _host.OwnsStockTerminal() && !HasNumberConflict(PhoneNumber);
 
     private void StartQuickDial(PhoneUIManager phone)
     {
@@ -103,10 +103,10 @@ internal sealed class IntelPhoneAdapter : IDisposable
     private bool HandleCall(PhoneUIManager phone, long number)
     {
         Invalidate(true);
-        if (_disposed || number != PhoneNumber || HasNumberConflict()) return true;
+        if (_disposed || number != PhoneNumber || HasNumberConflict(number)) return true;
         phone.StopCall();
         if (!_host.BrokerReady) { Feedback(phone, "请先进入游戏存档。"); return false; }
-        if (!_host.OwnsStockTerminal()) { Feedback(phone, "持有本存档的股市面板道具后，才能预约闻舟。"); return false; }
+        if (!_host.OwnsStockTerminal()) { Feedback(phone, "持有本存档的股市面板道具后，才能预约消息商。"); return false; }
         var ui = GenericConfirmationUIManager.Instance;
         if (ui == null || ui.panel == null) { Feedback(phone, "预约确认界面暂未就绪，请稍后重拨。"); return false; }
         if (ui.panel.activeSelf) { Feedback(phone, "请先处理当前确认窗口，再重新拨号。"); return false; }
@@ -125,8 +125,8 @@ internal sealed class IntelPhoneAdapter : IDisposable
         try
         {
             _opening = true;
-            ui.OpenPanel("我是闻舟，可以替你联系股市消息来源。是否预约我明天到店？\n\n确认后登记预约；取消或挂断都不会创建新预约。", "预约明日到访", "暂不预约", ticket.Confirm, ticket.Cancel);
-            Feedback(phone, "闻舟：请确认是否预约明日到访。");
+            ui.OpenPanel("这里是行情消息专线，闻舟和剑清酱共用这个号码。是否预约一位消息商明天到店？\n\n确认后随机安排一人；重复拨号只查询已有预约，不重新抽取。", "预约明日到访", "暂不预约", ticket.Confirm, ticket.Cancel);
+            Feedback(phone, "行情消息专线：请确认是否预约明日到访。");
             _log.Msg("[股市预约电话探针] 已显示确认，尚未调用预约领域。");
         }
         catch { Invalidate(true); throw; }
@@ -226,8 +226,8 @@ internal sealed class IntelPhoneAdapter : IDisposable
         try
         {
             adapter.Invalidate(true);
-            if (__0 != PhoneNumber || adapter.HasNumberConflict()) return true;
-            if (!adapter._host.BrokerReady || !adapter._host.OwnsStockTerminal()) { __instance.StopCall(); Feedback(__instance, "持有本存档的股市面板后，才能预约闻舟。"); return false; }
+            if (__0 != PhoneNumber || adapter.HasNumberConflict(__0)) return true;
+            if (!adapter._host.BrokerReady || !adapter._host.OwnsStockTerminal()) { __instance.StopCall(); Feedback(__instance, "持有本存档的股市面板后，才能预约消息商。"); return false; }
             adapter.StartQuickDial(__instance); return false;
         }
         catch (Exception ex) { adapter.Report("快速拨号检查失败", ex); return __0 != PhoneNumber; }

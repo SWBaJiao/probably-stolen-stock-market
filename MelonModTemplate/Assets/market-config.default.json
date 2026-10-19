@@ -20,6 +20,7 @@
   "FeeRate": 0.005,
   "MinimumFee": 1,
   "RumorPrice": 50,
+  "JianqingReverseProbability": 0.70,
   "RumorHorizon": 3,
   "BrokerCooldownDays": 3,
   "HistoryLimit": 240,

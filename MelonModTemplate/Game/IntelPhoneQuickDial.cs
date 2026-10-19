@@ -15,6 +15,8 @@ internal sealed class IntelPhoneQuickDial : IDisposable
     private readonly MelonLogger.Instance _log;
     private readonly Func<bool> _canShow;
     private readonly Action<PhoneUIManager> _dial;
+    private readonly string _name;
+    private readonly long _number;
     private GameObject? _view;
     private Button? _button;
     private Button.ButtonClickedEvent? _event;
@@ -22,8 +24,8 @@ internal sealed class IntelPhoneQuickDial : IDisposable
     private UnityAction? _native;
     private bool _disposed;
 
-    internal IntelPhoneQuickDial(MelonLogger.Instance log, Func<bool> canShow, Action<PhoneUIManager> dial)
-    { _log = log; _canShow = canShow; _dial = dial; }
+    internal IntelPhoneQuickDial(MelonLogger.Instance log, string name, long number, Func<bool> canShow, Action<PhoneUIManager> dial)
+    { _log = log; _name = name; _number = number; _canShow = canShow; _dial = dial; }
 
     internal void Ensure(PhoneBookUIManager book)
     {
@@ -33,7 +35,7 @@ internal sealed class IntelPhoneQuickDial : IDisposable
         if (phone == null || phone.phoneBookUIManager == null || phone.phoneBookUIManager.Pointer != book.Pointer
             || book.contactElementPrefab == null || book.layoutGroup == null) return;
         var view = UnityEngine.Object.Instantiate(book.contactElementPrefab, book.layoutGroup.transform).Cast<GameObject>();
-        _view = view; view.name = "StockMarket.IntelBrokerQuickDial";
+        _view = view; view.name = "StockMarket.IntelBrokerQuickDial." + _number;
         try
         {
             var contact = view.GetComponent(Il2CppType.Of<ContactElement>())?.TryCast<ContactElement>()
@@ -43,9 +45,9 @@ internal sealed class IntelPhoneQuickDial : IDisposable
                 if (component?.TryCast<Button>() is { } button) buttons.Add(button);
             if (buttons.Count != 1) throw new InvalidOperationException("联系人视图未提供唯一快捷按钮，已跳过。");
             if (contact.titleTMP == null || contact.statusTMP == null) throw new InvalidOperationException("联系人视图缺少原版姓名或状态文本。");
-            contact.titleTMP.text = "闻舟";
-            contact.statusTMP.text = $"{IntelPhoneAdapter.PhoneNumber} · 预约明日到访";
-            contact.number = IntelPhoneAdapter.PhoneNumber;
+            contact.titleTMP.text = _name;
+            contact.statusTMP.text = $"{_number} · 预约明日到访";
+            contact.number = _number;
             _button = buttons[0];
             // 替换整个事件对象，清除序列化的 OnQuickDial 监听，不能仅 RemoveAllListeners。
             _event = new Button.ButtonClickedEvent(); _button.onClick = _event;
@@ -62,7 +64,7 @@ internal sealed class IntelPhoneQuickDial : IDisposable
             // ContactElement 没有 Awake、OnEnable 或 Update；移除后仅保留原生纯 UI 子树。
             UnityEngine.Object.Destroy(contact);
             view.SetActive(true); view.transform.SetAsLastSibling();
-            _log.Msg("[股市预约电话探针] 已追加闻舟临时快捷联系人；原版电话簿存档未改写。");
+            _log.Msg($"[股市预约电话探针] 已追加{_name}临时快捷联系人；原版电话簿存档未改写。");
         }
         catch { Reset(); throw; }
     }

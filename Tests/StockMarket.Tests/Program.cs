@@ -349,6 +349,8 @@ DailyTradeTests.Run(Check);
 EventLifecycleTests.Run(Check);
 EventShockTimingTests.Run(Check);
 EventDirectionTests.Run(Check);
+MultiBrokerTests.Run(Check);
+SharedBrokerPhoneTests.Run(Check);
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet

@@ -65,7 +65,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         get
         {
             if (!OwnsStockTerminal()) return "持有本存档的股市面板道具后，解锁掮客电话预约。";
-            var booking = Engine?.GetBrokerPhoneBooking();
+            var booking = Engine?.GetSharedBrokerPhoneBooking();
             string status = booking == null ? "暂无预约。" : booking.Status switch
             {
                 BrokerPhoneBookingStatus.Booked => $"已约第 {booking.ArrivalDay} 日到访，开门后在队尾等待。",
@@ -74,7 +74,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
                 BrokerPhoneBookingStatus.Cancelled => "本次预约已取消，可拨电话查询。",
                 _ => "之前的预约已过期，可再拨电话查询。"
             };
-            return $"闻舟 · 行情掮客：{IntelPhoneAdapter.PhoneNumber}（电话簿可快速拨号）\n{status}";
+            return $"行情消息专线：{IntelPhoneAdapter.PhoneNumber}（电话簿可快速拨号）\n{status}";
         }
     }
     public int? OfferCost => _offer?.Price;
@@ -253,12 +253,12 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         if (!BrokerReady) return "请先进入游戏存档。";
         if (Environment.CurrentManagedThreadId != _threadId || _monetaryOperation || BlocksGameInput) return "请先关闭股市面板，再使用游戏电话。";
         if (!OwnsStockTerminal()) return "你需要持有本存档的股市面板道具，才能预约内幕掮客。";
-        if (Client?.identifier == IntelBrokerAdapter.NpcId) return "行情掮客正在接待中，请完成并遣散后再预约。";
+        if (IntelBrokerAdapter.GetBrokerId(Client) != null) return "行情掮客正在接待中，请完成并遣散后再预约。";
         try
         {
             _log.Msg("[股市电话预约] 请求开始 " + BrokerQueueSnapshot());
             EnsureMarketDay();
-            var result = Engine!.BookBrokerByPhone(ScheduledEvents());
+            var result = Engine!.BookRandomBrokerByPhone(ScheduledEvents());
             Persist();
             _log.Msg("[股市电话预约] 请求结束 " + BrokerQueueSnapshot() + " result=" + result.Message);
             return result.Message;
@@ -296,12 +296,12 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         _observedStoreState = _store.storeState;
     }
 
-    internal OperationResult PurchaseBrokerOffer(string visitId, string offerId)
+    internal OperationResult PurchaseBrokerOffer(string visitId, string offerId, string brokerId = BrokerIds.Wenzhou)
     {
         if (!CanBuyBrokerIntel) return OperationResult.Fail(BrokerTradeStatus);
         if (Environment.CurrentManagedThreadId != _threadId || _monetaryOperation) return OperationResult.Fail("操作繁忙，请稍后再试。");
-        if (Client?.identifier != IntelBrokerAdapter.NpcId) return OperationResult.Fail("当前接待对象已变化。");
-        var visit = Engine!.GetBrokerVisit();
+        if (IntelBrokerAdapter.GetBrokerId(Client) != brokerId) return OperationResult.Fail("当前接待对象已变化。");
+        var visit = Engine!.GetBrokerVisit(brokerId);
         if (visit == null || visit.VisitId != visitId || visit.OfferId != offerId || !visit.HasArrived || visit.Departed)
             return OperationResult.Fail("当前内幕报价已变化。");
         var engine = Engine;
@@ -309,7 +309,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
         int before = Cash;
         try
         {
-            var result = engine.BuyBrokerOffer(offerId, ScheduledEvents(), this, Persist);
+            var result = engine.BuyBrokerOffer(offerId, ScheduledEvents(), this, Persist, brokerId);
             _log.Msg($"[内幕购买探针] success={result.Success} visit={visitId} cash={before}->{Cash}");
             RefreshOffer();
             return result;
@@ -367,18 +367,20 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             _log.Msg($"[股市顾客] session={_save.SessionId} id={client.identifier} faction={client.clientFaction} tags={string.Join(",", Strings(client.tag))}");
             Persist();
         }
-        SellerDescription = client.identifier == IntelBrokerAdapter.NpcId ? "闻舟 · 行情掮客正在来访" : "当前没有行情掮客；普通顾客不再出售股市内幕。";
+        var brokerId = IntelBrokerAdapter.GetBrokerId(client);
+        SellerDescription = brokerId != null ? IntelBrokerAdapter.GetBrokerName(brokerId) + " · 行情掮客正在来访" : "当前没有行情掮客；普通顾客不再出售股市内幕。";
         _clientPointer = pointer;
         RefreshOffer();
     }
     private void RefreshOffer()
     {
-        if (Engine == null || Client?.identifier != IntelBrokerAdapter.NpcId || _save.SessionClosed)
+        var brokerId = IntelBrokerAdapter.GetBrokerId(Client);
+        if (Engine == null || brokerId == null || _save.SessionClosed)
         { _offer = null; return; }
-        var visit = Engine.GetBrokerVisit();
+        var visit = Engine.GetBrokerVisit(brokerId);
         _offer = visit != null && visit.HasArrived && !visit.Departed
             ? Engine.GetRumors().FirstOrDefault(r => r.Id == visit.OfferId) : null;
-        if (_offer != null) SellerDescription = "闻舟 · 行情掮客 · 消息来源：" + _offer.Identity;
+        if (_offer != null) SellerDescription = IntelBrokerAdapter.GetBrokerName(brokerId) + " · 行情掮客 · 消息来源：" + _offer.Identity;
     }
     private IReadOnlyList<ScheduledEvent> ScheduledEvents()
     {

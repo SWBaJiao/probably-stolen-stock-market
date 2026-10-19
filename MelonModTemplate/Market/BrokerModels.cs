@@ -2,10 +2,18 @@ using System.Collections.Generic;
 
 namespace MelonModTemplate.Market;
 
+public static class BrokerIds
+{
+    public const string Wenzhou = "wenzhou";
+    public const string Jianqing = "jianqing";
+    public const string JianqingSellerKey = "npc:jianqing";
+}
+
 public enum IntelPaperState { Pending, Delivered, Uncertain }
 public enum BrokerPhoneBookingStatus { Booked, Arrived, Completed, Cancelled, Expired }
 public sealed class BrokerPhoneBookingRecord
 {
+    public string BrokerId { get; set; } = BrokerIds.Wenzhou;
     public string VisitId { get; set; } = "";
     public string OfferId { get; set; } = "";
     public int RequestDay { get; set; }
@@ -14,6 +22,7 @@ public sealed class BrokerPhoneBookingRecord
 }
 public sealed class BrokerPhoneBookingView
 {
+    public string BrokerId { get; set; } = BrokerIds.Wenzhou;
     public string VisitId { get; set; } = "";
     public string OfferId { get; set; } = "";
     public int RequestDay { get; set; }
@@ -25,6 +34,7 @@ public sealed class BrokerPhoneBookingView
 }
 public sealed class BrokerVisitState
 {
+    public string BrokerId { get; set; } = BrokerIds.Wenzhou;
     public long Sequence { get; set; }
     public int LastArrivalDay { get; set; } = -1;
     public string VisitId { get; set; } = "";
@@ -42,6 +52,7 @@ public sealed class BrokerVisitState
 // 报价投影只提供来源和产品类别，不提供未购买的公司与方向。
 public sealed class BrokerVisitView
 {
+    public string BrokerId { get; set; } = BrokerIds.Wenzhou;
     public string VisitId { get; set; } = "";
     public string OfferId { get; set; } = "";
     public string AppearanceKey { get; set; } = "";
@@ -61,6 +72,7 @@ public sealed class BrokerVisitView
 // 纸条、日历和投资面板只能读取已购投影，不接触真实事件与内部真假标记。
 public sealed class IntelRecord
 {
+    public string BrokerId { get; set; } = BrokerIds.Wenzhou;
     public string OfferId { get; set; } = "";
     public string SourceName { get; set; } = "";
     public string SourceIdentity { get; set; } = "";
