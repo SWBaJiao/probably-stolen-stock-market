@@ -6,6 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../MelonModTemplate/Game/TerminalGrantPolicy.cs" Link="TerminalGrantPolicy.cs" />
+    <Compile Include="../../ProbablyStolenStockMarket/Game/TerminalGrantPolicy.cs" Link="TerminalGrantPolicy.cs" />
   </ItemGroup>
 </Project>

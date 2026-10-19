@@ -12,7 +12,7 @@
 
 事件 ID、商品类型及修正幅度由本机 `GameAssembly.dll` 原生工厂静态反汇编确认，事件含义由游戏中文本地化表确认。IL2CPP dummy 程序集只用于定位方法地址、字段偏移，未将空方法体当作原生逻辑。另以原生 StoreEvent 构造调用交叉检查 54 处，其中 1 处为 QueueEvent 内联构造同一个证物库失窃事件，因此独立事件是 53 个。静态存在不代表每个事件在当前存档/试玩流程中都能触发。
 
-幅度使用实际部署位置的 `UserData/MelonModTemplate/market-config.json`，经当前源码 `MarketConfig.Deserialize` 完成默认值补齐与旧默认迁移，再由真实 `EventImpactResolver.EnsureRule` 逐项计算，未用另一套近似公式替代。
+幅度使用审查时实际部署的 `UserData/MelonModTemplate/market-config.json`（0.12.1 已原样迁移至 `UserData/ProbablyStolenStockMarket/market-config.json`），经当前源码 `MarketConfig.Deserialize` 完成默认值补齐与旧默认迁移，再由真实 `EventImpactResolver.EnsureRule` 逐项计算，未用另一套近似公式替代。
 
 显式规则优先，目前 3 条：营养果歉收、非法武器走私货物、武器需求增加。其余按商品类型修正推导：
 
@@ -149,11 +149,11 @@
 
 ## 源码与原生定位
 
-- `MelonModTemplate/Market/Config.cs:65-78`：行业别名、权重及 3 个显式事件；`:117-127`：旧默认动员迁移。
-- `MelonModTemplate/Market/EventImpactResolver.cs:20-66`：显式优先、反号、逐类型累加、±15% 限幅与缓存。
-- `MelonModTemplate/Market/EventLifecycleEngine.cs:49-89`、`:124-234`：保留目标、计划冲击、预热/延续/恢复。
-- `MelonModTemplate/Market/EventDirectionCompatibility.cs:20-31`：已主冲击旧实例不反向重写。
-- `MelonModTemplate/Game/GameBridge.cs:402-409`：只复制原版商品修正用于股市规则。
+- `ProbablyStolenStockMarket/Market/Config.cs:65-78`：行业别名、权重及 3 个显式事件；`:117-127`：旧默认动员迁移。
+- `ProbablyStolenStockMarket/Market/EventImpactResolver.cs:20-66`：显式优先、反号、逐类型累加、±15% 限幅与缓存。
+- `ProbablyStolenStockMarket/Market/EventLifecycleEngine.cs:49-89`、`:124-234`：保留目标、计划冲击、预热/延续/恢复。
+- `ProbablyStolenStockMarket/Market/EventDirectionCompatibility.cs:20-31`：已主冲击旧实例不反向重写。
+- `ProbablyStolenStockMarket/Game/GameBridge.cs:402-409`：只复制原版商品修正用于股市规则。
 - `StoreEvent::.ctor` RVA `0x6AB360`：初始化空价格修正列表；普通事件见 `EventListNormal`，阵营事件见 `OperationListBM/LL/Rev/Sec/UL`，其余见 `EventListCosmetic/Innate/Special/Unique`；每行具体工厂和 RVA 均在 JSON。
 - `StoreEventManager::QueueEvent` RVA `0x6A7E90`：内联证物库事件不增加独立事件数。中文 `event_op_food_drive_*` 仅有本地化条目，本次未找到对应工厂/独立定义，不伪造事件 ID 或数值。
 

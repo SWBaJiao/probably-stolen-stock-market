@@ -1,4 +1,4 @@
-using MelonModTemplate.Features;
+using ProbablyStolenStockMarket.Features;
 
 int passed = 0;
 void Test(string name, Action test) { test(); passed++; Console.WriteLine("PASS " + name); }

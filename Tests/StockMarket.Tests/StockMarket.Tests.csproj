@@ -6,6 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../../MelonModTemplate/Market/**/*.cs" Link="Market/%(Filename)%(Extension)" />
+    <Compile Include="../../ProbablyStolenStockMarket/Market/**/*.cs" Link="Market/%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>

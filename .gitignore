@@ -8,5 +8,6 @@
 /ModTemplate/
 /probably-stolen-modding/
 /work/
+/artifacts/
 # 旧 LearnerMod 示例资源只作本地风格参考，不包含在股市 Mod 发布中。
-/MelonModTemplate/Assets/Textures/Items/health_pack.png
+/ProbablyStolenStockMarket/Assets/Textures/Items/health_pack.png

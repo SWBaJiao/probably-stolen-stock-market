@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="build/MelonDevelopment.props" />
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <AssemblyName>ProbablyStolenStockMarket</AssemblyName>
+    <RootNamespace>ProbablyStolenStockMarket</RootNamespace>
+  </PropertyGroup>
+
+  <!-- 加载器及代理程序集由游戏侧提供，不复制它们覆盖现有安装。 -->
+  <ItemGroup>
+    <Reference Include="MelonLoader">
+      <HintPath>$(MelonLoaderAssembly)</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony" Condition="Exists('$(MelonRuntimeDirectory)/0Harmony.dll')">
+      <HintPath>$(MelonRuntimeDirectory)/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- 访问游戏类型时启用；文件名以本机首次生成的实际代理程序集为准。 -->
+  <ItemGroup Condition="'$(UseGameInterop)' == 'true'">
+    <Reference Include="$(Il2CppAssembliesDirectory)/*.dll">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Common">
+      <HintPath>$(MelonRuntimeDirectory)/Il2CppInterop.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>$(MelonRuntimeDirectory)/Il2CppInterop.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Import Project="build/MelonDevelopment.targets" />
+</Project>

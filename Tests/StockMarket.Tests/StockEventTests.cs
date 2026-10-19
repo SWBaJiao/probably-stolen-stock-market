@@ -1,5 +1,5 @@
 using System.Text.Json.Nodes;
-using MelonModTemplate.Market;
+using ProbablyStolenStockMarket.Market;
 
 static class StockEventTests
 {

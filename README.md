@@ -2,7 +2,9 @@
 
 基于 MelonLoader 的投资玩法 Mod：10 家虚构公司、商品交叉关联、顾客成交驱动行情、原版与企业专用事件、现货持仓与付费真假内幕。
 
-<img src="MelonModTemplate/Assets/Textures/Items/stock_market_terminal.png" height="220" alt="股市面板道具图标">
+安装包见 [GitHub Releases](https://github.com/SWBaJiao/probably-stolen-stock-market/releases)，解压安装与旧版升级步骤见 [安装说明](docs/RELEASE-INSTALL.md)。
+
+<img src="ProbablyStolenStockMarket/Assets/Textures/Items/stock_market_terminal.png" height="220" alt="股市面板道具图标">
 
 进入存档后自动赠送“股市面板”，双击打开。现货买卖默认开放，资金与投资状态随原版存档保存。背包满时延后赠送，旧版道具编号失效时可按 `Ctrl+F8` 显式恢复，已发放后不会因空查询重复创建。
 
@@ -10,7 +12,7 @@
 
 开发目标为 Probably Stolen Demo 0.46D、Unity 2021.3.45f2、MelonLoader 0.7.3、Windows .NET 6 IL2CPP 环境。使用 CrossOver 安装时，构建路径填写容器在 macOS 上的实际磁盘路径。
 
-已完成源码、独立逻辑测试、构建与部署配置。游戏中的回调顺序、背包入口、保存恢复与画面显示需要实际游玩验收；测试和编译通过不能代替游戏内验证。详见 [开发与安装说明](MelonModTemplate/README.md) 和 [适配证据与验收步骤](MelonModTemplate/Game/ADAPTER-NOTES.md)。
+已完成源码、独立逻辑测试、构建与部署配置。游戏中的回调顺序、背包入口、保存恢复与画面显示需要实际游玩验收；测试和编译通过不能代替游戏内验证。详见 [开发与安装说明](ProbablyStolenStockMarket/README.md) 和 [适配证据与验收步骤](ProbablyStolenStockMarket/Game/ADAPTER-NOTES.md)。
 
 第 41～42 日 K 线、批发成交漏记及交易门控的检查结果见 [行情诊断](docs/PRICE-DIAGNOSIS.md)。
 
@@ -35,17 +37,19 @@
 - 新增“剑清酱”，与闻舟共用 **731206** 电话随机来访，分别保存预约、来访及信誉。她的消息默认 70% 概率逐家公司与真实事件影响反向、30% 概率一致，历史信誉不改变这个比例；两人都有独立像素立绘，闻舟以兜帽和面罩隐藏面部。
 - 独立透明像素风终端图标，显式刷新背包与拖拽图像；双击使用游戏原生窗口、按钮、输入框和字体素材。保存时仍使用原版便笺资源标识。
 
-人物资源预览：[剑清酱](MelonModTemplate/Assets/Textures/Characters/jianqing.png)、[闻舟](MelonModTemplate/Assets/Textures/Characters/wenzhou.png)。剑清酱的面部采用减少细节后的粗像素版本。
+人物资源预览：[剑清酱](ProbablyStolenStockMarket/Assets/Textures/Characters/jianqing.png)、[闻舟](ProbablyStolenStockMarket/Assets/Textures/Characters/wenzhou.png)。剑清酱的面部采用减少细节后的粗像素版本。
 
 ## 开发
 
 1. 安装 MelonLoader 并运行游戏一次，生成对应版本的 `MelonLoader/Il2CppAssemblies`。
-2. 复制 `MelonModTemplate/Game.local.props.example` 为 `Game.local.props`，填写 `GameDirectory`。
-3. 执行 `dotnet build MelonModTemplate/MelonModTemplate.csproj -c Release`。构建成功后自动部署 DLL 和资源；只编译使用 `-p:DeployOnBuild=false`。
+2. 复制 `ProbablyStolenStockMarket/Game.local.props.example` 为 `Game.local.props`，填写 `GameDirectory`。
+3. 执行 `dotnet build ProbablyStolenStockMarket/ProbablyStolenStockMarket.csproj -c Release`。构建成功后自动部署 DLL 和资源；只编译使用 `-p:DeployOnBuild=false`。
 
 模组目标框架为 .NET 6；独立测试使用 .NET 10 SDK，命令为 `dotnet run --project Tests/StockMarket.Tests`。测试不加载游戏，也不需要游戏 DLL。
 
-运行配置首次生成在 `<游戏>/UserData/MelonModTemplate/market-config.json`。修改后重启游戏生效；非法配置会停止股市初始化并保留原文件。已有配置不会被构建覆盖。
+运行配置首次生成在 `<游戏>/UserData/ProbablyStolenStockMarket/market-config.json`。修改后重启游戏生效；非法配置会停止股市初始化并保留原文件。已有配置不会被构建覆盖。
+
+0.12.1 将项目目录、程序集和资源目录统一命名为 `ProbablyStolenStockMarket`。部署成功后，旧 `MelonModTemplate.dll` 及符号文件移入新 UserData 目录的 `LegacyBackup`，避免同时加载两份模组。首次运行优先使用新配置；仅存在旧配置时，验证后原样复制到新目录，资源也支持从旧目录读取。存档标识、持仓、内幕与 NPC 标识保持稳定。
 
 0.10.0 为自动事件规则增加来源和方向版本。能确认来源的旧事件若尚未大跳，只更新未来影响方向，保留已发生的预热、随机日期及实际价格；已执行大跳的事件继续原有生命周期。方向调整涉及的旧待核实内幕标为“未能验证”，不扣来源信誉。仍与旧版出厂配置完全一致的动员事件规则会在加载时升级，用户修改过的显式规则保留。
 

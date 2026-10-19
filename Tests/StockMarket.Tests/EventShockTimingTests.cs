@@ -1,4 +1,4 @@
-using MelonModTemplate.Market;
+using ProbablyStolenStockMarket.Market;
 using System.Text.Json.Nodes;
 
 static class EventShockTimingTests

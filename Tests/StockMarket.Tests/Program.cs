@@ -1,4 +1,4 @@
-using MelonModTemplate.Market;
+using ProbablyStolenStockMarket.Market;
 
 if (args.Length == 2 && args[0] == "--export-config")
 {

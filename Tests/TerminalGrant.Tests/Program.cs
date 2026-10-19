@@ -1,4 +1,4 @@
-using MelonModTemplate.Game;
+using ProbablyStolenStockMarket.Game;
 
 var count = 0;
 void Check(bool condition, string description)

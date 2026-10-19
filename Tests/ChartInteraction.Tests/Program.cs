@@ -1,4 +1,4 @@
-using MelonModTemplate.UI;
+using ProbablyStolenStockMarket.UI;
 
 var passed = 0;
 void Check(bool condition, string name)

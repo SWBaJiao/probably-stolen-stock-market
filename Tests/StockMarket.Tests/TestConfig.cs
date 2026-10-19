@@ -1,4 +1,4 @@
-using MelonModTemplate.Market;
+using ProbablyStolenStockMarket.Market;
 
 static class TestConfig
 {

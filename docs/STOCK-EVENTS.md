@@ -39,7 +39,7 @@
 
 原版活动列表只管理原版事件。专用事件由独立日程结束，原版列表缺少专用 ID 不会使其提前结束。
 
-以下配置位于游戏侧 `UserData/MelonModTemplate/market-config.json`，缺失字段使用新版默认值，现有文件不会被部署覆盖。
+以下配置位于游戏侧 `UserData/ProbablyStolenStockMarket/market-config.json`，缺失字段使用新版默认值，现有文件不会被部署覆盖。
 
 | 配置 | 默认值 | 含义 |
 |---|---:|---|
