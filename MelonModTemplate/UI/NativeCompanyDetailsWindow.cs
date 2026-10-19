@@ -72,6 +72,8 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
         Label("story", 80);
         Label("news.title", 28, true);
         Label("news", 80);
+        Label("native.title", 28, true);
+        Label("native", 80);
         _builder.End();
         Button("返回行情", Dispose, -1);
         NativeStockMarketPanel.NormalizeLayout(_window.frame.contentRoot);
@@ -139,10 +141,12 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
         _window.SetTitle(company.Name + " · 公司介绍");
         Text("name", company.Name);
         Text("story", company.Description);
-        Text("news.title", "已公开事件");
+        Text("news.title", "股市专用新闻");
+        Text("news", StockNewsText.Format(engine, engine.GetPublicStockNews(company.Id), 12));
+        Text("native.title", "原版事件公开记录");
         // 只读公开流水，不读取排程或未购买情报，避免公司介绍泄露未来事件。
         var news = engine.State.Ledger.Where(e => e.Kind == "event" && (string.IsNullOrEmpty(e.CompanyId) || e.CompanyId == company.Id)).TakeLast(12).Reverse().ToArray();
-        Text("news", news.Length == 0 ? "暂无已公开事件。" : string.Join("\n\n", news.Select(e => $"第 {e.Day} 日  {e.Description}")));
+        Text("native", news.Length == 0 ? "暂无原版事件公开记录。" : string.Join("\n\n", news.Select(e => $"第 {e.Day} 日  {e.Description}")));
     }
 
     private void Text(string id, string value)

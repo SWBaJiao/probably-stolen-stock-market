@@ -4,7 +4,7 @@ static class SharedBrokerPhoneTests
 {
     static MarketEngine Engine(ulong seed = 17)
     {
-        var config = MarketConfig.CreateDefault(); config.DailyLimit = 0m; config.Events.Clear(); config.Sellers.Clear();
+        var config = TestConfig.Create(); config.DailyLimit = 0m; config.Events.Clear(); config.Sellers.Clear();
         config.Events.Add(new EventRule { EventId = "shared-phone", Sectors = new() { "water" }, Impacts = new() { ["water"] = -.1m, ["harvest"] = .05m } });
         var engine = new MarketEngine(config); engine.ApplyStorageAccess(false); engine.AdvanceDay(1); engine.State.RandomState = seed;
         return engine;

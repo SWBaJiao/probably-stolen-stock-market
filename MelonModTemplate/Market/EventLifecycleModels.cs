@@ -23,6 +23,7 @@ public sealed class EventCompanyEffect
 }
 public sealed class EventLifecycleState
 {
+    public bool StockOwned { get; set; }
     public string ImpactSource { get; set; } = "";
     // 表示已完成的方向兼容处理版本；已经首冲的真实历史快照不会随之重写。
     public int DirectionVersion { get; set; }

@@ -1,4 +1,316 @@
 {
+  "EnableStockEvents": true,
+  "StockScheduleDays": 7,
+  "StockEventIntervalMinDays": 2,
+  "StockEventIntervalMaxDays": 4,
+  "StockTemplateCooldownDays": 14,
+  "StockDurationMinDays": 2,
+  "StockDurationMaxDays": 4,
+  "StockIntensityMin": 0.80,
+  "StockIntensityMax": 1.20,
+  "EventShockDailyLimit": 0.15,
+  "StockEventTemplates": [
+    {
+      "Id": "stock:harvest_supply_contract",
+      "PrimaryCompanyId": "harvest",
+      "Polarity": 1,
+      "Title": "\u4E30\u79BE\u7B7E\u4E0B\u957F\u671F\u4F9B\u8D27\u5408\u540C",
+      "Body": "\u4E30\u79BE\u4F9B\u7ED9\u516C\u5E03\u65B0\u7684\u957F\u671F\u98DF\u54C1\u4F9B\u8D27\u5408\u540C\uFF0C\u7A33\u5B9A\u7684\u91C7\u8D2D\u5B89\u6392\u6709\u671B\u6539\u5584\u4ED3\u5E93\u5468\u8F6C\u3002\u73AF\u5B87\u5546\u8D38\u53C2\u4E0E\u5206\u9500\uFF0C\u6668\u661F\u7269\u6D41\u627F\u63A5\u914D\u5957\u8FD0\u8F93\uFF0C\u56E0\u6B64\u4E5F\u53D7\u5230\u8BA2\u5355\u6269\u5927\u7684\u5E26\u52A8\u3002",
+      "Sectors": [
+        "food"
+      ],
+      "Impacts": {
+        "harvest": 0.08,
+        "commerce": 0.03,
+        "logistics": 0.02
+      }
+    },
+    {
+      "Id": "stock:harvest_batch_recall",
+      "PrimaryCompanyId": "harvest",
+      "Polarity": -1,
+      "Title": "\u4E30\u79BE\u98DF\u54C1\u6279\u6B21\u53EC\u56DE",
+      "Body": "\u4E30\u79BE\u4F9B\u7ED9\u5BA3\u5E03\u53EC\u56DE\u4E00\u6279\u98DF\u54C1\u5E76\u5F00\u5C55\u8D28\u91CF\u590D\u67E5\uFF0C\u9000\u6362\u4E0E\u6574\u6539\u6210\u672C\u538B\u4F4E\u4E86\u5E02\u573A\u9884\u671F\u3002\u73AF\u5B87\u5546\u8D38\u9700\u8981\u8C03\u6574\u5206\u9500\u8BA1\u5212\uFF0C\u6668\u661F\u7269\u6D41\u7684\u539F\u5B9A\u8D27\u8FD0\u5B89\u6392\u4E5F\u9762\u4E34\u7F29\u51CF\u3002",
+      "Sectors": [
+        "food"
+      ],
+      "Impacts": {
+        "harvest": -0.08,
+        "commerce": -0.03,
+        "logistics": -0.02
+      }
+    },
+    {
+      "Id": "stock:water_new_plant",
+      "PrimaryCompanyId": "water",
+      "Polarity": 1,
+      "Title": "\u6E05\u6CC9\u65B0\u51C0\u6C34\u8BBE\u5907\u6295\u4EA7",
+      "Body": "\u6E05\u6CC9\u5FAA\u73AF\u7684\u65B0\u51C0\u6C34\u8BBE\u5907\u8FDB\u5165\u6295\u4EA7\u9636\u6BB5\uFF0C\u5E02\u573A\u671F\u5F85\u4F9B\u5E94\u80FD\u529B\u4E0E\u5904\u7406\u6548\u7387\u6539\u5584\u3002\u661F\u953B\u5DE5\u4E1A\u83B7\u5F97\u8BBE\u5907\u914D\u5957\u9700\u6C42\uFF0C\u805A\u5408\u6750\u6599\u7684\u6C34\u5904\u7406\u8017\u6750\u4E5F\u8FCE\u6765\u8865\u8D27\u673A\u4F1A\u3002",
+      "Sectors": [
+        "water"
+      ],
+      "Impacts": {
+        "water": 0.08,
+        "industrial": 0.03,
+        "materials": 0.02
+      }
+    },
+    {
+      "Id": "stock:water_filter_quality",
+      "PrimaryCompanyId": "water",
+      "Polarity": -1,
+      "Title": "\u6E05\u6CC9\u6EE4\u82AF\u8D28\u91CF\u4E8B\u6545",
+      "Body": "\u6E05\u6CC9\u5FAA\u73AF\u62AB\u9732\u6EE4\u82AF\u8D28\u91CF\u4E8B\u6545\uFF0C\u9700\u8981\u627F\u62C5\u8D54\u507F\u548C\u6574\u6539\u6210\u672C\u3002\u4E0D\u8FC7\u66FF\u4EE3\u6EE4\u6750\u4E0E\u8BBE\u5907\u62A2\u4FEE\u9700\u6C42\u589E\u52A0\uFF0C\u805A\u5408\u6750\u6599\u548C\u661F\u953B\u5DE5\u4E1A\u56E0\u6B64\u53EF\u80FD\u83B7\u5F97\u989D\u5916\u8BA2\u5355\uFF0C\u76F8\u5173\u516C\u53F8\u9884\u671F\u51FA\u73B0\u5206\u5316\u3002",
+      "Sectors": [
+        "water"
+      ],
+      "Impacts": {
+        "water": -0.10,
+        "materials": 0.03,
+        "industrial": 0.02
+      }
+    },
+    {
+      "Id": "stock:medical_clinic_order",
+      "PrimaryCompanyId": "medical",
+      "Polarity": 1,
+      "Title": "\u767D\u5854\u83B7\u5F97\u8BCA\u6240\u8054\u5408\u91C7\u8D2D\u8BA2\u5355",
+      "Body": "\u591A\u5BB6\u8BCA\u6240\u7684\u8054\u5408\u91C7\u8D2D\u8BA2\u5355\u843D\u5230\u767D\u5854\u533B\u7597\uFF0C\u836F\u54C1\u548C\u533B\u7597\u8017\u6750\u7684\u51FA\u8D27\u9884\u671F\u63D0\u5347\u3002\u805A\u5408\u6750\u6599\u4E3A\u751F\u4EA7\u63D0\u4F9B\u539F\u6599\uFF0C\u8FDC\u661F\u79D1\u6280\u53C2\u4E0E\u8BBE\u5907\u6A21\u5757\u914D\u5957\uFF0C\u4E5F\u6709\u671B\u5206\u4EAB\u5230\u65B0\u589E\u9700\u6C42\u3002",
+      "Sectors": [
+        "medical"
+      ],
+      "Impacts": {
+        "medical": 0.08,
+        "materials": 0.03,
+        "technology": 0.02
+      }
+    },
+    {
+      "Id": "stock:medical_approval_delay",
+      "PrimaryCompanyId": "medical",
+      "Polarity": -1,
+      "Title": "\u767D\u5854\u65B0\u836F\u5BA1\u6279\u53D7\u963B",
+      "Body": "\u767D\u5854\u533B\u7597\u7684\u65B0\u836F\u5BA1\u6279\u8FDB\u7A0B\u53D7\u963B\uFF0C\u76F8\u5173\u4EA7\u54C1\u6295\u4EA7\u4E0E\u9500\u552E\u8BA1\u5212\u88AB\u63A8\u8FDF\u3002\u805A\u5408\u6750\u6599\u7684\u539F\u6599\u8BA2\u5355\u9884\u671F\u968F\u4E4B\u51CF\u5C11\uFF0C\u73AF\u5B87\u5546\u8D38\u539F\u5B9A\u7684\u6E20\u9053\u94FA\u8D27\u5B89\u6392\u4E5F\u53D7\u5230\u5F71\u54CD\u3002",
+      "Sectors": [
+        "medical"
+      ],
+      "Impacts": {
+        "medical": -0.08,
+        "materials": -0.02,
+        "commerce": -0.02
+      }
+    },
+    {
+      "Id": "stock:industrial_export_order",
+      "PrimaryCompanyId": "industrial",
+      "Polarity": 1,
+      "Title": "\u661F\u953B\u83B7\u5F97\u673A\u68B0\u51FA\u53E3\u8BA2\u5355",
+      "Body": "\u661F\u953B\u5DE5\u4E1A\u83B7\u5F97\u4E00\u6279\u673A\u68B0\u51FA\u53E3\u8BA2\u5355\uFF0C\u751F\u4EA7\u7EBF\u548C\u96F6\u4EF6\u91C7\u8D2D\u5B89\u6392\u8F6C\u8D8B\u7E41\u5FD9\u3002\u6668\u661F\u7269\u6D41\u53D7\u76CA\u4E8E\u8BBE\u5907\u8FD0\u8F93\u9700\u6C42\uFF0C\u9706\u5149\u80FD\u6E90\u4E5F\u53EF\u80FD\u83B7\u5F97\u66F4\u591A\u751F\u4EA7\u4F9B\u80FD\u4E0E\u80FD\u6E90\u914D\u5957\u8BA2\u5355\u3002",
+      "Sectors": [
+        "tools"
+      ],
+      "Impacts": {
+        "industrial": 0.08,
+        "logistics": 0.03,
+        "energy": 0.02
+      }
+    },
+    {
+      "Id": "stock:industrial_line_accident",
+      "PrimaryCompanyId": "industrial",
+      "Polarity": -1,
+      "Title": "\u661F\u953B\u751F\u4EA7\u7EBF\u4E8B\u6545",
+      "Body": "\u661F\u953B\u5DE5\u4E1A\u7684\u751F\u4EA7\u7EBF\u53D1\u751F\u4E8B\u6545\uFF0C\u68C0\u4FEE\u505C\u5DE5\u4EE4\u4EA4\u8D27\u9884\u671F\u627F\u538B\u3002\u5B89\u76FE\u9632\u52A1\u4F9D\u8D56\u7684\u673A\u68B0\u90E8\u4EF6\u4F9B\u5E94\u53D7\u5230\u7275\u8FDE\uFF0C\u9706\u5149\u80FD\u6E90\u9762\u5411\u8BE5\u751F\u4EA7\u7EBF\u7684\u4F9B\u80FD\u9700\u6C42\u4E5F\u53EF\u80FD\u4E0B\u964D\u3002",
+      "Sectors": [
+        "tools"
+      ],
+      "Impacts": {
+        "industrial": -0.10,
+        "defense": -0.03,
+        "energy": -0.02
+      }
+    },
+    {
+      "Id": "stock:technology_control_breakthrough",
+      "PrimaryCompanyId": "technology",
+      "Polarity": 1,
+      "Title": "\u8FDC\u661F\u63A7\u5236\u6A21\u5757\u53D6\u5F97\u7A81\u7834",
+      "Body": "\u8FDC\u661F\u79D1\u6280\u516C\u5E03\u63A7\u5236\u6A21\u5757\u6280\u672F\u7A81\u7834\uFF0C\u5E02\u573A\u671F\u5F85\u65B0\u6A21\u5757\u62D3\u5C55\u5E94\u7528\u3002\u9706\u5149\u80FD\u6E90\u7684\u4F9B\u7535\u63A7\u5236\u8BBE\u5907\u548C\u767D\u5854\u533B\u7597\u7684\u7535\u5B50\u8BCA\u7597\u8BBE\u5907\u90FD\u4E0E\u8FD9\u7C7B\u6A21\u5757\u6709\u5173\uFF0C\u914D\u5957\u4E1A\u52A1\u9884\u671F\u4E00\u540C\u6539\u5584\u3002",
+      "Sectors": [
+        "electronics"
+      ],
+      "Impacts": {
+        "technology": 0.10,
+        "energy": 0.03,
+        "medical": 0.02
+      }
+    },
+    {
+      "Id": "stock:technology_module_recall",
+      "PrimaryCompanyId": "technology",
+      "Polarity": -1,
+      "Title": "\u8FDC\u661F\u5173\u952E\u6A21\u5757\u53EC\u56DE",
+      "Body": "\u8FDC\u661F\u79D1\u6280\u5BA3\u5E03\u53EC\u56DE\u5173\u952E\u6A21\u5757\uFF0C\u7EF4\u4FEE\u4E0E\u66FF\u6362\u5B89\u6392\u4EE4\u4EA4\u4ED8\u9884\u671F\u627F\u538B\u3002\u9706\u5149\u80FD\u6E90\u548C\u767D\u5854\u533B\u7597\u7684\u76F8\u5173\u914D\u5957\u8BBE\u5907\u4E5F\u9700\u8981\u91CD\u65B0\u68C0\u67E5\uFF0C\u5E02\u573A\u56E0\u800C\u4E0B\u8C03\u8FD9\u4E9B\u4E1A\u52A1\u7684\u8FD1\u671F\u9884\u671F\u3002",
+      "Sectors": [
+        "electronics"
+      ],
+      "Impacts": {
+        "technology": -0.10,
+        "energy": -0.03,
+        "medical": -0.02
+      }
+    },
+    {
+      "Id": "stock:commerce_district_rights",
+      "PrimaryCompanyId": "commerce",
+      "Polarity": 1,
+      "Title": "\u73AF\u5B87\u53D6\u5F97\u5546\u4E1A\u533A\u72EC\u5BB6\u7ECF\u9500\u6743",
+      "Body": "\u73AF\u5B87\u5546\u8D38\u53D6\u5F97\u4E00\u5904\u5546\u4E1A\u533A\u7684\u72EC\u5BB6\u7ECF\u9500\u6743\uFF0C\u65B0\u589E\u6E20\u9053\u6709\u671B\u6269\u5927\u8D27\u7269\u6D41\u901A\u3002\u6668\u661F\u7269\u6D41\u53C2\u4E0E\u914D\u9001\u5B89\u6392\uFF0C\u4E30\u79BE\u4F9B\u7ED9\u7684\u98DF\u54C1\u4E5F\u8FDB\u5165\u65B0\u7684\u9500\u552E\u7F51\u7EDC\uFF0C\u76F8\u5173\u4E1A\u52A1\u9884\u671F\u53D7\u76CA\u3002",
+      "Sectors": [
+        "luxury"
+      ],
+      "Impacts": {
+        "commerce": 0.08,
+        "logistics": 0.03,
+        "harvest": 0.02
+      }
+    },
+    {
+      "Id": "stock:commerce_channel_closure",
+      "PrimaryCompanyId": "commerce",
+      "Polarity": -1,
+      "Title": "\u73AF\u5B87\u8FDD\u89C4\u6E20\u9053\u906D\u67E5\u5C01",
+      "Body": "\u73AF\u5B87\u5546\u8D38\u7684\u4E00\u6761\u8FDD\u89C4\u6E20\u9053\u906D\u5230\u67E5\u5C01\uFF0C\u6E20\u9053\u6536\u5165\u548C\u6668\u661F\u7269\u6D41\u7684\u76F8\u5173\u914D\u9001\u9884\u671F\u53D7\u5230\u6253\u51FB\u3002\u5B89\u76FE\u9632\u52A1\u53EF\u80FD\u63A5\u624B\u90E8\u5206\u5408\u89C4\u4F9B\u8D27\u9700\u6C42\uFF0C\u56E0\u6B64\u5728\u8FD9\u6B21\u6D88\u606F\u4E2D\u53CD\u800C\u53D7\u5230\u5229\u597D\u5E26\u52A8\u3002",
+      "Sectors": [
+        "luxury"
+      ],
+      "Impacts": {
+        "commerce": -0.10,
+        "logistics": -0.03,
+        "defense": 0.02
+      }
+    },
+    {
+      "Id": "stock:energy_storage_order",
+      "PrimaryCompanyId": "energy",
+      "Polarity": 1,
+      "Title": "\u9706\u5149\u83B7\u5F97\u50A8\u80FD\u7535\u6C60\u5927\u5355",
+      "Body": "\u9706\u5149\u80FD\u6E90\u83B7\u5F97\u50A8\u80FD\u7535\u6C60\u5927\u5355\uFF0C\u80FD\u6E90\u8BBE\u5907\u51FA\u8D27\u9884\u671F\u4E0A\u5347\u3002\u8FDC\u661F\u79D1\u6280\u63D0\u4F9B\u63A7\u5236\u6A21\u5757\uFF0C\u661F\u953B\u5DE5\u4E1A\u53C2\u4E0E\u673A\u68B0\u4E0E\u8BBE\u5907\u914D\u5957\uFF0C\u8BA2\u5355\u6269\u5927\u6709\u671B\u5E26\u52A8\u4E24\u5BB6\u516C\u53F8\u7684\u76F8\u5173\u4E1A\u52A1\u3002",
+      "Sectors": [
+        "energy"
+      ],
+      "Impacts": {
+        "energy": 0.10,
+        "technology": 0.03,
+        "industrial": 0.02
+      }
+    },
+    {
+      "Id": "stock:energy_fuel_contract_loss",
+      "PrimaryCompanyId": "energy",
+      "Polarity": -1,
+      "Title": "\u9706\u5149\u71C3\u6599\u91C7\u8D2D\u5408\u540C\u7834\u88C2",
+      "Body": "\u9706\u5149\u80FD\u6E90\u7684\u71C3\u6599\u91C7\u8D2D\u5408\u540C\u7834\u88C2\uFF0C\u91C7\u8D2D\u4E0E\u4EA4\u4ED8\u8BA1\u5212\u9762\u4E34\u91CD\u65B0\u5B89\u6392\u3002\u661F\u953B\u5DE5\u4E1A\u7684\u751F\u4EA7\u4F9B\u80FD\u9884\u671F\u627F\u538B\uFF0C\u6668\u661F\u7269\u6D41\u539F\u5B9A\u7684\u80FD\u6E90\u8D27\u8FD0\u9700\u6C42\u4E5F\u53EF\u80FD\u51CF\u5C11\u3002",
+      "Sectors": [
+        "energy"
+      ],
+      "Impacts": {
+        "energy": -0.10,
+        "industrial": -0.03,
+        "logistics": -0.02
+      }
+    },
+    {
+      "Id": "stock:logistics_route_approval",
+      "PrimaryCompanyId": "logistics",
+      "Polarity": 1,
+      "Title": "\u6668\u661F\u65B0\u8D27\u8FD0\u822A\u7EBF\u83B7\u6279",
+      "Body": "\u6668\u661F\u7269\u6D41\u7684\u65B0\u8D27\u8FD0\u822A\u7EBF\u83B7\u6279\uFF0C\u8FD0\u8F93\u80FD\u529B\u4E0E\u914D\u9001\u8986\u76D6\u6709\u671B\u6269\u5927\u3002\u73AF\u5B87\u5546\u8D38\u53EF\u4EE5\u62D3\u5C55\u8D27\u7269\u6D41\u901A\uFF0C\u4E30\u79BE\u4F9B\u7ED9\u4E5F\u591A\u4E86\u4E00\u6761\u98DF\u54C1\u8FD0\u8F93\u901A\u9053\uFF0C\u4F9B\u5E94\u94FE\u4F19\u4F34\u7684\u9884\u671F\u968F\u4E4B\u6539\u5584\u3002",
+      "Sectors": [
+        "food"
+      ],
+      "Impacts": {
+        "logistics": 0.08,
+        "commerce": 0.03,
+        "harvest": 0.02
+      }
+    },
+    {
+      "Id": "stock:logistics_equipment_failure",
+      "PrimaryCompanyId": "logistics",
+      "Polarity": -1,
+      "Title": "\u6668\u661F\u8D27\u8FD0\u8BBE\u5907\u5927\u9762\u79EF\u6545\u969C",
+      "Body": "\u6668\u661F\u7269\u6D41\u7684\u8D27\u8FD0\u8BBE\u5907\u5927\u9762\u79EF\u6545\u969C\uFF0C\u8FD0\u8F93\u4E0E\u73AF\u5B87\u5546\u8D38\u7684\u6E20\u9053\u5468\u8F6C\u9884\u671F\u627F\u538B\u3002\u8BBE\u5907\u7EF4\u4FEE\u9700\u6C42\u540C\u65F6\u589E\u52A0\uFF0C\u661F\u953B\u5DE5\u4E1A\u53EF\u80FD\u63A5\u5230\u66F4\u591A\u68C0\u4FEE\u4E0E\u66FF\u6362\u90E8\u4EF6\u8BA2\u5355\uFF0C\u5F62\u6210\u4E0D\u540C\u65B9\u5411\u7684\u5F71\u54CD\u3002",
+      "Sectors": [
+        "tools"
+      ],
+      "Impacts": {
+        "logistics": -0.10,
+        "commerce": -0.03,
+        "industrial": 0.02
+      }
+    },
+    {
+      "Id": "stock:defense_security_contract",
+      "PrimaryCompanyId": "defense",
+      "Polarity": 1,
+      "Title": "\u5B89\u76FE\u83B7\u5F97\u957F\u671F\u5B89\u4FDD\u5408\u540C",
+      "Body": "\u5B89\u76FE\u9632\u52A1\u83B7\u5F97\u957F\u671F\u5B89\u4FDD\u5408\u540C\uFF0C\u88C5\u5907\u548C\u5B89\u5168\u5668\u6750\u9700\u6C42\u9884\u671F\u589E\u957F\u3002\u661F\u953B\u5DE5\u4E1A\u7684\u673A\u68B0\u90E8\u4EF6\u4E0E\u8FDC\u661F\u79D1\u6280\u7684\u7535\u5B50\u7EC4\u4EF6\u53C2\u4E0E\u914D\u5957\uFF0C\u5E02\u573A\u4E5F\u4E0A\u8C03\u4E86\u4E24\u5BB6\u4F9B\u5E94\u5546\u7684\u76F8\u5173\u4E1A\u52A1\u9884\u671F\u3002",
+      "Sectors": [
+        "weapons"
+      ],
+      "Impacts": {
+        "defense": 0.08,
+        "industrial": 0.03,
+        "technology": 0.02
+      }
+    },
+    {
+      "Id": "stock:defense_armor_recall",
+      "PrimaryCompanyId": "defense",
+      "Polarity": -1,
+      "Title": "\u5B89\u76FE\u9632\u62A4\u88C5\u5907\u53EC\u56DE",
+      "Body": "\u5B89\u76FE\u9632\u52A1\u5BA3\u5E03\u53EC\u56DE\u4E00\u6279\u9632\u62A4\u88C5\u5907\uFF0C\u8D28\u4FDD\u6210\u672C\u4E0E\u4EA4\u4ED8\u5EF6\u8BEF\u4EE4\u5E02\u573A\u9884\u671F\u4E0B\u964D\u3002\u661F\u953B\u5DE5\u4E1A\u548C\u8FDC\u661F\u79D1\u6280\u9762\u5411\u8BE5\u6279\u88C5\u5907\u7684\u90E8\u4EF6\u4E0E\u7535\u5B50\u7EC4\u4EF6\u8BA2\u5355\u4E5F\u53D7\u5230\u7275\u8FDE\u3002",
+      "Sectors": [
+        "weapons"
+      ],
+      "Impacts": {
+        "defense": -0.08,
+        "industrial": -0.03,
+        "technology": -0.02
+      }
+    },
+    {
+      "Id": "stock:materials_treatment_certified",
+      "PrimaryCompanyId": "materials",
+      "Polarity": 1,
+      "Title": "\u805A\u5408\u51C0\u6C34\u836F\u5242\u901A\u8FC7\u8BA4\u8BC1",
+      "Body": "\u805A\u5408\u6750\u6599\u7684\u51C0\u6C34\u836F\u5242\u901A\u8FC7\u8BA4\u8BC1\uFF0C\u5E02\u573A\u671F\u5F85\u6C34\u5904\u7406\u539F\u6599\u4E1A\u52A1\u62D3\u5C55\u3002\u6E05\u6CC9\u5FAA\u73AF\u53EF\u5C06\u5176\u7528\u4E8E\u51C0\u6C34\u914D\u5957\uFF0C\u767D\u5854\u533B\u7597\u76F8\u5173\u536B\u751F\u8017\u6750\u7684\u539F\u6599\u4F9B\u5E94\u9884\u671F\u4E5F\u5F97\u5230\u6539\u5584\u3002",
+      "Sectors": [
+        "materials"
+      ],
+      "Impacts": {
+        "materials": 0.08,
+        "water": 0.03,
+        "medical": 0.02
+      }
+    },
+    {
+      "Id": "stock:materials_pollution_shutdown",
+      "PrimaryCompanyId": "materials",
+      "Polarity": -1,
+      "Title": "\u805A\u5408\u5DE5\u5382\u56E0\u6C61\u67D3\u505C\u4EA7",
+      "Body": "\u805A\u5408\u6750\u6599\u7684\u5DE5\u5382\u56E0\u6C61\u67D3\u505C\u4EA7\uFF0C\u6574\u6539\u548C\u505C\u5DE5\u6210\u672C\u4EE4\u7ECF\u8425\u9884\u671F\u627F\u538B\u3002\u6E05\u6CC9\u5FAA\u73AF\u4F9D\u8D56\u7684\u6C34\u5904\u7406\u539F\u6599\u4E0E\u767D\u5854\u533B\u7597\u7684\u76F8\u5173\u539F\u6599\u4F9B\u5E94\u4E5F\u53EF\u80FD\u53D7\u5230\u5F71\u54CD\uFF0C\u9884\u671F\u540C\u6B65\u8F6C\u5F31\u3002",
+      "Sectors": [
+        "materials"
+      ],
+      "Impacts": {
+        "materials": -0.10,
+        "water": -0.03,
+        "medical": -0.02
+      }
+    }
+  ],
   "RequireSaveReloadVerification": false,
   "InitialPrice": 100,
   "DailyLimit": 0.03,

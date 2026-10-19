@@ -52,7 +52,7 @@ public sealed partial class MarketEngine
     private bool CanOfferBrokerEvent(ScheduledEvent scheduled, int plannedDay) =>
         scheduled.Day > plannedDay && (long)scheduled.Day <= (long)plannedDay + Config.RumorHorizon &&
         !State.OccurredEvents.Contains(EventKey(scheduled.EventId, scheduled.OccurrenceKey)) &&
-        Config.Events.Any(r => r.EventId == scheduled.EventId && r.Impacts.Any(p => p.Value != 0 && Config.Companies.Any(c => c.Id == p.Key)));
+        FindScheduledRule(scheduled) is { } rule && rule.Impacts.Any(p => p.Value != 0 && Config.Companies.Any(c => c.Id == p.Key));
 
     public BrokerVisitView? TryPlanBrokerVisit(IReadOnlyList<ScheduledEvent> scheduled, bool manual = false, string brokerId = BrokerIds.Wenzhou)
     {
@@ -72,20 +72,32 @@ public sealed partial class MarketEngine
     private BrokerVisitView? CreateBrokerVisitAt(IReadOnlyList<ScheduledEvent> scheduled, int plannedDay, bool manual, bool phone, string brokerId)
     {
         var candidates = scheduled.Where(e => CanOfferBrokerEvent(e, plannedDay))
-            .Select(e => (scheduled: e, rule: Config.Events.FirstOrDefault(r => r.EventId == e.EventId)))
+            .Select(e => (scheduled: e, rule: FindScheduledRule(e)))
             .Where(x => x.rule != null && x.rule.Impacts.Any(p => p.Value != 0 && Config.Companies.Any(c => c.Id == p.Key)))
             .OrderBy(x => x.scheduled.Day).ThenBy(x => x.scheduled.EventId, StringComparer.Ordinal).ThenBy(x => x.scheduled.OccurrenceKey, StringComparer.Ordinal).ToList();
         if (candidates.Count == 0) return null;
         var visit = EnsureBrokerState(brokerId);
         var candidate = candidates[(int)(NextRandom() * candidates.Count)];
         var rule = candidate.rule!;
+        var stock = FindStockOccurrence(candidate.scheduled.EventId, candidate.scheduled.OccurrenceKey);
         var nonzero = rule.Impacts.Where(p => p.Value != 0 && Config.Companies.Any(c => c.Id == p.Key)).ToDictionary(p => p.Key, p => Math.Sign(p.Value));
         var sectors = Config.Sectors.Where(s => rule.Sectors.Contains(s.Id) && s.Weights.Keys.Any(nonzero.ContainsKey)).ToList();
         if (sectors.Count == 0) sectors = Config.Sectors.Where(s => s.Weights.Keys.Any(nonzero.ContainsKey)).ToList();
         var industryOffer = NextRandom() < .5m && sectors.Count > 0;
         var sector = sectors.Count > 0 ? sectors[(int)(NextRandom() * sectors.Count)] : null;
         Dictionary<string, int> directions;
-        if (industryOffer) directions = nonzero.Where(p => sector!.Weights.ContainsKey(p.Key)).ToDictionary(p => p.Key, p => p.Value);
+        if (stock != null)
+        {
+            // 专用事件保存完整的三家公司方向，行业或公司措辞均不能截掉交叉影响。
+            directions = new(nonzero);
+            if (!industryOffer)
+            {
+                var companySectors = sectors.Where(s => s.Weights.ContainsKey(stock.PrimaryCompanyId)).ToList();
+                if (companySectors.Count == 0) companySectors = Config.Sectors.Where(s => s.Weights.ContainsKey(stock.PrimaryCompanyId)).ToList();
+                sector = companySectors.Count > 0 ? companySectors[(int)(NextRandom() * companySectors.Count)] : null;
+            }
+        }
+        else if (industryOffer) directions = nonzero.Where(p => sector!.Weights.ContainsKey(p.Key)).ToDictionary(p => p.Key, p => p.Value);
         else
         {
             var companies = nonzero.OrderBy(p => p.Key, StringComparer.Ordinal).ToList();
@@ -118,7 +130,8 @@ public sealed partial class MarketEngine
         var correct = NextRandom() < reliability;
         if (!correct) directions = directions.ToDictionary(p => p.Key, p => -p.Value);
         var id = "broker:" + brokerId + ":" + State.SaveIdentity + ":" + (++visit.Sequence);
-        var predictions = directions.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => Config.Companies.First(c => c.Id == p.Key).Name + (p.Value > 0 ? "走势可能走强" : "走势可能走弱"));
+        var predictions = directions.OrderBy(p => stock != null && !industryOffer && p.Key == stock.PrimaryCompanyId ? 0 : 1)
+            .ThenBy(p => p.Key, StringComparer.Ordinal).Select(p => Config.Companies.First(c => c.Id == p.Key).Name + (p.Value > 0 ? "走势可能走强" : "走势可能走弱"));
         var offer = new RumorOffer
         {
             Id = id, SessionId = id, BrokerId = brokerId, IsBrokerOffer = true, SellerKey = source.Key, SellerName = source.Name, Identity = source.Identity,
@@ -281,7 +294,7 @@ public sealed partial class MarketEngine
     private bool StillScheduledAt(RumorOffer offer, IReadOnlyList<ScheduledEvent> scheduled, int baselineDay) =>
         !State.OccurredEvents.Contains(EventKey(offer.EventId, offer.OccurrenceKey)) && scheduled.Any(e => e.EventId == offer.EventId && e.OccurrenceKey == offer.OccurrenceKey && e.Day == offer.DueDay && e.Day > baselineDay && e.Day <= baselineDay + Config.RumorHorizon);
 
-    public IReadOnlyList<IntelRecord> GetIntelRecords() => State.Rumors.Values.Where(r => r.IsBrokerOffer && r.Purchased && r.CalendarEligible).OrderBy(r => r.PurchaseDay).ThenBy(r => r.Id, StringComparer.Ordinal).Select(r => new IntelRecord { BrokerId = r.BrokerId, OfferId = r.Id, SourceName = r.SellerName, SourceIdentity = r.Identity, Reliability = r.Reliability, IsGroupIdentity = r.IsGroupIdentity, Correct = State.Reputations.GetValueOrDefault(r.SellerKey)?.Correct ?? 0, Incorrect = State.Reputations.GetValueOrDefault(r.SellerKey)?.Incorrect ?? 0, Industry = r.Industry, Content = r.Content, CompanyDirections = new Dictionary<string, int>(r.CompanyDirections), PurchaseDay = r.PurchaseDay, ObservationStartDay = r.ObservationStartDay, ObservationEndDay = r.WindowEndDay, Status = r.Resolution, PaperState = r.PaperState, PaperItemId = r.PaperItemId, CalendarEligible = r.CalendarEligible }).ToList();
+    public IReadOnlyList<IntelRecord> GetIntelRecords() => State.Rumors.Values.Where(r => r.IsBrokerOffer && r.Purchased && r.CalendarEligible).OrderBy(r => r.PurchaseDay).ThenBy(r => r.Id, StringComparer.Ordinal).Select(r => new IntelRecord { BrokerId = r.BrokerId, OfferId = r.Id, SourceName = r.SellerName, SourceIdentity = r.Identity, Reliability = r.Reliability, IsGroupIdentity = r.IsGroupIdentity, Correct = State.Reputations.GetValueOrDefault(r.SellerKey)?.Correct ?? 0, Incorrect = State.Reputations.GetValueOrDefault(r.SellerKey)?.Incorrect ?? 0, Industry = r.Industry, Content = r.Content, PublicNews = IntelPublicNews(r), VerificationSummary = IntelVerificationSummary(r), CompanyDirections = new Dictionary<string, int>(r.CompanyDirections), PurchaseDay = r.PurchaseDay, ObservationStartDay = r.ObservationStartDay, ObservationEndDay = r.WindowEndDay, Status = r.Resolution, PaperState = r.PaperState, PaperItemId = r.PaperItemId, CalendarEligible = r.CalendarEligible }).ToList();
 
     public bool SetIntelPaperState(string offerId, IntelPaperState status, int itemId = -1)
     {

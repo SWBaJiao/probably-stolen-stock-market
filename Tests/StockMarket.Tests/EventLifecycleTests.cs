@@ -6,7 +6,7 @@ static class EventLifecycleTests
 {
     static MarketEngine Engine()
     {
-        var c = MarketConfig.CreateDefault(); c.DailyLimit = 0m; c.EventShockWindowDays = 1;
+        var c = TestConfig.Create(); c.DailyLimit = 0m; c.EventShockWindowDays = 1;
         c.Events.Clear();
         c.Events.Add(new EventRule { EventId = "rise", Description = "公开上行事件", Impacts = new() { ["water"] = .1m, ["medical"] = .05m } });
         c.Events.Add(new EventRule { EventId = "fall", Description = "不可公开的下行事件名", Impacts = new() { ["water"] = -.1m } });
@@ -23,7 +23,7 @@ static class EventLifecycleTests
     }
     public static void Run(Action<bool, string> check)
     {
-        var undated = new MarketEngine(MarketConfig.CreateDefault());
+        var undated = new MarketEngine(TestConfig.Create());
         var empty = undated.Serialize();
         check(!undated.ActivateEvent("badNutrifruitHarvest", "unknown-day", 0) && undated.Serialize() == empty, "无游戏日期时拒绝事件激活而不留下不可恢复的生命周期");
         var e = Engine(); e.ActivateEvent("rise", "one", 1, true, 5);
@@ -70,7 +70,7 @@ static class EventLifecycleTests
         check(e.State.EventLifecycles.Count == 0 && e.State.CompletedEventLifecycles.Count == 2 && e.State.Companies["water"].PersistentEventFactor > 1m, "两个同向事件先后结束后分别保留偏移并完成归档");
 
         e = Engine(); e.ActivateEvent("rise", "one", 1); e.ActivateEvent("fall", "one", 1);
-        check(Near(e.GetEventAdjustedAnchor("water"), 99m), "涨跌事件的独立乘数允许互相抵消而不覆盖彼此");
+        check(Near(e.GetEventAdjustedAnchor("water"), 100m), "涨跌事件的独立乘数允许互相抵消而不覆盖彼此");
         e.EndEvent("fall", "one", 1); var baseline = Clone(e); baseline.Config.EventDailyDriftLimit = 0;
         e.RecordTrade("ordinary", "sale", new[] { "water" }, 1000m); baseline.RecordTrade("ordinary", "sale", new[] { "water" }, 1000m);
         e.Config.DailyLimit = .03m; baseline.Config.DailyLimit = .03m;
@@ -115,7 +115,7 @@ static class EventLifecycleTests
         check(adopted.Serialize() == adoptedSave, "旧事件重复同步不重新抽样或补造历史持续幅度");
         var historical = new MarketEngine(legacy.Config, MarketEngine.Deserialize(old.ToJsonString(), legacy.Config)); historical.SyncActiveEvents(Array.Empty<ActiveMarketEvent>(), 1, true);
         check(historical.State.EventLifecycles.Count == 0 && historical.State.EventRetentions.Count == 0 && historical.State.Companies["water"].Price == 117m, "旧档已经结束的历史事件不补建生命周期或回撤旧价格");
-        var fixedConfig = MarketConfig.CreateDefault(); fixedConfig.EventRetentionMin = .35m; fixedConfig.EventRetentionMax = .35m; fixedConfig.Validate();
+        var fixedConfig = TestConfig.Create(); fixedConfig.EventRetentionMin = .35m; fixedConfig.EventRetentionMax = .35m; fixedConfig.Validate();
         var invalid = false; try { fixedConfig.EventRetentionMin = 0; fixedConfig.Validate(); } catch (ArgumentException) { invalid = true; }
         check(invalid, "允许固定保留比作测试但拒绝零保留等退化区间");
     }

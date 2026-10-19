@@ -152,16 +152,23 @@ public sealed class NativeStockMarketPanel : IDisposable
         StyleWindow();
         Label("summary", "", 32, true);
         _builder.BeginRow(6);
-        var navWidth = (_width - 66) / 4;
+        var compactNavigation = _width < 760;
+        var navWidth = compactNavigation ? (_width - 60) / 3 : (_width - 72) / 5;
         Button("nav.market", "行情与委托", "page:0", navWidth);
         Button("nav.portfolio", "我的持仓", "page:1", navWidth);
         Button("nav.rumors", "内幕档案", "page:2", navWidth);
+        if (compactNavigation) { _builder.End(); _builder.BeginRow(6); }
         Button("nav.ledger", "资金与行情流水", "page:3", navWidth);
+        Button("nav.news", "市场新闻", "page:4", navWidth);
         _builder.End();
+        if (compactNavigation)
+            foreach (var id in new[] { "nav.market", "nav.portfolio", "nav.rumors", "nav.ledger", "nav.news" })
+                if (_elements[id].text != null) _elements[id].text.fontSize = 14;
 
         var wide = _width >= 820;
-        // 正常窗口固定委托区；极矮窗口保留整页滚动，避免强行裁掉交易控件。
-        var scrollMarket = wide ? _height < 640 : _height < 750;
+        // 双行导航额外占用高度，窄窗口提前切换整页滚动，保证委托按钮可达。
+        var minimumFixedHeight = wide ? 640 : compactNavigation ? 790 : 750;
+        var scrollMarket = _height < minimumFixedHeight;
         if (scrollMarket) BeginPage();
         else BeginFixedPage();
         _builder.BeginRow(12);
@@ -224,6 +231,9 @@ public sealed class NativeStockMarketPanel : IDisposable
         _chart = new NativeCandlestickChart(chartRoot, font);
         var hoverBounds = _window.root.transform.Cast<RectTransform>();
         _chart.SetHoverBounds(hoverBounds);
+        _chart.SetPublicEventSummary(day => _host.Engine is { } active
+            ? string.Join("；", active.GetPublicStockNews(_companyId).Where(n => n.PublicDay == day).Take(3).Select(n => n.Title.Length > 28 ? n.Title.Substring(0, 28) + "…" : n.Title))
+            : "");
         _builder.End();
 
         _builder.BeginRow(5);
@@ -267,6 +277,12 @@ public sealed class NativeStockMarketPanel : IDisposable
         BeginPage();
         Label("ledger.title", "近期资金与行情流水（新记录在前）", 34, true);
         Label("ledger.entries", "", 150);
+        EndPage();
+
+        BeginPage();
+        Label("news.title", "企业消息与市场动态", 34, true);
+        Label("news.guide", "仅展示已经公开的股市专用事件。新闻中的公司影响为本事件已施加的累计影响，当前股价还会受到日行情和其他事件影响。", 52);
+        Label("news.entries", "", 150);
         EndPage();
 
         Label("status", "", 32);
@@ -433,9 +449,10 @@ public sealed class NativeStockMarketPanel : IDisposable
             RefreshPortfolio(engine);
             RefreshRumors(engine);
             RefreshLedger(engine);
+            RefreshStockNews(engine);
             RefreshOrder();
-            for (int index = 0; index < 4; index++)
-                Tint(new[] { "nav.market", "nav.portfolio", "nav.rumors", "nav.ledger" }[index], index == _page);
+            for (int index = 0; index < 5; index++)
+                Tint(new[] { "nav.market", "nav.portfolio", "nav.rumors", "nav.ledger", "nav.news" }[index], index == _page);
         }
         finally { _refreshing = false; }
     }
@@ -479,26 +496,36 @@ public sealed class NativeStockMarketPanel : IDisposable
         // 未购情报仅展示 host 的安全报价，不读取未来事件或 RumorOffer 内部字段。
         Text("seller.offer", _host.OfferDescription);
         Text("broker.contact", _host.BrokerContactDescription);
-        var purchased = engine.GetRumors().Where(r => r.Purchased).Reverse().Take(30).ToArray();
-        var intel = engine.GetIntelRecords().ToDictionary(r => r.OfferId);
+        var records = engine.GetIntelRecords();
+        var recent = records.Reverse().Take(30).ToArray();
+        var modernIds = records.Select(r => r.OfferId).ToHashSet(StringComparer.Ordinal);
         var book = new StringBuilder();
-        foreach (var rumor in purchased)
+        foreach (var record in recent)
         {
-            var resolution = rumor.Resolution switch { RumorResolution.True => "属实", RumorResolution.False => "失实", RumorResolution.Unverified => "未能验证", _ => "等待验证" };
-            var source = rumor.SellerName == rumor.Identity ? rumor.SellerName : $"{rumor.SellerName} · {rumor.Identity}";
-            book.AppendLine($"{source} · {resolution}");
-            book.AppendLine($"{(rumor.IsGroupIdentity ? "同类来源信誉" : "来源信誉")} {rumor.Reliability:0%} · 验证 {rumor.Correct + rumor.Incorrect} 次 · 观察至第 {rumor.DueDay} 日");
-            if (intel.TryGetValue(rumor.Id, out var record))
-            {
-                var delivery = record.PaperState switch { IntelPaperState.Delivered => "已交付", IntelPaperState.Uncertain => "位置待核实", _ => "待柜台交付" };
-                book.AppendLine($"第 {record.PurchaseDay} 日购买 · 日历第 {record.ObservationStartDay}～{record.ObservationEndDay} 日 · 纸条{delivery}");
-            }
-            book.AppendLine(rumor.Content);
-            book.AppendLine("关联公司：" + string.Join("、", rumor.CompanyIds.Select(id => engine.Config.Companies.FirstOrDefault(c => c.Id == id)?.Name ?? id)));
+            var source = record.SourceName == record.SourceIdentity ? record.SourceName : $"{record.SourceName} · {record.SourceIdentity}";
+            book.AppendLine($"{source} · {ResolutionText(record.Status)}");
+            book.AppendLine($"购入时参考可信度 {record.Reliability:0%} · {(record.IsGroupIdentity ? "同类来源历史" : "来源历史")}：属实 {record.Correct} 条、失实 {record.Incorrect} 条");
+            var delivery = record.PaperState switch { IntelPaperState.Delivered => "已交付", IntelPaperState.Uncertain => "位置待核实", _ => "待柜台交付" };
+            book.AppendLine($"第 {record.PurchaseDay} 日购买 · 日历第 {record.ObservationStartDay}～{record.ObservationEndDay} 日 · 纸条{delivery}");
+            book.AppendLine(record.Content);
+            book.AppendLine("关联公司：" + string.Join("、", record.CompanyDirections.Keys.Select(id => CompanyName(engine, id))));
+            if (!string.IsNullOrWhiteSpace(record.PublicNews)) book.AppendLine("公开消息：" + record.PublicNews);
+            if (!string.IsNullOrWhiteSpace(record.VerificationSummary)) book.AppendLine(record.VerificationSummary);
             book.AppendLine();
         }
-        if (purchased.Length == 0) book.Append("暂无已购线索。购买后保存在此处；到期按实际事件验证。");
-        else book.Append("显示最近 30 条已购买情报。");
+        // 老版本顾客报价没有纸条记录，只保留已购投影的正文、来源与结果。
+        var legacy = engine.GetRumors().Where(r => r.Purchased && !modernIds.Contains(r.Id)).Reverse().Take(Math.Max(0, 30 - recent.Length)).ToArray();
+        foreach (var rumor in legacy)
+        {
+            var source = rumor.SellerName == rumor.Identity ? rumor.SellerName : $"{rumor.SellerName} · {rumor.Identity}";
+            book.AppendLine($"{source} · {ResolutionText(rumor.Resolution)} · 旧档线索");
+            book.AppendLine($"购入时参考可信度 {rumor.Reliability:0%} · 历史属实 {rumor.Correct} 条、失实 {rumor.Incorrect} 条");
+            book.AppendLine(rumor.Content);
+            book.AppendLine("关联公司：" + string.Join("、", rumor.CompanyIds.Select(id => CompanyName(engine, id))));
+            book.AppendLine();
+        }
+        if (recent.Length + legacy.Length == 0) book.Append("暂无已购线索。购买后保存在此处；到期按实际事件验证。");
+        else book.Append("显示最近 30 条已购买情报；原始预测始终保留，核验结果不会改写预测正文。");
         Text("rumors.book", book.ToString());
     }
 
@@ -508,7 +535,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         var text = new StringBuilder();
         foreach (var entry in entries)
         {
-            var kind = entry.Kind switch { "event" => "事件", "day" => "日行情", "customer" => "顾客结算", "buy" => "买入", "sell" => "卖出", "rumor" => "情报", _ => entry.Kind };
+            var kind = entry.Kind switch { "event" => "事件", "stock-event" => "股市新闻", "day" => "日行情", "customer" => "顾客结算", "buy" => "买入", "sell" => "卖出", "rumor" => "情报", _ => entry.Kind };
             text.AppendLine($"第 {entry.Day} 日 · {kind}" + (entry.CashDelta == 0 ? "" : " · 资金 " + SignedMoney(entry.CashDelta)));
             text.AppendLine(entry.Description);
             text.AppendLine();
@@ -517,6 +544,15 @@ public sealed class NativeStockMarketPanel : IDisposable
         else text.Append("显示最近 100 条记录。");
         Text("ledger.entries", text.ToString());
     }
+
+    private void RefreshStockNews(MarketEngine engine) => Text("news.entries", StockNewsText.Format(engine, engine.GetPublicStockNews(), 30));
+
+    private static string CompanyName(MarketEngine engine, string id) => engine.Config.Companies.FirstOrDefault(c => c.Id == id)?.Name ?? id;
+
+    private static string ResolutionText(RumorResolution resolution) => resolution switch
+    {
+        RumorResolution.True => "属实", RumorResolution.False => "失实", RumorResolution.Unverified => "未能验证", _ => "未核实"
+    };
 
     private void RefreshOrder()
     {
@@ -593,7 +629,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private void SetPage(int index)
     {
         _chart?.HideHover();
-        _page = Math.Clamp(index, 0, 3);
+        _page = Math.Clamp(index, 0, 4);
         for (int i = 0; i < _pages.Count; i++) _pages[i].SetActive(i == _page);
     }
 

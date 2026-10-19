@@ -5,7 +5,7 @@ static class EventShockTimingTests
 {
     static MarketEngine Engine(ulong seed = 1, decimal chance = 1m)
     {
-        var config = MarketConfig.CreateDefault(); config.DailyLimit = 0m; config.EventPreheatChance = chance;
+        var config = TestConfig.Create(); config.DailyLimit = 0m; config.EventPreheatChance = chance;
         config.Events.Clear();
         config.Events.Add(new EventRule { EventId = "timing", Description = "公开供需事件", Impacts = new() { ["water"] = .1m, ["medical"] = -.1m } });
         var engine = new MarketEngine(config); engine.AdvanceDay(1); engine.State.RandomState = seed;

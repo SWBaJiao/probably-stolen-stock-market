@@ -7,7 +7,7 @@ static class MultiBrokerTests
     const string J = BrokerIds.Jianqing;
     static MarketEngine Engine(ulong seed = 917UL, decimal reverse = .7m)
     {
-        var config = MarketConfig.CreateDefault(); config.DailyLimit = 0m; config.EventShockWindowDays = 1; config.JianqingReverseProbability = reverse;
+        var config = TestConfig.Create(); config.DailyLimit = 0m; config.EventShockWindowDays = 1; config.JianqingReverseProbability = reverse;
         config.Events.Clear(); config.Sellers.Clear();
         config.Events.Add(new EventRule { EventId = "dual-event", Description = "双来源事件", Sectors = new() { "water" }, Impacts = new() { ["water"] = -.1m, ["harvest"] = .05m } });
         config.Sellers.Add(new SellerRule { Identifier = "expert", Identity = "供水专家", BaseReliability = .9m, Sectors = new() { "water" } });
@@ -88,9 +88,9 @@ static class MultiBrokerTests
             check(boundaryQuote.PredictsOccurrence == (reverse == 0m) && boundaryQuote.Reliability == 1m - reverse && boundaryQuote.CompanyDirections.All(p => p.Value == Math.Sign(boundary.Config.Events[0].Impacts[p.Key]) * (reverse == 0m ? 1 : -1)) && Clone(boundary).Serialize() == boundary.Serialize(), $"反向概率{reverse}端点严格生成对应方向并可保存恢复");
         }
         var invalid = 0;
-        foreach (var reverse in new[] { -.01m, 1.01m }) try { var config = MarketConfig.CreateDefault(); config.JianqingReverseProbability = reverse; config.Validate(); } catch (ArgumentException) { invalid++; }
+        foreach (var reverse in new[] { -.01m, 1.01m }) try { var config = TestConfig.Create(); config.JianqingReverseProbability = reverse; config.Validate(); } catch (ArgumentException) { invalid++; }
         check(invalid == 2, "反向概率配置拒绝小于零或大于一的值");
-        var removedSetting = JsonNode.Parse(MarketConfig.CreateDefault().Serialize())!; removedSetting["JianqingTruthProbability"] = .95m;
+        var removedSetting = JsonNode.Parse(TestConfig.Create().Serialize())!; removedSetting["JianqingTruthProbability"] = .95m;
         check(!MarketConfig.Deserialize(removedSetting.ToJsonString()).Serialize().Contains("JianqingTruthProbability"), "未发布的旧概率配置额外字段忽略且不再导出");
         var cancelledIntel = Engine(); var cancelledVisit = cancelledIntel.TryPlanBrokerVisit(scheduled, true, J)!;
         cancelledIntel.MarkBrokerArrived(cancelledVisit.VisitId, J); cancelledIntel.BuyBrokerOffer(cancelledVisit.OfferId, scheduled, new Wallet(), () => { }, J);

@@ -6,7 +6,7 @@ static class BrokerTests
 {
     static MarketEngine Engine(ulong? seed = null)
     {
-        var config = MarketConfig.CreateDefault();
+        var config = TestConfig.Create();
         config.Sellers.Clear();
         config.Events.Clear();
         config.Events.Add(new EventRule { EventId = "broker-private-event", Description = "不可泄露的真正事件标题", Sectors = new() { "weapons" }, Impacts = new() { ["defense"] = .1m, ["commerce"] = -.1m, ["technology"] = 0m } });

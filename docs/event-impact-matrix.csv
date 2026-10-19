@@ -1,0 +1,54 @@
+﻿事件ID,事件名称,原版商品调价,规则来源,丰禾供给主冲击(%),清泉循环主冲击(%),白塔医疗主冲击(%),星锻工业主冲击(%),远星科技主冲击(%),环宇商贸主冲击(%),霆光能源主冲击(%),晨星物流主冲击(%),安盾防务主冲击(%),聚合材料主冲击(%),未映射类型,核查结论,原因,原生工厂,RVA
+nutrifruitHarvest,营养果大丰收,FOOD -20%,自动推导,6.5,0,0,0,0,2,0,1.5,0,0,,基本合理，有条件,增产缓解供货压力，符合现行供给链玩法；若把丰禾视为农产品生产者，降价也可能压利润。+6.5% 属中等冲击。,EventListNormal.CreateNutrifruitHarvest,0x678410
+badNutrifruitHarvest,营养果歉收,FOOD +50%,显式配置,-12,0,0,0,0,-5,0,-5,0,0,,基本合理,枯萎、缺资源与维护不足明确造成短缺，丰禾下跌有依据；环宇、物流连带受损可解释。,EventListNormal.CreateBadNutrifruitHarvestDuration,0x677260
+seedShortage,营养果种子短缺,FOOD +33%、SEED +50%,自动推导,-10.725,0,0,0,0,-3.3,0,-2.475,0,0,SEED,方向合理，覆盖不全,种子失窃影响后续供给，食品链下跌合理；SEED +50% 未映射，当前只计算 FOOD +33%。,EventListNormal.CreateSeedHeist,0x678E00
+medicalSuppliesShortage,医疗用品短缺,MEDICAL +50%,自动推导,0,0,-15,0,0,-5,0,-2.5,0,0,,需要分化,新闻强调假货被查后正品需求激增。正品供应商白塔可能受益，掺假企业或渠道受损；目前白塔统一 -15% 缺少身份区分。,EventListNormal.CreateCounterfeitMedicalSuppliesDiscoveredDuration,0x6776E0
+water_treatment_breakdown,供水危机,WATER +100%、WATER_RATION +100%、BREVAGE +90%、WATER_PURIFICATION_SUPPLY +80%,自动推导,-15,-15,0,0,0,0,0,-13.5,0,0,WATER_RATION、BREVAGE,方向合理，幅度失衡,水泵故障造成供给危机，清泉下跌合理；丰禾与清泉同为 -15%，晨星 -13.5% 的连带冲击偏重；星锻抢修、聚合处理材料可能受益属于推断，当前未体现。,EventListNormal.CreateWaterTreatmentPlantBreakdownDuration,0x679300
+scheduled_treatment_maintenance,轻微缺水,WATER +35%、WATER_RATION +35%、BREVAGE +30%、WATER_PURIFICATION_SUPPLY +25%,自动推导,-6,-15,0,0,0,0,0,-4.5,0,0,WATER_RATION、BREVAGE,明显偏重,新闻明确为计划维护、影响有限，却令清泉 -15%，与严重供水危机同上限。建议设独立轻微事件规则。,EventListNormal.CreateScheduledTreatmentPlantMaintenanceDuration,0x678A50
+miner_return_ice_asteroid,供水过剩,WATER -25%、WATER_RATION -25%、BREVAGE -20%、WATER_PURIFICATION_SUPPLY -15%,自动推导,4,13,0,0,0,0,0,3,0,0,WATER_RATION、BREVAGE,幅度偏重，角色需明确,高纯度水到货有利供货与运输，但可能压低本地制水利润；清泉 +13% 接近严重利好，应区分生产者与贸易商。,EventListNormal.CreateMinerReturnFromIceAsteroidDuration,0x677E20
+lower_level_mob_justice,下层区的私刑处决,WEAPON +33%、ARMOR +33%,自动推导,0,0,0,0,-4.95,-6.6,0,0,-15,0,,需要分化，幅度偏重,民间私刑增加不安，贸易受压有依据；武器与护甲需求上涨可能利好安盾订单，当前两标签累加后直接 -15%。,EventListNormal.CreateLowerLevelMobJustice,0x677950
+storeroom_excavated,日用品过剩,HOUSEHOLD_GOOD -20%,未映射,0,0,0,0,0,0,0,0,0,0,HOUSEHOLD_GOOD,覆盖缺失,实际 HOUSEHOLD_GOOD -20%，但无分类映射，所有公司均无直接反应。可为环宇及物流补独立规则。,EventListNormal.CreateStoreRoomExcavatedDuration,0x6790C0
+miningExpeditionReturn,材料盈余,MATERIAL -25%,自动推导,0,0,0,6.875,0,0,2.5,1.25,1.875,0,,基本合理，有条件,原料到货有利加工与供应链；星锻兼营矿产与机械，矿产售价下降的负面与制造成本下降的正面尚未区分。,EventListNormal.CreateMiningExpeditionReturnDuration,0x6781D0
+construction_project,建设项目,MATERIAL +30%,自动推导,0,0,0,-8.25,0,0,-3,-1.5,-2.25,0,,方向需要重审,新闻是新项目增加并挤占材料、劳工。机械及材料供货商可能获得订单；目前星锻 -8.25%、安盾 -2.25% 主要来自统一反价，安盾的直接关联也偏弱。,EventListNormal.CreateConstructionProject,0x6774D0
+meteorShower,流星雨,MATERIAL +50%,自动推导,0,0,0,-13.75,0,0,-5,-2.5,-3.75,0,,大方向合理，需要分化,空间站受损使生产、运输承压合理；抢修订单可能使星锻和材料业务部分受益。当前聚合完全无反应，星锻统一重挫。,EventListNormal.CreateMeteorShower,0x677C10
+powerShortage,停电,ENERGY_CELL +66%,自动推导,0,0,0,-6.6,0,0,-15,-4.95,0,0,,大方向合理，需要分化,发电机故障损害供能与生产有依据；霆光同时经营电池，其短缺售价与销量收益尚未独立计算。,EventListNormal.CreatePowerShortage,0x678850
+powerPlantMaintenance,发电站检修,ENERGY_CELL +33%,自动推导,0,0,0,-3.3,0,0,-10.725,-2.475,0,0,,明显偏重,原文为计划检修、轻微供电干扰，霆光 -10.725% 与事件严重程度不匹配。,EventListNormal.SchedulePowerPlantMaintenance,0x679840
+stationWideBlackout,谁把灯关了？,ENERGY_CELL +100%、WEAPON +25%,自动推导,0,0,0,-10,-1.875,-2.5,-15,-7.5,-8.125,0,,大方向合理，需要分化,灾难性全站断电足以形成大跌；白塔、清泉、远星生产停摆和聚合抢修材料的影响未完整建模，安盾下跌仅来自武器涨价。,EventListNormal.StationWideBlackout,0x679A70
+cruiseShipDocked,游客涌入,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,可补充玩法,原版只增加游客等行为，没有价格修正；目前直接为 0。可考虑环宇、丰禾与物流的小幅客流利好；实际顾客成交仍可间接影响次日行情。,EventListNormal.CruiseShipDocked,0x6796B0
+oxymoreWave,奥克西莫成瘾情况日益严重,MEDICAL +25%,自动推导,0,0,-8.75,0,0,-2.5,0,-1.25,0,0,,方向需要重审,新闻明确医疗用品与治疗需求增加；当前白塔 -8.75% 没有体现销售增长，可让白塔与经销渠道受益、其他行业承受社会成本。,EventListNormal.CreateOxymoreWave,0x678610
+bm_gang_war,下层区帮派战争,MEDICAL +50%,自动推导,0,0,-15,0,0,-5,0,-2.5,0,0,,需要分化,枪战与伤亡破坏经营，但同时提高医疗需求；目前白塔 -15%，未区分医疗订单利好与贸易物流风险。,OperationListBM.GangWar,0x6A2520
+bm_illegal_weapon_shipment,非法武器走私货物,WEAPON -35%,显式配置,0,0,0,0,5,6,0,0,10,0,,需要分化,非法武器供给增加、价格下降。渠道可因货源增多受益，正规安盾也可能受低价竞争挤压；远星 +5% 缺少明确电子订单证据。,OperationListBM.IllegalWeaponShipment,0x6A2790
+ll_riot,下层区暴乱,FOOD +30%、WEAPON +50%,自动推导,-9.75,0,0,0,-3.75,-8,0,-2.25,-15,0,,大方向合理，需要分化,商铺被洗劫支持丰禾、环宇下跌；物流受损可解释，防务新增需求与秩序风险应分开处理。,OperationListLL.Riot,0x6A29F0
+ll_worker_strike,工人罢工,WATER +40%、WATER_RATION +40%、FOOD +40%,自动推导,-15,-13,0,0,0,-4,0,-6,0,0,WATER_RATION,基本合理，覆盖不全,新闻明确食物与水供应受干扰，相关公司下跌合理；未映射 WATER_RATION，生产及运输实际停工对象还可细分。,OperationListLL.WorkerStrike,0x6A2CD0
+rev_mobilization_secret,武器需求增加,WEAPON +25%,显式配置,0,0,0,-7,-5,0,0,0,-12,0,,方向需要重审,原文是武器需求小幅激增。安盾 -12%、星锻 -7%、远星 -5% 符合此前反价规则，但与供应商订单增长的经营逻辑冲突，且轻微需求变化被赋予大冲击。,OperationListRev.MobilizationSecret,0x6A3020
+rev_mobilization,革命力量动员,WEAPON +40%、MEDICAL +40%、ARMOR +40%,自动推导,0,0,-14,0,-6,-12,0,-2,-15,0,,需要分化，叠加偏重,动员提高武器、医疗、护甲需求；安盾 -15%、白塔 -14% 未体现订单收益，武器与护甲累加也放大幅度；物流风险可以负向。,OperationListRev.Mobilization,0x6A3290
+rev_raid_upper_level,革命军突袭上层区,HOUSEHOLD_GOOD -30%,未映射,0,0,0,0,0,0,0,0,0,0,HOUSEHOLD_GOOD,覆盖缺失,原版日用品供给增加、HOUSEHOLD_GOOD -30%，当前无映射；应区分下层渠道进货收益与遭劫经营者损失。,OperationListRev.RaidUpperLevel,0x6A3880
+raid_security,革命军突袭治安部,MEDICAL +75%,自动推导,0,0,-15,0,0,-7.5,0,-3.75,0,0,,需要分化,交火与伤亡增加医疗需求，白塔却 -15%；对运输、普通商贸的风险与医疗供应商收益应分开。,OperationListRev.RaidSecurity,0x6A35F0
+sec_increase_patrols,加强巡逻与检查站,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,可补充玩法,原版无直接价格修正，但检查站限制灰色流通、改善秩序；可给合规经营与灰色渠道相反影响。,OperationListSec.IncreasePatrols,0x6A3E90
+crackdown,全站严打,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,可补充玩法,全站严查违禁品，没有直接商品调价，当前股票为 0；灰色渠道风险可单独建立规则。,OperationListSec.Crackdown,0x6A3CE0
+sec_raid_black_market,治安部突袭黑市,NARCOTIC +50%、WEAPON +40%,自动推导,0,0,0,0,-3,-4,0,0,-13,0,NARCOTIC,方向有依据，角色需明确,黑市货物被查使渠道受损，负向可解释；正规防务供应商未必同样受损。NARCOTIC +50% 未映射，当前只计算 WEAPON。,OperationListSec.RaidBlackMarket,0x6A4280
+sec_raid_revolution,突袭革命军,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,直接为零可接受,原版主要影响阵营力量，无直接商品调价；是否增加防务订单或风险溢价属于额外设计，不能仅凭新闻标题定数值。,OperationListSec.RaidRevolution,0x6A4590
+sec_martial_law,戒严,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,明显遗漏重大风险,原版明确 isLockDown=true，宵禁与检查站干扰经营，当前直接股价影响仍为 0。优先补充物流与商贸规则。,OperationListSec.MartialLaw,0x6A4080
+sec_budget_increase,治安部预算增加,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,可补充玩法,预算增加无直接调价；安盾和设备供应商可能获得订单，当前没有体现，订单关联属于推断。,OperationListSec.BudgetIncrease,0x6A3B10
+ul_medical_aid,紧急医疗援助,MEDICAL -25%、FOOD -10%,自动推导,3.25,0,8.75,0,0,3.5,0,2,0,0,,需要分化,免费医疗物资与人员到位缓解供应，当前白塔 +8.75%；商业药品销售也可能受免费供给挤压。贸易环境改善和企业收入变化需分别解释。,OperationListUL.MedicalAid,0x6A49D0
+ul_household_relief,日用品救济行动,HOUSEHOLD_GOOD -40%,未映射,0,0,0,0,0,0,0,0,0,0,HOUSEHOLD_GOOD,覆盖缺失,日用品免费援助令 HOUSEHOLD_GOOD -40%，当前无映射，直接股价影响为 0。,OperationListUL.HouseholdRelief,0x6A4780
+lottery_draw,彩票开奖,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,当前无直接规则,工厂无商品调价，Mod 无显式影响表；后续 Action 或顾客行为可能产生间接影响，本次未执行游戏验证。,EventListSpecial.LotteryDraw,0x6914F0
+Wanted3CapturedEvent,下层区革命军被捕！,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,当前无直接规则,工厂无商品调价，Mod 无显式影响表；后续 Action 或顾客行为可能产生间接影响，本次未执行游戏验证。,EventListUnique.Wanted3CapturedEvent,0x6918A0
+evidenceLockerBreakIn,证物库失窃！,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,当前无直接规则,工厂无商品调价，Mod 无显式影响表；后续 Action 或顾客行为可能产生间接影响，本次未执行游戏验证。,EventListUnique.CreateEvidenceLockerBreakIn,0x6916F0
+allQuiet,下层区风平浪静,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.AllQuiet,0x675E50
+ScheduledEletricalMaintenance,电力计划检修,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.ScheduledEletricalMaintenance,0x676AB0
+NutrifruitGrow,都有好果子吃！,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.NutrifruitGrow,0x676630
+PeatContent,“泥炭”肉罐头里到底有多少肉？,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.PeatContent,0x676750
+RecyclingAwarenessCampaign,回收宣传活动启动,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.RecyclingAwarenessCampaign,0x676870
+ArtistShowcase,本地艺术家作品展,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.ArtistShowcase,0x676090
+MaintenanceCrewStrike,维护工短暂罢工结束,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.MaintenanceCrewStrike,0x6763F0
+TechDemoDay,窥见未来！,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.TechDemoDay,0x676BD0
+NewTransitLine,中层区新交通线开通,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.NewTransitLine,0x676510
+WaterFountainUnveiled,装饰性喷泉公开亮相！,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.WaterFountainUnveiled,0x676CF0
+CommunityGardenExpansion,下层区公共园圃扩建,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.CommunityGardenExpansion,0x6761B0
+ArtContestHeld,中层区举办艺术比赛,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.ArtContestHeld,0x675F70
+CulturalCelebration,上层区举办文化庆典,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.CulturalCelebration,0x6762D0
+RoutineSpacewalkTraining,例行舱外活动训练演习,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。,EventListCosmetic.RoutineSpacewalkTraining,0x676990
+rent_day,交租日,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,属于玩家付款或特定顾客流程；不应直接当作全市场经营数据。相关真实商品成交另行计入。,EventListInnate.CreateRentDayEvent,0x6770F0
+mortgage_payment,按揭还款,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,属于玩家付款或特定顾客流程；不应直接当作全市场经营数据。相关真实商品成交另行计入。,EventListInnate.CreateMortgagePaymentEvent,0x676F80
+cartel_visit,卡特尔来访,无直接商品调价,未映射,0,0,0,0,0,0,0,0,0,0,,合理保持无直接影响,属于玩家付款或特定顾客流程；不应直接当作全市场经营数据。相关真实商品成交另行计入。,EventListInnate.CreateCartelVisitEvent,0x676E10

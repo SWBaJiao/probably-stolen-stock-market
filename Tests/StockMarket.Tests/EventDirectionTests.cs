@@ -12,7 +12,7 @@ static class EventDirectionTests
     };
     static MarketEngine Engine()
     {
-        var config = MarketConfig.CreateDefault(); config.DailyLimit = 0m; config.EventPreheatChance = 1m;
+        var config = TestConfig.Create(); config.DailyLimit = 0m; config.EventPreheatChance = 1m;
         var engine = new MarketEngine(config); engine.AdvanceDay(1); return engine;
     }
     static EventLifecycleState Life(MarketEngine engine) => engine.State.EventLifecycles.Values.Single();
@@ -21,7 +21,7 @@ static class EventDirectionTests
         var old = Engine(); old.State.RandomState = alreadyShocked ? 1UL : 8UL;
         old.Config.Events.Add(new EventRule { EventId = WaterEvent, Description = "供水危机", Sectors = new() { "water" }, Impacts = new() { ["water"] = .15m, ["harvest"] = .15m, ["logistics"] = .135m } });
         old.ActivateEvent(WaterEvent, "one", 1, true, 6);
-        var current = MarketConfig.CreateDefault(); current.DailyLimit = 0m; current.EventPreheatChance = 1m;
+        var current = TestConfig.Create(); current.DailyLimit = 0m; current.EventPreheatChance = 1m;
         return new MarketEngine(current, MarketEngine.Deserialize(old.Serialize(), current));
     }
     static RumorOffer Quote(string id, bool purchased, bool correct = true, int direction = 1) => new()
@@ -32,7 +32,7 @@ static class EventDirectionTests
     };
     static MarketConfig OldDefaultConfig()
     {
-        var config = MarketConfig.CreateDefault(); var revision = config.Events.Single(e => e.EventId == "rev_mobilization_secret");
+        var config = TestConfig.Create(); var revision = config.Events.Single(e => e.EventId == "rev_mobilization_secret");
         revision.Impacts = revision.Impacts.ToDictionary(p => p.Key, p => -p.Value); revision.ImpactSource = ""; revision.DirectionVersion = 0;
         return config;
     }

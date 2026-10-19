@@ -25,10 +25,12 @@ public sealed partial class MarketEngine
             if (!State.Positions.ContainsKey(c.Id)) State.Positions[c.Id] = new Position();
         }
         ValidateState(State, config);
+        MigrateShockBudget(State);
         ReconcileEventDirections(State, config);
         MigrateTradeSignals(State);
         MigrateCandles(State, config);
         MigrateIntraday(State);
+        EnsureStockCalendar(State.LastDay);
     }
 
     public string Serialize() => JsonSerializer.Serialize(State, JsonOptions);
@@ -38,6 +40,7 @@ public sealed partial class MarketEngine
     {
         var state = JsonSerializer.Deserialize<MarketState>(json, JsonOptions) ?? throw new ArgumentException("股市存档为空");
         ValidateState(state, config);
+        MigrateShockBudget(state);
         ReconcileEventDirections(state, config);
         MigrateTradeSignals(state);
         MigrateCandles(state, config);
@@ -55,6 +58,7 @@ public sealed partial class MarketEngine
         if (state.TradeSettlementVersion < 0 || state.TradeSettlementVersion > 1 || state.TradeSignalsByDay == null || state.TradeSettlementVersion == 0 && state.TradeSignalsByDay.Count > 0 || state.TradeSignalsByDay.Any(d => d.Key < 0 || d.Key > state.LastDay || d.Value == null || d.Value.Keys.Any(id => !state.Companies.ContainsKey(id)))) throw new ArgumentException("股市存档每日成交信号无效");
         ValidateBrokerState(state);
         ValidateEventLifecycles(state);
+        ValidateStockState(state);
         // 持仓公司不能被配置删除，否则无法出售已有股份。
         if (state.Positions.Any(x => x.Value.Quantity > 0 && !config.Companies.Any(c => c.Id == x.Key))) throw new ArgumentException("公司配置删除了仍有持仓的公司");
     }
@@ -167,6 +171,8 @@ public sealed partial class MarketEngine
         {
             State.TradeSignalsByDay.TryGetValue(d - 1, out var previousTrades);
             State.LastDay = d;
+            EnsureStockCalendar(d);
+            StartStockEvents(d);
             foreach (var company in Config.Companies)
             {
                 var s = State.Companies[company.Id];
@@ -234,7 +240,7 @@ public sealed partial class MarketEngine
         if (State.Rumors.TryGetValue(sessionId, out var existing)) return View(existing);
         if (string.IsNullOrWhiteSpace(sessionId) || string.IsNullOrWhiteSpace(seller.Key) || State.Sessions.TryGetValue(sessionId, out var session) && session.Closed || !State.OfferedSessions.Add(sessionId)) return null;
         var candidates = scheduled.Where(e => e.Day > State.LastDay && e.Day <= State.LastDay + Config.RumorHorizon && !State.OccurredEvents.Contains(EventKey(e.EventId, e.OccurrenceKey)))
-            .Select(e => (scheduled: e, rule: Config.Events.FirstOrDefault(x => x.EventId == e.EventId)))
+            .Select(e => (scheduled: e, rule: FindScheduledRule(e)))
             .Where(x => x.rule != null && x.rule.Impacts.Count > 0 && (seller.Sectors.Count == 0 || x.rule.Sectors.Any(seller.Sectors.Contains)))
             .OrderBy(x => x.scheduled.Day).ThenBy(x => x.scheduled.EventId, StringComparer.Ordinal).ToList();
         if (candidates.Count == 0) return null;
@@ -297,7 +303,7 @@ public sealed partial class MarketEngine
     private RumorView View(RumorOffer offer)
     {
         var rep = Reputation(offer.SellerKey);
-        return new RumorView { BrokerId = offer.BrokerId, Id = offer.Id, SellerName = offer.SellerName, Identity = offer.Identity, IsGroupIdentity = offer.IsGroupIdentity, Price = offer.Price, Reliability = offer.Reliability, Correct = rep.Correct, Incorrect = rep.Incorrect, Purchased = offer.Purchased, Expired = offer.Expired, DueDay = offer.Purchased ? offer.WindowEndDay : 0, Content = offer.Purchased ? offer.Content : "购买后查看线索", CompanyIds = offer.Purchased ? offer.CompanyIds.ToList() : new(), Resolution = offer.Purchased ? offer.Resolution : RumorResolution.Pending };
+        return new RumorView { PublicNews = IntelPublicNews(offer), VerificationSummary = IntelVerificationSummary(offer), BrokerId = offer.BrokerId, Id = offer.Id, SellerName = offer.SellerName, Identity = offer.Identity, IsGroupIdentity = offer.IsGroupIdentity, Price = offer.Price, Reliability = offer.Reliability, Correct = rep.Correct, Incorrect = rep.Incorrect, Purchased = offer.Purchased, Expired = offer.Expired, DueDay = offer.Purchased ? offer.WindowEndDay : 0, Content = offer.Purchased ? offer.Content : "购买后查看线索", CompanyIds = offer.Purchased ? offer.CompanyIds.ToList() : new(), Resolution = offer.Purchased ? offer.Resolution : RumorResolution.Pending };
     }
     private SellerReputation Reputation(string key)
     {

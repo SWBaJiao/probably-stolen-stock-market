@@ -66,6 +66,9 @@ public sealed class DailyCandle
 }
 public sealed class CompanyState
 {
+    public int EventShockDay { get; set; } = -1;
+    public decimal EventShockNetSignal { get; set; }
+    public decimal EventShockRatio { get; set; } = 1m;
     public int EventDriftDay { get; set; } = -1;
     public decimal EventDriftRatio { get; set; } = 1m;
     public decimal PersistentEventFactor { get; set; } = 1m;
@@ -132,6 +135,8 @@ public sealed class RumorOffer
 // 界面仅接收投影，未购买时不暴露事件与真假依据。
 public sealed class RumorView
 {
+    public string PublicNews { get; set; } = "";
+    public string VerificationSummary { get; set; } = "";
     public string BrokerId { get; set; } = BrokerIds.Wenzhou;
     public string Id { get; set; } = "";
     public string SellerName { get; set; } = "";
@@ -150,6 +155,7 @@ public sealed class RumorView
 }
 public sealed class MarketState
 {
+    public StockEventCalendar StockEvents { get; set; } = new();
     public Dictionary<string, EventLifecycleState> EventLifecycles { get; set; } = new();
     public Dictionary<string, decimal> EventRetentions { get; set; } = new();
     public HashSet<string> CompletedEventLifecycles { get; set; } = new();

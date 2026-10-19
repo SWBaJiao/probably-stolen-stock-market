@@ -14,7 +14,7 @@ public sealed partial class MarketEngine
         var active = events.GroupBy(e => EventKey(e.EventId, e.OccurrenceKey)).ToDictionary(g => g.Key, g => g.First());
         var changed = false;
         // 先结束缺项，避免推进新日时多续一天；新事件必须在推进日期以后才施加首次冲击。
-        foreach (var pair in State.EventLifecycles.ToArray())
+        foreach (var pair in State.EventLifecycles.Where(p => !p.Value.StockOwned).ToArray())
         {
             if (active.TryGetValue(pair.Key, out var native)) changed |= ConfirmActive(pair.Value, native, observedDay);
             else
@@ -38,7 +38,13 @@ public sealed partial class MarketEngine
     // lastActiveDay 为最后生效日：日末 Deactivate(D) 后，最早于 D+1 轻微恢复。
     public bool EndEvent(string eventId, string occurrenceKey, int lastActiveDay)
     {
-        if (!State.EventLifecycles.TryGetValue(EventKey(eventId, occurrenceKey), out var life) || !life.NativeActive) return false;
+        if (!State.EventLifecycles.TryGetValue(EventKey(eventId, occurrenceKey), out var life) || life.StockOwned) return false;
+        return EndLifecycle(life, lastActiveDay);
+    }
+
+    private bool EndLifecycle(EventLifecycleState life, int lastActiveDay)
+    {
+        if (!life.NativeActive) return false;
         life.NativeActive = false;
         life.LastActiveDay = Math.Max(life.FirstObservedDay, lastActiveDay);
         life.RecoveryTargetFrozen = false;
@@ -124,28 +130,12 @@ public sealed partial class MarketEngine
         {
             var life = pair.Value;
             if (life.NativeActive && !life.IsPermanent && life.ExpectedEndDayExclusive.HasValue && day >= life.ExpectedEndDayExclusive.Value && day > life.ActiveConfirmedThroughDay)
-                EndEvent(life.EventId, life.OccurrenceKey, Math.Max(life.ExpectedEndDayExclusive.Value - 1, life.ActiveConfirmedThroughDay));
+                EndLifecycle(life, Math.Max(life.ExpectedEndDayExclusive.Value - 1, life.ActiveConfirmedThroughDay));
             if (!life.NativeActive && day > life.LastActiveDay && !life.RecoveryTargetFrozen) FreezeRecoveryTarget(life);
             life.LastAdvanceDay = day;
         }
         // 计划冲击在小幅合并调整之前执行，同一发生实例只应用一次。
-        foreach (var pair in advancing)
-        {
-            var life = pair.Value;
-            if (!life.ShockApplied && !life.ShockCancelled && day >= life.ShockDay && (life.NativeActive || day <= life.LastActiveDay))
-            {
-                foreach (var company in life.Companies)
-                {
-                    var before = State.Companies[company.Key].Price;
-                    MovePrice(company.Key, company.Value.ReferenceInitialImpact, life.IsPublic ? string.IsNullOrWhiteSpace(life.PublicDescription) ? "事件冲击" : life.PublicDescription : "市场异动");
-                    var ratio = State.Companies[company.Key].Price / before;
-                    company.Value.AppliedInitialImpact = ratio - 1m;
-                    company.Value.CurrentFactor *= ratio;
-                    company.Value.RetainedTargetFactor = 1m + (company.Value.CurrentFactor - 1m) * life.RetentionRatio;
-                }
-                life.ShockApplied = true;
-            }
-        }
+        ApplyEventShocks(advancing.Select(p => p.Value).Where(l => !l.ShockApplied && !l.ShockCancelled && day >= l.ShockDay && (l.NativeActive || day <= l.LastActiveDay)).ToArray(), day);
         foreach (var company in Config.Companies)
         {
             var quote = State.Companies[company.Id];
@@ -221,7 +211,7 @@ public sealed partial class MarketEngine
             if (appliedRatio != 1m)
             {
                 var phase = string.Join("与", new[] { preheated ? "预热" : "", continued ? "持续影响" : "", recovered ? "余波修复" : "" }.Where(p => p.Length > 0));
-                var reason = (hidden ? "市场异动：" : "事件") + phase + $" {appliedRatio - 1m:+0.00%;-0.00%;0.00%}";
+                var reason = (hidden ? "市场异动" : "事件" + phase) + $" {appliedRatio - 1m:+0.00%;-0.00%;0.00%}";
                 MovePrice(company.Id, appliedRatio - 1m, reason);
             }
         }
@@ -230,9 +220,12 @@ public sealed partial class MarketEngine
             var life = pair.Value;
             if (life.NativeActive || day <= life.LastActiveDay || !life.RecoveryTargetFrozen || life.Companies.Values.Any(e => !e.RecoveryComplete)) continue;
             foreach (var effect in life.Companies) State.Companies[effect.Key].PersistentEventFactor = FactorProduct(State.Companies[effect.Key].PersistentEventFactor, effect.Value.CurrentFactor);
+            if (life.StockOwned && FindStockOccurrence(life.EventId, life.OccurrenceKey) is { } stock) { stock.ActualImpacts = life.Companies.ToDictionary(p => p.Key, p => p.Value.CurrentFactor - 1m); stock.Completed = true; }
             State.CompletedEventLifecycles.Add(pair.Key);
             State.EventLifecycles.Remove(pair.Key);
         }
+        CaptureStockProgress();
+        ResolveOccurredRumors();
     }
 
     // 每日结果只由已保存的种子与日期决定，重入及读档不消耗全局随机流。

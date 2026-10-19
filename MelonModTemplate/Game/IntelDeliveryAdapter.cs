@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime;
 using MelonLoader;
@@ -13,6 +15,7 @@ namespace MelonModTemplate.Game;
 // 纸条使用原生文档和柜台；领域记录先保存事务，再核对真实父容器。
 internal sealed class IntelDeliveryAdapter : IDisposable
 {
+    private static IntelDeliveryAdapter? _current;
     private readonly GameBridge _host;
     private readonly MelonLogger.Instance _log;
     private readonly Dictionary<string, GameItem> _previewItems = new();
@@ -22,8 +25,40 @@ internal sealed class IntelDeliveryAdapter : IDisposable
     private string _identity = "";
     private long _nextPoll;
     private bool _disposed;
+    private HarmonyLib.Harmony? _harmony;
+    private MethodInfo? _openPanel, _openPrefix;
 
     internal IntelDeliveryAdapter(GameBridge host, MelonLogger.Instance log) { _host = host; _log = log; }
+
+    internal void Initialize(HarmonyLib.Harmony harmony)
+    {
+        if (_current != null) throw new InvalidOperationException("情报纸条适配器已经存在。");
+        _current = this; _harmony = harmony;
+        try
+        {
+            _openPanel = AccessTools.Method(typeof(HandnoteUIManager), "OpenPanel", new[] { typeof(GameItem) })
+                ?? throw new MissingMethodException("HandnoteUIManager.OpenPanel(GameItem)");
+            _openPrefix = AccessTools.Method(typeof(IntelDeliveryAdapter), nameof(OpenPaperPrefix))
+                ?? throw new MissingMethodException(nameof(OpenPaperPrefix));
+            harmony.Patch(_openPanel, prefix: new HarmonyMethod(_openPrefix));
+        }
+        catch { Dispose(); throw; }
+    }
+
+    private static void OpenPaperPrefix(GameItem __0)
+    {
+        var adapter = _current;
+        if (adapter == null || adapter._disposed || !adapter._host.BrokerReady || __0 == null || __0.identifier != "handnote") return;
+        try
+        {
+            var record = adapter._host.Engine?.GetIntelRecords().FirstOrDefault(r =>
+                HasOfferMarker(__0, r.OfferId) && (r.PaperItemId >= 0 && r.PaperItemId == __0.uniqueId
+                    || adapter._previewItems.TryGetValue(r.OfferId, out var preview) && preview.Pointer == __0.Pointer));
+            // 必须同时命中本模组标记与已保存编号或自有预览实例，普通纸条不进入刷新流程。
+            if (record != null) FillDocument(__0, record);
+        }
+        catch (Exception ex) { adapter._log.Warning("[股市情报纸条] 阅读前刷新失败，保留已有纸条正文：" + ex.Message); }
+    }
 
     public void Tick()
     {
@@ -192,7 +227,15 @@ internal sealed class IntelDeliveryAdapter : IDisposable
     }
     internal static string BuildBody(IntelRecord record)
     {
-        return $"购买于第 {record.PurchaseDay} 日\n观察窗口：第 {record.ObservationStartDay}～{record.ObservationEndDay} 日\n来源记录：{(record.IsGroupIdentity ? "角色类型与阵营合并记录" : "个人记录")}\n参考可信度：{record.Reliability:P0}；属实 {record.Correct} / 失实 {record.Incorrect}\n\n{record.Content}\n\n记录状态：{StatusLabel(record.Status)}";
+        string source = record.SourceName == record.SourceIdentity ? record.SourceName : record.SourceName + " · " + record.SourceIdentity;
+        var body = new StringBuilder($"消息来源：{source}\n购买于第 {record.PurchaseDay} 日\n观察窗口：第 {record.ObservationStartDay}～{record.ObservationEndDay} 日\n来源记录：{(record.IsGroupIdentity ? "角色类型与阵营合并记录" : "个人记录")}\n参考可信度：{record.Reliability:P0}；属实 {record.Correct} / 失实 {record.Incorrect}\n\n{record.Content}\n\n记录状态：{StatusLabel(record.Status)}");
+        // 核验字段由领域层安全投影；待核实时不展示排程、事件编号或内部真假结果。
+        if (record.Status != RumorResolution.Pending)
+        {
+            if (!string.IsNullOrWhiteSpace(record.PublicNews)) body.Append("\n\n已公开消息：\n").Append(record.PublicNews);
+            if (!string.IsNullOrWhiteSpace(record.VerificationSummary)) body.Append("\n\n核验对照：\n").Append(record.VerificationSummary);
+        }
+        return body.ToString();
     }
     private static void SetState(MarketEngine engine, string id, IntelPaperState state, int itemId = -1)
     { if (!engine.SetIntelPaperState(id, state, itemId)) throw new InvalidOperationException("情报纸条状态转换被拒绝：" + state); }
@@ -224,5 +267,19 @@ internal sealed class IntelDeliveryAdapter : IDisposable
         foreach (var item in _previewItems.Values) try { if (item.parentInventory == null) item.Destroy(); } catch { }
         _previewItems.Clear(); _busy.Clear(); _reported.Clear(); _persistenceFaults.Clear(); _identity = ""; _nextPoll = 0;
     }
-    public void Dispose() { if (_disposed) return; Reset(); _disposed = true; }
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        try
+        {
+            if (_harmony != null && _openPanel != null && _openPrefix != null) _harmony.Unpatch(_openPanel, _openPrefix);
+        }
+        catch (Exception ex) { _log.Warning("[股市情报纸条] 阅读钩子解绑失败，继续释放资源：" + ex.Message); }
+        finally
+        {
+            try { Reset(); }
+            finally { if (ReferenceEquals(_current, this)) _current = null; }
+        }
+    }
 }

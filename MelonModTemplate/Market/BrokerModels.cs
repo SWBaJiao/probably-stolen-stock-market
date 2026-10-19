@@ -72,6 +72,8 @@ public sealed class BrokerVisitView
 // 纸条、日历和投资面板只能读取已购投影，不接触真实事件与内部真假标记。
 public sealed class IntelRecord
 {
+    public string PublicNews { get; set; } = "";
+    public string VerificationSummary { get; set; } = "";
     public string BrokerId { get; set; } = BrokerIds.Wenzhou;
     public string OfferId { get; set; } = "";
     public string SourceName { get; set; } = "";

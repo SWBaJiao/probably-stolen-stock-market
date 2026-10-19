@@ -1,0 +1,2113 @@
+{
+  "metadata": {
+    "date": "2026-10-19",
+    "game": "Probably Stolen Demo 0.46D",
+    "modVersion": "0.11.0",
+    "commit": "1365fab4f1075c693f2a9b9a387ea68a3754dce0",
+    "method": "静态原生工厂反汇编＋中文本地化＋本机自定义配置经 MarketConfig.Deserialize 和 EventImpactResolver 的实际计算",
+    "eventCount": 53,
+    "directImpactCount": 24,
+    "zeroDirectImpactCount": 29,
+    "gameAssemblySha256": "3bea17eeec77adab6418918c28a8aa9a06f290582a2972639a48bd7e5a01ab44",
+    "metadataSha256": "efdca95772fdce327b51e0c7e8d320e7055917be5c669db47c1f7b36389f1f41",
+    "customConfigSha256": "1ee7a4e9adee31de238b200a81790b039b9c84808f6a4c817b75fba09d7c1ec6",
+    "coverage": "53 个独立工厂事件；原生 StoreEvent 构造调用交叉检查 54 处，其中 1 处是在 QueueEvent 中内联构造同一个 evidenceLockerBreakIn。排除重复无参时长包装方法；未把只有本地化而未找到工厂的 food_drive 当作已实现事件。",
+    "limits": "静态目录不保证每个工厂在当前 Playtest 流程可触发；未执行游戏。表格是新规则的主冲击目标，不覆盖已主冲击旧存档实例的方向快照，不包含后续 Action 的全部间接行为。"
+  },
+  "effectiveConfig": {
+    "RequireSaveReloadVerification": false,
+    "InitialPrice": 100,
+    "DailyLimit": 0.03,
+    "TradeDailyLimit": 0.02,
+    "EventShockWindowDays": 5,
+    "EventPreheatChance": 0.65,
+    "EventPreheatScale": 0.05,
+    "EventPreheatLimit": 0.005,
+    "EventContinuationScale": 0.1,
+    "EventContinuationLimit": 0.0075,
+    "EventContinuationBudget": 0.25,
+    "EventRecoveryRate": 0.25,
+    "EventDailyDriftLimit": 0.01,
+    "EventRetentionMin": 0.2,
+    "EventRetentionMax": 0.5,
+    "CustomerLimit": 0.02,
+    "RetailDailyLimit": 0.08,
+    "SignalScale": 1000,
+    "FeeRate": 0.005,
+    "MinimumFee": 1,
+    "RumorPrice": 50,
+    "JianqingReverseProbability": 0.7,
+    "RumorHorizon": 3,
+    "BrokerCooldownDays": 3,
+    "HistoryLimit": 240,
+    "LedgerLimit": 300,
+    "EnableStructuredEventFallback": true,
+    "StructuredEventScale": 0.5,
+    "StructuredEventLimit": 0.15,
+    "Companies": [
+      {
+        "Id": "harvest",
+        "Name": "丰禾供给",
+        "Description": "丰禾供给最早靠一辆往返种植区的小货车起家，如今替街角商店和食堂收购营养果、农产品与耐储食品。它会向清泉循环采购灌装用水，也借晨星物流的货舱把易腐货物赶在变质前送达。丰收时仓库忙于周转，缺水或运输受阻时，采购员则得为下一批货重新讨价还价。"
+      },
+      {
+        "Id": "water",
+        "Name": "清泉循环",
+        "Description": "清泉循环接管过一座年久失修的净水站，靠检修管线、回收旧滤芯和分装饮用水慢慢站稳脚跟。如今它既供应日常用水，也经营过滤器和净水物资，处理药剂常要向聚合材料询价，设备故障时则离不开星锻工业的零件。对这家公司而言，水质、耗材和机器开工率总是同一本账上的事。"
+      },
+      {
+        "Id": "medical",
+        "Name": "白塔医疗",
+        "Description": "白塔医疗从一间替诊所分装药品的小作坊发展而来，柜台上既有常用药和医疗耗材，也有需要定期维修的诊疗设备。药剂师会向聚合材料采购配药与消毒原料，技术人员则寻找远星科技提供的电子模块。原料短缺、设备停摆或诊所集中补货，都会让仓库的出货安排随之改变。"
+      },
+      {
+        "Id": "industrial",
+        "Name": "星锻工业",
+        "Description": "星锻工业的招牌挂在老矿区旁，车间里既收矿石和金属，也修工具、组装机械，出售能让旧设备继续运转的零件。霆光能源的电池与供电设备支撑着生产线，安盾防务的装备维修又带来另一类订单。矿料进价、机器停工和客户是否补充库存，决定了工头每天先开哪一张工单。"
+      },
+      {
+        "Id": "technology",
+        "Name": "远星科技",
+        "Description": "远星科技靠拆解旧终端和重新配制电子模块攒下第一批客户，后来才把业务伸向科研装置与设备控制系统。它为霆光能源的供电设备寻找控制部件，也向安盾防务提供装备所需的电子组件。看似不起眼的模块断货，往往会拖慢整台机器交付，仓库因此始终留着一排等待配件的空箱。"
+      },
+      {
+        "Id": "commerce",
+        "Name": "环宇商贸",
+        "Description": "环宇商贸没有统一风格的货架：食品、医疗用品、电子设备与防护装备旁边，常摆着来自远处的奢侈品。采购员从丰禾供给这样的供应商手里凑齐货单，再借晨星物流把货分送到不同街区。它靠渠道和周转衔接买卖双方，货物涨价、商路中断或顾客口味转变，都会改写下一轮进货计划。"
+      },
+      {
+        "Id": "energy",
+        "Name": "霆光能源",
+        "Description": "霆光能源起初只替修理铺补充电池，后来逐渐接手燃料、能源电池和供电设备的买卖。星锻工业的机械开工离不开稳定供能，远星科技的电子模块又影响着它的设备维护。业务看起来贯穿整个站区，仓库里却仍要逐件核算能源货物的进价、耗损与运输成本，一次缺货就可能打乱多家客户的排程。"
+      },
+      {
+        "Id": "logistics",
+        "Name": "晨星物流",
+        "Description": "晨星物流的员工习惯在别人关店后清点货箱，替各行业经营运输、仓储和补货衔接。丰禾供给的食品要赶在变质前送达，白塔医疗的药品与耗材则需要分清批次妥善存放；机械、能源与奢侈品也挤在同一张调度表上。商路畅通时它忙着周转，通道受阻时便得协调改道、退货和堆积的库存。"
+      },
+      {
+        "Id": "defense",
+        "Name": "安盾防务",
+        "Description": "安盾防务最早替巡逻人员修补防护装备，后来才扩展到武器、安全器材和配套零件的供应。它向星锻工业寻找金属和机械部件，也通过环宇商贸接触分散在各处的买家。新订单会带动车间备料，运输限制和部件短缺则可能拖延交付；柜台后的采购单，往往比门前的招牌更早反映生意冷暖。"
+      },
+      {
+        "Id": "materials",
+        "Name": "聚合材料",
+        "Description": "聚合材料把一间旧仓库改成分装车间，经营化学品、工业原料和供下游加工使用的材料。白塔医疗需要配药与消毒原料，清泉循环需要水处理药剂，维修和电子行业也会来找适用的耗材。同一批原料有时会被几类客户同时询价，采购员必须在供应、存放条件和不同订单之间反复安排。"
+      }
+    ],
+    "Sectors": [
+      {
+        "Id": "food",
+        "Name": "食品、农产品",
+        "ItemTypes": [
+          "food",
+          "agriculture"
+        ],
+        "Weights": {
+          "harvest": 0.65,
+          "commerce": 0.2,
+          "logistics": 0.15
+        }
+      },
+      {
+        "Id": "water",
+        "Name": "饮用水、水处理用品",
+        "ItemTypes": [
+          "water",
+          "WATER_PURIFICATION_SUPPLY",
+          "FILTER"
+        ],
+        "Weights": {
+          "water": 0.65,
+          "harvest": 0.2,
+          "logistics": 0.15
+        }
+      },
+      {
+        "Id": "medical",
+        "Name": "药品、医疗耗材",
+        "ItemTypes": [
+          "medical",
+          "medicine"
+        ],
+        "Weights": {
+          "medical": 0.7,
+          "commerce": 0.2,
+          "logistics": 0.1
+        }
+      },
+      {
+        "Id": "tools",
+        "Name": "工具、机械",
+        "ItemTypes": [
+          "tool",
+          "tools",
+          "machine"
+        ],
+        "Weights": {
+          "industrial": 0.6,
+          "materials": 0.2,
+          "defense": 0.1,
+          "logistics": 0.1
+        }
+      },
+      {
+        "Id": "minerals",
+        "Name": "矿石、金属、工业材料",
+        "ItemTypes": [
+          "mineral",
+          "ore",
+          "metal",
+          "MATERIAL",
+          "BASIC_MATERIAL"
+        ],
+        "Weights": {
+          "industrial": 0.55,
+          "energy": 0.2,
+          "defense": 0.15,
+          "logistics": 0.1
+        }
+      },
+      {
+        "Id": "electronics",
+        "Name": "电子、模块",
+        "ItemTypes": [
+          "electronic",
+          "electronics",
+          "module"
+        ],
+        "Weights": {
+          "technology": 0.5,
+          "energy": 0.2,
+          "industrial": 0.2,
+          "commerce": 0.1
+        }
+      },
+      {
+        "Id": "energy",
+        "Name": "燃料、电池",
+        "ItemTypes": [
+          "fuel",
+          "battery",
+          "energy",
+          "ENERGY_CELL"
+        ],
+        "Weights": {
+          "energy": 0.65,
+          "industrial": 0.2,
+          "logistics": 0.15
+        }
+      },
+      {
+        "Id": "materials",
+        "Name": "化学品",
+        "ItemTypes": [
+          "chemical",
+          "substance",
+          "CHEMICAL_SUPPLIES"
+        ],
+        "Weights": {
+          "materials": 0.5,
+          "medical": 0.2,
+          "technology": 0.2,
+          "water": 0.1
+        }
+      },
+      {
+        "Id": "weapons",
+        "Name": "武器、防护装备",
+        "ItemTypes": [
+          "weapon",
+          "armor",
+          "protection"
+        ],
+        "Weights": {
+          "defense": 0.65,
+          "commerce": 0.2,
+          "technology": 0.15
+        }
+      },
+      {
+        "Id": "luxury",
+        "Name": "奢侈品",
+        "ItemTypes": [
+          "luxury",
+          "LUXURY_ITEM"
+        ],
+        "Weights": {
+          "commerce": 0.75,
+          "logistics": 0.15,
+          "technology": 0.1
+        }
+      }
+    ],
+    "Events": [
+      {
+        "ImpactSource": "",
+        "DirectionVersion": 0,
+        "EventId": "badNutrifruitHarvest",
+        "Description": "营养果歉收，食品供应承压",
+        "TrueHint": "食品供应可能收紧，相关商家的进货压力正在增加",
+        "FalseHint": "食品供应可能增加，相关商家的进货压力正在缓解",
+        "Impacts": {
+          "harvest": -0.12,
+          "commerce": -0.05,
+          "logistics": -0.05
+        },
+        "Sectors": [
+          "food"
+        ]
+      },
+      {
+        "ImpactSource": "",
+        "DirectionVersion": 0,
+        "EventId": "bm_illegal_weapon_shipment",
+        "Description": "非法武器货物到港，防务市场出现波动",
+        "TrueHint": "一批防务物资可能流入市场，供应渠道正在扩张",
+        "FalseHint": "防务物资流通可能收紧，供应渠道正在收缩",
+        "Impacts": {
+          "defense": 0.1,
+          "commerce": 0.06,
+          "technology": 0.05
+        },
+        "Sectors": [
+          "weapons",
+          "electronics"
+        ]
+      },
+      {
+        "ImpactSource": "builtin-price",
+        "DirectionVersion": 2,
+        "EventId": "rev_mobilization_secret",
+        "Description": "武器需求增加",
+        "TrueHint": "有组织正在筹集装备，相关采购规模可能扩大",
+        "FalseHint": "有组织正在缩减装备采购，相关订单规模可能回落",
+        "Impacts": {
+          "defense": -0.12,
+          "industrial": -0.07,
+          "technology": -0.05
+        },
+        "Sectors": [
+          "weapons",
+          "minerals",
+          "electronics"
+        ]
+      }
+    ],
+    "Sellers": [
+      {
+        "Identifier": "shadyCustomerInformation",
+        "Faction": "",
+        "Identity": "情报商",
+        "BaseReliability": 0.65,
+        "Sectors": []
+      },
+      {
+        "Identifier": "pharmacist",
+        "Faction": "",
+        "Identity": "药剂师",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "medical",
+          "materials"
+        ]
+      },
+      {
+        "Identifier": "hospitalAdmin",
+        "Faction": "",
+        "Identity": "医院管理者",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "medical"
+        ]
+      },
+      {
+        "Identifier": "clinicNurse",
+        "Faction": "",
+        "Identity": "诊所护士",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "medical"
+        ]
+      },
+      {
+        "Identifier": "lowerLevelChemist",
+        "Faction": "",
+        "Identity": "化学从业者",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "materials"
+        ]
+      },
+      {
+        "Identifier": "farmerMinor",
+        "Faction": "",
+        "Identity": "农业从业者",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "food"
+        ]
+      },
+      {
+        "Identifier": "miner",
+        "Faction": "",
+        "Identity": "矿业从业者",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "minerals",
+          "energy"
+        ]
+      },
+      {
+        "Identifier": "minerMinor",
+        "Faction": "",
+        "Identity": "矿业从业者",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "minerals"
+        ]
+      },
+      {
+        "Identifier": "iceMiner",
+        "Faction": "",
+        "Identity": "冰矿从业者",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "water",
+          "minerals"
+        ]
+      },
+      {
+        "Identifier": "maintenanceWorker",
+        "Faction": "",
+        "Identity": "维修从业者",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "tools",
+          "electronics",
+          "energy"
+        ]
+      },
+      {
+        "Identifier": "retired_water_merchant",
+        "Faction": "",
+        "Identity": "退休水商",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "water"
+        ]
+      },
+      {
+        "Identifier": "patrolOfficer",
+        "Faction": "",
+        "Identity": "巡逻警员",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "weapons"
+        ]
+      },
+      {
+        "Identifier": "securityInspector",
+        "Faction": "",
+        "Identity": "安保检查员",
+        "BaseReliability": 0.75,
+        "Sectors": [
+          "weapons"
+        ]
+      },
+      {
+        "Identifier": "thief",
+        "Faction": "",
+        "Identity": "可疑来源",
+        "BaseReliability": 0.3,
+        "Sectors": []
+      }
+    ]
+  },
+  "events": [
+    {
+      "eventId": "nutrifruitHarvest",
+      "factory": "EventListNormal.CreateNutrifruitHarvest",
+      "rva": "0x678410",
+      "length": "0x1F6",
+      "modifiers": [
+        {
+          "itemType": "FOOD",
+          "value": -20,
+          "rva": "0x6785c8"
+        }
+      ],
+      "localization": {
+        "event_normal_nutrifruit_harvest_news": "营养果农场喜迎大丰收！",
+        "event_normal_nutrifruit_harvest_display": "营养果大丰收",
+        "event_normal_nutrifruit_harvest_desc": "中层区一家大型农场正在收割其种植的营养果。预计短期内市场将出现新鲜营养果，食物价格也会随之下降。"
+      },
+      "name": "营养果大丰收",
+      "currentRule": {
+        "EventId": "nutrifruitHarvest",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "harvest": 0.065,
+          "commerce": 0.02,
+          "logistics": 0.015
+        },
+        "Unmapped": []
+      },
+      "assessment": "基本合理，有条件",
+      "review": "增产缓解供货压力，符合现行供给链玩法；若把丰禾视为农产品生产者，降价也可能压利润。+6.5% 属中等冲击。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "badNutrifruitHarvest",
+      "factory": "EventListNormal.CreateBadNutrifruitHarvestDuration",
+      "rva": "0x677260",
+      "length": "0x252",
+      "modifiers": [
+        {
+          "itemType": "FOOD",
+          "value": 50,
+          "rva": "0x677451"
+        }
+      ],
+      "localization": {
+        "event_normal_bad_harvest_news": "营养果收成惨淡",
+        "event_normal_bad_harvest_display": "营养果歉收",
+        "event_normal_bad_harvest_desc": "下层区的一家营养果农场本季度歉收，作物因缺乏适当的资源和维护而枯萎。预计短期内食物价格将上涨，新鲜产品也将出现短缺。"
+      },
+      "name": "营养果歉收",
+      "currentRule": {
+        "EventId": "badNutrifruitHarvest",
+        "Source": "",
+        "DirectionVersion": 0,
+        "Impacts": {
+          "harvest": -0.12,
+          "commerce": -0.05,
+          "logistics": -0.05
+        },
+        "Unmapped": []
+      },
+      "assessment": "基本合理",
+      "review": "枯萎、缺资源与维护不足明确造成短缺，丰禾下跌有依据；环宇、物流连带受损可解释。",
+      "ruleKind": "显式配置"
+    },
+    {
+      "eventId": "seedShortage",
+      "factory": "EventListNormal.CreateSeedHeist",
+      "rva": "0x678E00",
+      "length": "0x2BF",
+      "modifiers": [
+        {
+          "itemType": "FOOD",
+          "value": 33,
+          "rva": "0x678feb"
+        },
+        {
+          "itemType": "SEED",
+          "value": 50,
+          "rva": "0x679050"
+        }
+      ],
+      "localization": {
+        "event_normal_seed_heist_news": "营养果种子遭劫！",
+        "event_normal_seed_heist_display": "营养果种子短缺",
+        "event_normal_seed_heist_desc": "水培农场仓库中的营养果种子在一夜之间被人洗劫一空。预计整个空间站的食物和种子的价格都将大幅上涨。"
+      },
+      "name": "营养果种子短缺",
+      "currentRule": {
+        "EventId": "seedShortage",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "harvest": -0.10725,
+          "commerce": -0.033,
+          "logistics": -0.02475
+        },
+        "Unmapped": [
+          "SEED"
+        ]
+      },
+      "assessment": "方向合理，覆盖不全",
+      "review": "种子失窃影响后续供给，食品链下跌合理；SEED +50% 未映射，当前只计算 FOOD +33%。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "medicalSuppliesShortage",
+      "factory": "EventListNormal.CreateCounterfeitMedicalSuppliesDiscoveredDuration",
+      "rva": "0x6776E0",
+      "length": "0x252",
+      "modifiers": [
+        {
+          "itemType": "MEDICAL",
+          "value": 50,
+          "rva": "0x6778d1"
+        }
+      ],
+      "localization": {
+        "event_normal_counterfeit_med_news": "发现假冒医疗用品！",
+        "event_normal_counterfeit_med_display": "医疗用品短缺",
+        "event_normal_counterfeit_med_desc": "多个诊所和医院中发现了大量假冒医疗用品。预计对正品医疗物资的需求将激增。"
+      },
+      "name": "医疗用品短缺",
+      "currentRule": {
+        "EventId": "medicalSuppliesShortage",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "medical": -0.15,
+          "commerce": -0.05,
+          "logistics": -0.025
+        },
+        "Unmapped": []
+      },
+      "assessment": "需要分化",
+      "review": "新闻强调假货被查后正品需求激增。正品供应商白塔可能受益，掺假企业或渠道受损；目前白塔统一 -15% 缺少身份区分。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "water_treatment_breakdown",
+      "factory": "EventListNormal.CreateWaterTreatmentPlantBreakdownDuration",
+      "rva": "0x679300",
+      "length": "0x397",
+      "modifiers": [
+        {
+          "itemType": "WATER",
+          "value": 100,
+          "rva": "0x6794fd"
+        },
+        {
+          "itemType": "WATER_RATION",
+          "value": 100,
+          "rva": "0x679562"
+        },
+        {
+          "itemType": "BREVAGE",
+          "value": 90,
+          "rva": "0x6795c7"
+        },
+        {
+          "itemType": "WATER_PURIFICATION_SUPPLY",
+          "value": 80,
+          "rva": "0x67962c"
+        }
+      ],
+      "localization": {
+        "event_normal_water_breakdown_news": "水处理厂故障，供水面临告急",
+        "event_normal_water_breakdown_display": "供水危机",
+        "event_normal_water_breakdown_desc": "中央水处理厂的水泵故障正对供水造成严重影响。治安部已呼吁民众保持冷静，市场专家预测未来几天水和净水物资的价格将飙升。"
+      },
+      "name": "供水危机",
+      "currentRule": {
+        "EventId": "water_treatment_breakdown",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "water": -0.15,
+          "harvest": -0.15,
+          "logistics": -0.135
+        },
+        "Unmapped": [
+          "WATER_RATION",
+          "BREVAGE"
+        ]
+      },
+      "assessment": "方向合理，幅度失衡",
+      "review": "水泵故障造成供给危机，清泉下跌合理；丰禾与清泉同为 -15%，晨星 -13.5% 的连带冲击偏重；星锻抢修、聚合处理材料可能受益属于推断，当前未体现。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "scheduled_treatment_maintenance",
+      "factory": "EventListNormal.CreateScheduledTreatmentPlantMaintenanceDuration",
+      "rva": "0x678A50",
+      "length": "0x397",
+      "modifiers": [
+        {
+          "itemType": "WATER",
+          "value": 35,
+          "rva": "0x678c4d"
+        },
+        {
+          "itemType": "WATER_RATION",
+          "value": 35,
+          "rva": "0x678cb2"
+        },
+        {
+          "itemType": "BREVAGE",
+          "value": 30,
+          "rva": "0x678d17"
+        },
+        {
+          "itemType": "WATER_PURIFICATION_SUPPLY",
+          "value": 25,
+          "rva": "0x678d7c"
+        }
+      ],
+      "localization": {
+        "event_normal_water_maintenance_news": "水处理厂将按期进行例行维护",
+        "event_normal_water_maintenance_display": "轻微缺水",
+        "event_normal_water_maintenance_desc": "治安部宣布，中央水处理厂的例行维护将按计划进行。管道受到的影响预计会很有限。"
+      },
+      "name": "轻微缺水",
+      "currentRule": {
+        "EventId": "scheduled_treatment_maintenance",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "water": -0.15,
+          "harvest": -0.06,
+          "logistics": -0.045
+        },
+        "Unmapped": [
+          "WATER_RATION",
+          "BREVAGE"
+        ]
+      },
+      "assessment": "明显偏重",
+      "review": "新闻明确为计划维护、影响有限，却令清泉 -15%，与严重供水危机同上限。建议设独立轻微事件规则。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "miner_return_ice_asteroid",
+      "factory": "EventListNormal.CreateMinerReturnFromIceAsteroidDuration",
+      "rva": "0x677E20",
+      "length": "0x397",
+      "modifiers": [
+        {
+          "itemType": "WATER",
+          "value": -25,
+          "rva": "0x67801d"
+        },
+        {
+          "itemType": "WATER_RATION",
+          "value": -25,
+          "rva": "0x678082"
+        },
+        {
+          "itemType": "BREVAGE",
+          "value": -20,
+          "rva": "0x6780e7"
+        },
+        {
+          "itemType": "WATER_PURIFICATION_SUPPLY",
+          "value": -15,
+          "rva": "0x67814c"
+        }
+      ],
+      "localization": {
+        "event_normal_ice_asteroid_news": "矿工从冰小行星回归！",
+        "event_normal_ice_asteroid_display": "供水过剩",
+        "event_normal_ice_asteroid_desc": "我们一支勇敢的采冰队已从富冰小行星“贝拉41-A”的成功远征中返回。他们的回归预计将带来大量高纯度水，并因此导致价格下降。"
+      },
+      "name": "供水过剩",
+      "currentRule": {
+        "EventId": "miner_return_ice_asteroid",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "water": 0.13,
+          "harvest": 0.04,
+          "logistics": 0.03
+        },
+        "Unmapped": [
+          "WATER_RATION",
+          "BREVAGE"
+        ]
+      },
+      "assessment": "幅度偏重，角色需明确",
+      "review": "高纯度水到货有利供货与运输，但可能压低本地制水利润；清泉 +13% 接近严重利好，应区分生产者与贸易商。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "lower_level_mob_justice",
+      "factory": "EventListNormal.CreateLowerLevelMobJustice",
+      "rva": "0x677950",
+      "length": "0x2BF",
+      "modifiers": [
+        {
+          "itemType": "WEAPON",
+          "value": 33,
+          "rva": "0x677b3b"
+        },
+        {
+          "itemType": "ARMOR",
+          "value": 33,
+          "rva": "0x677ba0"
+        }
+      ],
+      "localization": {
+        "event_normal_mob_justice_news": "下层区暴民动用私刑！",
+        "event_normal_mob_justice_display": "下层区的私刑处决",
+        "event_normal_mob_justice_desc": "下层区居民因再也无法忍受一名奸商，决定动用私刑。空间站治安部已呼吁民众保持冷静。"
+      },
+      "name": "下层区的私刑处决",
+      "currentRule": {
+        "EventId": "lower_level_mob_justice",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "defense": -0.15,
+          "commerce": -0.066,
+          "technology": -0.0495
+        },
+        "Unmapped": []
+      },
+      "assessment": "需要分化，幅度偏重",
+      "review": "民间私刑增加不安，贸易受压有依据；武器与护甲需求上涨可能利好安盾订单，当前两标签累加后直接 -15%。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "storeroom_excavated",
+      "factory": "EventListNormal.CreateStoreRoomExcavatedDuration",
+      "rva": "0x6790C0",
+      "length": "0x228",
+      "modifiers": [
+        {
+          "itemType": "HOUSEHOLD_GOOD",
+          "value": -20,
+          "rva": "0x679287"
+        }
+      ],
+      "localization": {
+        "event_normal_storeroom_news": "秘密储藏室被发现！",
+        "event_normal_storeroom_display": "日用品过剩",
+        "event_normal_storeroom_desc": "下层区一群拾荒者偶然发现了一个堆满日用品的密室。大量商品涌入市场，很可能导致今日价格下跌。"
+      },
+      "name": "日用品过剩",
+      "currentRule": {
+        "EventId": "storeroom_excavated",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": [
+          "HOUSEHOLD_GOOD"
+        ]
+      },
+      "assessment": "覆盖缺失",
+      "review": "实际 HOUSEHOLD_GOOD -20%，但无分类映射，所有公司均无直接反应。可为环宇及物流补独立规则。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "miningExpeditionReturn",
+      "factory": "EventListNormal.CreateMiningExpeditionReturnDuration",
+      "rva": "0x6781D0",
+      "length": "0x228",
+      "modifiers": [
+        {
+          "itemType": "MATERIAL",
+          "value": -25,
+          "rva": "0x678397"
+        }
+      ],
+      "localization": {
+        "event_normal_mining_return_news": "采矿远征队回归",
+        "event_normal_mining_return_display": "材料盈余",
+        "event_normal_mining_return_desc": "一批采矿队成功从富含矿产的小行星返航。预计材料价格将在短期内下跌。"
+      },
+      "name": "材料盈余",
+      "currentRule": {
+        "EventId": "miningExpeditionReturn",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "industrial": 0.06875,
+          "energy": 0.025,
+          "defense": 0.01875,
+          "logistics": 0.0125
+        },
+        "Unmapped": []
+      },
+      "assessment": "基本合理，有条件",
+      "review": "原料到货有利加工与供应链；星锻兼营矿产与机械，矿产售价下降的负面与制造成本下降的正面尚未区分。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "construction_project",
+      "factory": "EventListNormal.CreateConstructionProject",
+      "rva": "0x6774D0",
+      "length": "0x20F",
+      "modifiers": [
+        {
+          "itemType": "MATERIAL",
+          "value": 30,
+          "rva": "0x6776a1"
+        }
+      ],
+      "localization": {
+        "event_normal_construction_news": "建设项目",
+        "event_normal_construction_desc": "各类新建设项目正在整个下层区如雨后春笋般涌现。建筑材料和熟练劳工可能会面临短缺。"
+      },
+      "name": "建设项目",
+      "currentRule": {
+        "EventId": "construction_project",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "industrial": -0.0825,
+          "energy": -0.03,
+          "defense": -0.0225,
+          "logistics": -0.015
+        },
+        "Unmapped": []
+      },
+      "assessment": "方向需要重审",
+      "review": "新闻是新项目增加并挤占材料、劳工。机械及材料供货商可能获得订单；目前星锻 -8.25%、安盾 -2.25% 主要来自统一反价，安盾的直接关联也偏弱。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "meteorShower",
+      "factory": "EventListNormal.CreateMeteorShower",
+      "rva": "0x677C10",
+      "length": "0x20F",
+      "modifiers": [
+        {
+          "itemType": "MATERIAL",
+          "value": 50,
+          "rva": "0x677de1"
+        }
+      ],
+      "localization": {
+        "event_normal_meteor_shower_news": "流星雨",
+        "event_normal_meteor_shower_desc": "昨夜一场流星雨袭击了空间站，导致多个区域出现损坏和破裂。缺乏加固舱体的下层区受灾最为严重——预计材料价格将上涨。"
+      },
+      "name": "流星雨",
+      "currentRule": {
+        "EventId": "meteorShower",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "industrial": -0.1375,
+          "energy": -0.05,
+          "defense": -0.0375,
+          "logistics": -0.025
+        },
+        "Unmapped": []
+      },
+      "assessment": "大方向合理，需要分化",
+      "review": "空间站受损使生产、运输承压合理；抢修订单可能使星锻和材料业务部分受益。当前聚合完全无反应，星锻统一重挫。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "powerShortage",
+      "factory": "EventListNormal.CreatePowerShortage",
+      "rva": "0x678850",
+      "length": "0x1F5",
+      "modifiers": [
+        {
+          "itemType": "ENERGY_CELL",
+          "value": 66,
+          "rva": "0x678a07"
+        }
+      ],
+      "localization": {
+        "event_normal_power_shortage_news": "下层区电力不足",
+        "event_normal_power_shortage_display": "停电",
+        "event_normal_power_shortage_desc": "发电机故障导致下层区停电。预计在维修期间，能量电池将出现短缺。"
+      },
+      "name": "停电",
+      "currentRule": {
+        "EventId": "powerShortage",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "energy": -0.15,
+          "industrial": -0.066,
+          "logistics": -0.0495
+        },
+        "Unmapped": []
+      },
+      "assessment": "大方向合理，需要分化",
+      "review": "发电机故障损害供能与生产有依据；霆光同时经营电池，其短缺售价与销量收益尚未独立计算。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "powerPlantMaintenance",
+      "factory": "EventListNormal.SchedulePowerPlantMaintenance",
+      "rva": "0x679840",
+      "length": "0x228",
+      "modifiers": [
+        {
+          "itemType": "ENERGY_CELL",
+          "value": 33,
+          "rva": "0x679a2a"
+        }
+      ],
+      "localization": {
+        "event_normal_power_maintenance_news": "发电厂计划检修",
+        "event_normal_power_maintenance_display": "发电站检修",
+        "event_normal_power_maintenance_desc": "下层区的一座主要发电厂已开始例行检修。居民们被告知在此检修期间内做好供电受到轻微干扰的准备。"
+      },
+      "name": "发电站检修",
+      "currentRule": {
+        "EventId": "powerPlantMaintenance",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "energy": -0.10725,
+          "industrial": -0.033,
+          "logistics": -0.02475
+        },
+        "Unmapped": []
+      },
+      "assessment": "明显偏重",
+      "review": "原文为计划检修、轻微供电干扰，霆光 -10.725% 与事件严重程度不匹配。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "stationWideBlackout",
+      "factory": "EventListNormal.StationWideBlackout",
+      "rva": "0x679A70",
+      "length": "0x2A1",
+      "modifiers": [
+        {
+          "itemType": "ENERGY_CELL",
+          "value": 100,
+          "rva": "0x679c68"
+        },
+        {
+          "itemType": "WEAPON",
+          "value": 25,
+          "rva": "0x679cc9"
+        }
+      ],
+      "localization": {
+        "event_normal_blackout_news": "谁把灯关了？",
+        "event_normal_blackout_desc": "中央电网的灾难性故障使整个空间站陷入了黑暗。预计对能量电池和电力相关产品的需求将会激增。"
+      },
+      "name": "谁把灯关了？",
+      "currentRule": {
+        "EventId": "stationWideBlackout",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "energy": -0.15,
+          "industrial": -0.1,
+          "logistics": -0.075,
+          "defense": -0.08125,
+          "commerce": -0.025,
+          "technology": -0.01875
+        },
+        "Unmapped": []
+      },
+      "assessment": "大方向合理，需要分化",
+      "review": "灾难性全站断电足以形成大跌；白塔、清泉、远星生产停摆和聚合抢修材料的影响未完整建模，安盾下跌仅来自武器涨价。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "cruiseShipDocked",
+      "factory": "EventListNormal.CruiseShipDocked",
+      "rva": "0x6796B0",
+      "length": "0x187",
+      "modifiers": [],
+      "localization": {
+        "event_normal_cruise_ship_news": "泳池怎么走？",
+        "event_normal_cruise_ship_display": "游客涌入",
+        "event_normal_cruise_ship_desc": "一艘游轮已在上层区靠泊，带来了一波游客。据推测，部分充满好奇心的游客甚至可能会逛到下层区。空间站治安部已呼吁公民在游览期间保持尊重。"
+      },
+      "name": "游客涌入",
+      "currentRule": {
+        "EventId": "cruiseShipDocked",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "可补充玩法",
+      "review": "原版只增加游客等行为，没有价格修正；目前直接为 0。可考虑环宇、丰禾与物流的小幅客流利好；实际顾客成交仍可间接影响次日行情。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "oxymoreWave",
+      "factory": "EventListNormal.CreateOxymoreWave",
+      "rva": "0x678610",
+      "length": "0x231",
+      "modifiers": [
+        {
+          "itemType": "MEDICAL",
+          "value": 25,
+          "rva": "0x6787dc"
+        }
+      ],
+      "localization": {
+        "event_normal_oxymore_news": "奥克西莫成瘾情况日益严重",
+        "event_normal_oxymore_desc": "据报道，整个空间站的奥克西莫使用量急剧增加，各诊所的成瘾和过量病例也随之激增。预计对医疗用品和治疗服务的需求将会上涨。"
+      },
+      "name": "奥克西莫成瘾情况日益严重",
+      "currentRule": {
+        "EventId": "oxymoreWave",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "medical": -0.0875,
+          "commerce": -0.025,
+          "logistics": -0.0125
+        },
+        "Unmapped": []
+      },
+      "assessment": "方向需要重审",
+      "review": "新闻明确医疗用品与治疗需求增加；当前白塔 -8.75% 没有体现销售增长，可让白塔与经销渠道受益、其他行业承受社会成本。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "bm_gang_war",
+      "factory": "OperationListBM.GangWar",
+      "rva": "0x6A2520",
+      "length": "0x264",
+      "modifiers": [
+        {
+          "itemType": "MEDICAL",
+          "value": 50,
+          "rva": "0x6a2721"
+        }
+      ],
+      "localization": {
+        "event_op_gang_war_news": "下层区帮派开战！",
+        "event_op_gang_war_desc": "敌对帮派已相互宣战！枪战和小规模冲突席卷下层区，医疗物资需求预计将会上升。",
+        "event_op_gang_war_display": "下层区帮派战争"
+      },
+      "scalarEffects": {
+        "bmPowerMod": -50,
+        "civilUnrestMod": 20,
+        "upperLevelFriendlinessMod": 15,
+        "isBlockByLockDown": 1
+      },
+      "name": "下层区帮派战争",
+      "currentRule": {
+        "EventId": "bm_gang_war",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "medical": -0.15,
+          "commerce": -0.05,
+          "logistics": -0.025
+        },
+        "Unmapped": []
+      },
+      "assessment": "需要分化",
+      "review": "枪战与伤亡破坏经营，但同时提高医疗需求；目前白塔 -15%，未区分医疗订单利好与贸易物流风险。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "bm_illegal_weapon_shipment",
+      "factory": "OperationListBM.IllegalWeaponShipment",
+      "rva": "0x6A2790",
+      "length": "0x253",
+      "modifiers": [
+        {
+          "itemType": "WEAPON",
+          "value": -35,
+          "rva": "0x6a29a5"
+        }
+      ],
+      "localization": {
+        "event_op_weapon_shipment_news": "非法武器走私货物抵达！",
+        "event_op_weapon_shipment_display": "非法武器走私货物",
+        "event_op_weapon_shipment_desc": "一大批非法武器已经躲过治安部的巡逻，流入下层区。预计武器供应量将激增，价格会随之下降。"
+      },
+      "scalarEffects": {
+        "bmPowerMod": 20,
+        "civilUnrestMod": 10
+      },
+      "name": "非法武器走私货物",
+      "currentRule": {
+        "EventId": "bm_illegal_weapon_shipment",
+        "Source": "",
+        "DirectionVersion": 0,
+        "Impacts": {
+          "defense": 0.1,
+          "commerce": 0.06,
+          "technology": 0.05
+        },
+        "Unmapped": []
+      },
+      "assessment": "需要分化",
+      "review": "非法武器供给增加、价格下降。渠道可因货源增多受益，正规安盾也可能受低价竞争挤压；远星 +5% 缺少明确电子订单证据。",
+      "ruleKind": "显式配置"
+    },
+    {
+      "eventId": "ll_riot",
+      "factory": "OperationListLL.Riot",
+      "rva": "0x6A29F0",
+      "length": "0x2DF",
+      "modifiers": [
+        {
+          "itemType": "FOOD",
+          "value": 30,
+          "rva": "0x6a2c1f"
+        },
+        {
+          "itemType": "WEAPON",
+          "value": 50,
+          "rva": "0x6a2c80"
+        }
+      ],
+      "localization": {
+        "event_op_riot_display": "下层区暴乱",
+        "event_op_riot_news": "暴乱爆发！",
+        "event_op_riot_desc": "受近期事件影响，大批下层区居民在各地掀起暴乱。商铺遭到洗劫，治安部据点遇袭，混乱迅速蔓延。食物和武器需求激增。"
+      },
+      "scalarEffects": {
+        "revPowerMod": 10,
+        "civilUnrestMod": -40,
+        "isBlockByLockDown": 1
+      },
+      "name": "下层区暴乱",
+      "currentRule": {
+        "EventId": "ll_riot",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "harvest": -0.0975,
+          "commerce": -0.08,
+          "logistics": -0.0225,
+          "defense": -0.15,
+          "technology": -0.0375
+        },
+        "Unmapped": []
+      },
+      "assessment": "大方向合理，需要分化",
+      "review": "商铺被洗劫支持丰禾、环宇下跌；物流受损可解释，防务新增需求与秩序风险应分开处理。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "ll_worker_strike",
+      "factory": "OperationListLL.WorkerStrike",
+      "rva": "0x6A2CD0",
+      "length": "0x34C",
+      "modifiers": [
+        {
+          "itemType": "WATER",
+          "value": 40,
+          "rva": "0x6a2f0e"
+        },
+        {
+          "itemType": "WATER_RATION",
+          "value": 40,
+          "rva": "0x6a2f6d"
+        },
+        {
+          "itemType": "FOOD",
+          "value": 40,
+          "rva": "0x6a2fc8"
+        }
+      ],
+      "localization": {
+        "event_op_worker_strike_news": "工人大罢工！",
+        "event_op_worker_strike_desc": "受近期事件影响，心怀不满的下层区工人已经罢工，食物和水的供应正受到干扰。",
+        "event_op_worker_strike_display": "工人罢工"
+      },
+      "scalarEffects": {
+        "revPowerMod": 5,
+        "civilUnrestMod": 20,
+        "isBlockByLockDown": 1
+      },
+      "name": "工人罢工",
+      "currentRule": {
+        "EventId": "ll_worker_strike",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "water": -0.13,
+          "harvest": -0.15,
+          "logistics": -0.06,
+          "commerce": -0.04
+        },
+        "Unmapped": [
+          "WATER_RATION"
+        ]
+      },
+      "assessment": "基本合理，覆盖不全",
+      "review": "新闻明确食物与水供应受干扰，相关公司下跌合理；未映射 WATER_RATION，生产及运输实际停工对象还可细分。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "rev_mobilization_secret",
+      "factory": "OperationListRev.MobilizationSecret",
+      "rva": "0x6A3020",
+      "length": "0x266",
+      "modifiers": [
+        {
+          "itemType": "WEAPON",
+          "value": 25,
+          "rva": "0x6a323e"
+        }
+      ],
+      "localization": {
+        "event_op_mob_secret_desc": "报告显示，整个下层区的神秘买家对武器的需求出现了小幅激增。",
+        "event_op_mob_secret_news": "武器需求增加"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "revPowerMod": 15
+      },
+      "name": "武器需求增加",
+      "currentRule": {
+        "EventId": "rev_mobilization_secret",
+        "Source": "builtin-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "defense": -0.12,
+          "industrial": -0.07,
+          "technology": -0.05
+        },
+        "Unmapped": []
+      },
+      "assessment": "方向需要重审",
+      "review": "原文是武器需求小幅激增。安盾 -12%、星锻 -7%、远星 -5% 符合此前反价规则，但与供应商订单增长的经营逻辑冲突，且轻微需求变化被赋予大冲击。",
+      "ruleKind": "显式配置"
+    },
+    {
+      "eventId": "rev_mobilization",
+      "factory": "OperationListRev.Mobilization",
+      "rva": "0x6A3290",
+      "length": "0x35F",
+      "modifiers": [
+        {
+          "itemType": "WEAPON",
+          "value": 40,
+          "rva": "0x6a34d7"
+        },
+        {
+          "itemType": "MEDICAL",
+          "value": 40,
+          "rva": "0x6a3536"
+        },
+        {
+          "itemType": "ARMOR",
+          "value": 40,
+          "rva": "0x6a3591"
+        }
+      ],
+      "localization": {
+        "event_op_mobilization_desc": "下层区已侦测到大规模革命活动。各革命小组正在为一场重大行动做最后准备，武器、医疗物资和护甲价格预计将会暴涨。",
+        "event_op_mobilization_news": "革命力量动员"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "revPowerMod": 40,
+        "isBlockByLockDown": 1
+      },
+      "name": "革命力量动员",
+      "currentRule": {
+        "EventId": "rev_mobilization",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "defense": -0.15,
+          "commerce": -0.12,
+          "technology": -0.06,
+          "medical": -0.14,
+          "logistics": -0.02
+        },
+        "Unmapped": []
+      },
+      "assessment": "需要分化，叠加偏重",
+      "review": "动员提高武器、医疗、护甲需求；安盾 -15%、白塔 -14% 未体现订单收益，武器与护甲累加也放大幅度；物流风险可以负向。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "rev_raid_upper_level",
+      "factory": "OperationListRev.RaidUpperLevel",
+      "rva": "0x6A3880",
+      "length": "0x283",
+      "modifiers": [
+        {
+          "itemType": "HOUSEHOLD_GOOD",
+          "value": -30,
+          "rva": "0x6a3aaa"
+        }
+      ],
+      "localization": {
+        "event_op_raid_upper_news": "革命军突袭上层区！",
+        "event_op_raid_upper_display": "革命军突袭上层区",
+        "event_op_raid_upper_desc": "革命军对上层区发动了大胆突袭，从住宅和商铺中掠夺物资，再拿到下层区出售以筹措行动经费。日用品供应预计将会增加。"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "revPowerMod": 15,
+        "upperLevelFriendlinessMod": -50,
+        "isBlockByLockDown": 1
+      },
+      "name": "革命军突袭上层区",
+      "currentRule": {
+        "EventId": "rev_raid_upper_level",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": [
+          "HOUSEHOLD_GOOD"
+        ]
+      },
+      "assessment": "覆盖缺失",
+      "review": "原版日用品供给增加、HOUSEHOLD_GOOD -30%，当前无映射；应区分下层渠道进货收益与遭劫经营者损失。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "raid_security",
+      "factory": "OperationListRev.RaidSecurity",
+      "rva": "0x6A35F0",
+      "length": "0x28D",
+      "modifiers": [
+        {
+          "itemType": "MEDICAL",
+          "value": 75,
+          "rva": "0x6a381a"
+        }
+      ],
+      "localization": {
+        "event_op_raid_sec_display": "革命军突袭治安部",
+        "event_op_raid_sec_desc": "革命军伏击了治安部在下层区的一处主要据点。冲突造成双方伤亡，也殃及了被卷入交火的下层区居民，致使医疗物资需求上升，治安部的影响力减弱。",
+        "event_op_raid_sec_news": "革命军突袭治安部！"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "revPowerMod": -25,
+        "secPowerMod": -35,
+        "civilUnrestMod": 15,
+        "isBlockByLockDown": 1
+      },
+      "name": "革命军突袭治安部",
+      "currentRule": {
+        "EventId": "raid_security",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "medical": -0.15,
+          "commerce": -0.075,
+          "logistics": -0.0375
+        },
+        "Unmapped": []
+      },
+      "assessment": "需要分化",
+      "review": "交火与伤亡增加医疗需求，白塔却 -15%；对运输、普通商贸的风险与医疗供应商收益应分开。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "sec_increase_patrols",
+      "factory": "OperationListSec.IncreasePatrols",
+      "rva": "0x6A3E90",
+      "length": "0x1EF",
+      "modifiers": [],
+      "localization": {
+        "event_op_patrols_desc": "治安部暂时扩大了巡逻范围，并在下层区各处增设检查站。部分革命军和黑市活动受到压制，下层区也恢复了些许秩序。",
+        "event_op_patrols_display": "加强巡逻与检查站",
+        "event_op_patrols_news": "治安巡逻全面加强！"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "revPowerMod": -15,
+        "bmPowerMod": -15,
+        "secPowerMod": -20,
+        "civilUnrestMod": -40
+      },
+      "name": "加强巡逻与检查站",
+      "currentRule": {
+        "EventId": "sec_increase_patrols",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "可补充玩法",
+      "review": "原版无直接价格修正，但检查站限制灰色流通、改善秩序；可给合规经营与灰色渠道相反影响。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "crackdown",
+      "factory": "OperationListSec.Crackdown",
+      "rva": "0x6A3CE0",
+      "length": "0x1AC",
+      "modifiers": [],
+      "localization": {
+        "event_op_crackdown_desc": "鉴于黑市活动日益猖獗、大量非法货物流入空间站，指挥部已宣布全面严打违禁品。即刻起，所有区域将实施更严格的盘查。",
+        "event_op_crackdown_news": "全站严打"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "bmPowerMod": -40,
+        "secPowerMod": -20,
+        "civilUnrestMod": -20
+      },
+      "name": "全站严打",
+      "currentRule": {
+        "EventId": "crackdown",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "可补充玩法",
+      "review": "全站严查违禁品，没有直接商品调价，当前股票为 0；灰色渠道风险可单独建立规则。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "sec_raid_black_market",
+      "factory": "OperationListSec.RaidBlackMarket",
+      "rva": "0x6A4280",
+      "length": "0x30F",
+      "modifiers": [
+        {
+          "itemType": "NARCOTIC",
+          "value": 50,
+          "rva": "0x6a44e6"
+        },
+        {
+          "itemType": "WEAPON",
+          "value": 40,
+          "rva": "0x6a4547"
+        }
+      ],
+      "localization": {
+        "event_op_raid_bm_desc": "治安部队突袭了多处黑市窝点，查获大量武器和毒品，令非法贸易难以开展。",
+        "event_op_raid_bm_news": "黑市遭突袭！",
+        "event_op_raid_bm_display": "治安部突袭黑市"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "secPowerMod": -15,
+        "bmPowerMod": -40,
+        "civilUnrestMod": -10
+      },
+      "name": "治安部突袭黑市",
+      "currentRule": {
+        "EventId": "sec_raid_black_market",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "defense": -0.13,
+          "commerce": -0.04,
+          "technology": -0.03
+        },
+        "Unmapped": [
+          "NARCOTIC"
+        ]
+      },
+      "assessment": "方向有依据，角色需明确",
+      "review": "黑市货物被查使渠道受损，负向可解释；正规防务供应商未必同样受损。NARCOTIC +50% 未映射，当前只计算 WEAPON。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "sec_raid_revolution",
+      "factory": "OperationListSec.RaidRevolution",
+      "rva": "0x6A4590",
+      "length": "0x1E5",
+      "modifiers": [],
+      "localization": {
+        "event_op_raid_rev_desc": "治安部突袭了一处已经暴露的革命军安全屋。人员被捕、物资被没收，革命力量因此遭到削弱。",
+        "event_op_raid_rev_display": "突袭革命军",
+        "event_op_raid_rev_news": "革命军藏身处遭捣毁！"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "secPowerMod": -20,
+        "revPowerMod": -40,
+        "civilUnrestMod": 0
+      },
+      "name": "突袭革命军",
+      "currentRule": {
+        "EventId": "sec_raid_revolution",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "直接为零可接受",
+      "review": "原版主要影响阵营力量，无直接商品调价；是否增加防务订单或风险溢价属于额外设计，不能仅凭新闻标题定数值。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "sec_martial_law",
+      "factory": "OperationListSec.MartialLaw",
+      "rva": "0x6A4080",
+      "length": "0x1F6",
+      "modifiers": [],
+      "localization": {
+        "event_op_martial_law_desc": "受近期事件影响，下层区已全面戒严。宵禁、检查站和监控遍布整个区域，革命军与黑市活动受到压制。",
+        "event_op_martial_law_display": "戒严",
+        "event_op_martial_law_news": "宣布戒严！"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "secPowerMod": -50,
+        "revPowerMod": -50,
+        "bmPowerMod": -50,
+        "civilUnrestMod": -50,
+        "isLockDown": 1
+      },
+      "name": "戒严",
+      "currentRule": {
+        "EventId": "sec_martial_law",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "明显遗漏重大风险",
+      "review": "原版明确 isLockDown=true，宵禁与检查站干扰经营，当前直接股价影响仍为 0。优先补充物流与商贸规则。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "sec_budget_increase",
+      "factory": "OperationListSec.BudgetIncrease",
+      "rva": "0x6A3B10",
+      "length": "0x1C5",
+      "modifiers": [],
+      "localization": {
+        "event_op_budget_increase_news": "治安部预算增加",
+        "event_op_budget_increase_desc": "指挥部大幅增加了治安部的预算，使其能够开展更多行动。"
+      },
+      "scalarEffects": {
+        "isFactionOperation": 1,
+        "secPowerMod": 50
+      },
+      "name": "治安部预算增加",
+      "currentRule": {
+        "EventId": "sec_budget_increase",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "可补充玩法",
+      "review": "预算增加无直接调价；安盾和设备供应商可能获得订单，当前没有体现，订单关联属于推断。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "ul_medical_aid",
+      "factory": "OperationListUL.MedicalAid",
+      "rva": "0x6A49D0",
+      "length": "0x2E2",
+      "modifiers": [
+        {
+          "itemType": "MEDICAL",
+          "value": -25,
+          "rva": "0x6a4c09"
+        },
+        {
+          "itemType": "FOOD",
+          "value": -10,
+          "rva": "0x6a4c6a"
+        }
+      ],
+      "localization": {
+        "event_op_medical_aid_desc": "上层区慈善机构向下层区增派了医护人员，并调拨了额外的医疗物资。尽管一些居民仍持怀疑态度，这项援助还是缓解了动荡。",
+        "event_op_medical_aid_display": "紧急医疗援助",
+        "event_op_medical_aid_news": "医疗援助已发放！"
+      },
+      "scalarEffects": {
+        "revPowerMod": -10,
+        "civilUnrestMod": -20,
+        "upperLevelFriendlinessMod": -25
+      },
+      "name": "紧急医疗援助",
+      "currentRule": {
+        "EventId": "ul_medical_aid",
+        "Source": "derived-price",
+        "DirectionVersion": 2,
+        "Impacts": {
+          "medical": 0.0875,
+          "commerce": 0.035,
+          "logistics": 0.02,
+          "harvest": 0.0325
+        },
+        "Unmapped": []
+      },
+      "assessment": "需要分化",
+      "review": "免费医疗物资与人员到位缓解供应，当前白塔 +8.75%；商业药品销售也可能受免费供给挤压。贸易环境改善和企业收入变化需分别解释。",
+      "ruleKind": "自动推导"
+    },
+    {
+      "eventId": "ul_household_relief",
+      "factory": "OperationListUL.HouseholdRelief",
+      "rva": "0x6A4780",
+      "length": "0x24C",
+      "modifiers": [
+        {
+          "itemType": "HOUSEHOLD_GOOD",
+          "value": -40,
+          "rva": "0x6a498e"
+        }
+      ],
+      "localization": {
+        "event_op_household_relief_display": "日用品救济行动",
+        "event_op_household_relief_news": "日用品援助已发放！",
+        "event_op_household_relief_desc": "上层区一家慈善机构向下层区居民慷慨捐赠了一批生活必需品。尽管一些人对其动机持有怀疑态度，但这批援助应该有助于改善生活条件，并安抚日益增长的不安情绪。"
+      },
+      "scalarEffects": {
+        "upperLevelFriendlinessMod": -20,
+        "civilUnrestMod": -15
+      },
+      "name": "日用品救济行动",
+      "currentRule": {
+        "EventId": "ul_household_relief",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": [
+          "HOUSEHOLD_GOOD"
+        ]
+      },
+      "assessment": "覆盖缺失",
+      "review": "日用品免费援助令 HOUSEHOLD_GOOD -40%，当前无映射，直接股价影响为 0。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "lottery_draw",
+      "factory": "EventListSpecial.LotteryDraw",
+      "rva": "0x6914F0",
+      "length": "0x1FB",
+      "modifiers": [],
+      "localization": {
+        "event_lottery_draw_news": "彩票开奖！",
+        "event_lottery_draw_display": "彩票开奖",
+        "event_lottery_draw_desc": "开奖号码是{0}！请向彩票代表兑奖！彩票号码只要至少有3位与开奖号码相符，就能赢得奖金！祝你好运！"
+      },
+      "scalarEffects": {},
+      "name": "彩票开奖",
+      "currentRule": {
+        "EventId": "lottery_draw",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "当前无直接规则",
+      "review": "工厂无商品调价，Mod 无显式影响表；后续 Action 或顾客行为可能产生间接影响，本次未执行游戏验证。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "Wanted3CapturedEvent",
+      "factory": "EventListUnique.Wanted3CapturedEvent",
+      "rva": "0x6918A0",
+      "length": "0x115",
+      "modifiers": [],
+      "localization": {
+        "event_wanted3_news": "下层区革命军被捕！",
+        "event_wanted3_desc": "空间站治安部迅速采取行动，逮捕了知名活动人士亚瑟·拉弗勒。此人曾是下层区历次失败革命中的领导层成员。"
+      },
+      "scalarEffects": {},
+      "name": "下层区革命军被捕！",
+      "currentRule": {
+        "EventId": "Wanted3CapturedEvent",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "当前无直接规则",
+      "review": "工厂无商品调价，Mod 无显式影响表；后续 Action 或顾客行为可能产生间接影响，本次未执行游戏验证。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "evidenceLockerBreakIn",
+      "factory": "EventListUnique.CreateEvidenceLockerBreakIn",
+      "rva": "0x6916F0",
+      "length": "0x1A1",
+      "modifiers": [],
+      "localization": {
+        "event_evidence_locker_news": "证物库失窃！",
+        "event_evidence_locker_desc": "空间站中央证物库发生了一起骇人听闻的入侵事件，令治安部焦头烂额。据报道，一箱被没收的违禁品现已失踪，其中包含某项正在调查的案件的关键证据。治安部已警告下层区居民，严密留意流入市面的可疑物品。"
+      },
+      "scalarEffects": {},
+      "name": "证物库失窃！",
+      "currentRule": {
+        "EventId": "evidenceLockerBreakIn",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "当前无直接规则",
+      "review": "工厂无商品调价，Mod 无显式影响表；后续 Action 或顾客行为可能产生间接影响，本次未执行游戏验证。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "allQuiet",
+      "factory": "EventListCosmetic.AllQuiet",
+      "rva": "0x675E50",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_all_quiet_news": "下层区风平浪静",
+        "event_cosmetic_all_quiet_desc": "下层区今日出奇地安静，未接到重大事件报告。市场维持稳定，居民生活一如往常。"
+      },
+      "scalarEffects": {},
+      "name": "下层区风平浪静",
+      "currentRule": {
+        "EventId": "allQuiet",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "ScheduledEletricalMaintenance",
+      "factory": "EventListCosmetic.ScheduledEletricalMaintenance",
+      "rva": "0x676AB0",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_electrical_news": "电力计划检修",
+        "event_cosmetic_electrical_desc": "因例行电力检修作业开始实施，上层区将会临时停电。"
+      },
+      "scalarEffects": {},
+      "name": "电力计划检修",
+      "currentRule": {
+        "EventId": "ScheduledEletricalMaintenance",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "NutrifruitGrow",
+      "factory": "EventListCosmetic.NutrifruitGrow",
+      "rva": "0x676630",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_nutrifruit_news": "都有好果子吃！",
+        "event_cosmetic_nutrifruit_desc": "下层区的一群维护技术员联合开发了一套低成本水培系统，能够稳定地小规模持续产出营养果。"
+      },
+      "scalarEffects": {},
+      "name": "都有好果子吃！",
+      "currentRule": {
+        "EventId": "NutrifruitGrow",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "PeatContent",
+      "factory": "EventListCosmetic.PeatContent",
+      "rva": "0x676750",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_peat_news": "“泥炭”肉罐头里到底有多少肉？",
+        "event_cosmetic_peat_desc": "作为下层区家家户户厨房必备的加工肉罐头食品，“泥炭”正面临着严密调查。独立研究人员正对该产品中实际的含肉量提出质疑。"
+      },
+      "scalarEffects": {},
+      "name": "“泥炭”肉罐头里到底有多少肉？",
+      "currentRule": {
+        "EventId": "PeatContent",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "RecyclingAwarenessCampaign",
+      "factory": "EventListCosmetic.RecyclingAwarenessCampaign",
+      "rva": "0x676870",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_recycling_news": "回收宣传活动启动",
+        "event_cosmetic_recycling_desc": "中层区发起了一场小规模的垃圾回收宣传活动，以鼓励妥善处理废弃物。预计该活动不会产生任何实际效果。"
+      },
+      "scalarEffects": {},
+      "name": "回收宣传活动启动",
+      "currentRule": {
+        "EventId": "RecyclingAwarenessCampaign",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "ArtistShowcase",
+      "factory": "EventListCosmetic.ArtistShowcase",
+      "rva": "0x676090",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_artist_showcase_news": "本地艺术家作品展",
+        "event_cosmetic_artist_showcase_desc": "下层区正在举办一场本地艺术家作品展，居民们可以在这里观赏并购买由空间站回收材料制成的艺术品。"
+      },
+      "scalarEffects": {},
+      "name": "本地艺术家作品展",
+      "currentRule": {
+        "EventId": "ArtistShowcase",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "MaintenanceCrewStrike",
+      "factory": "EventListCosmetic.MaintenanceCrewStrike",
+      "rva": "0x6763F0",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_maintenance_strike_news": "维护工短暂罢工结束",
+        "event_cosmetic_maintenance_strike_desc": "维护人员的短暂罢工已得到解决，未接到严重延误或损失的报告。目前各项工作已恢复正常。"
+      },
+      "scalarEffects": {},
+      "name": "维护工短暂罢工结束",
+      "currentRule": {
+        "EventId": "MaintenanceCrewStrike",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "TechDemoDay",
+      "factory": "EventListCosmetic.TechDemoDay",
+      "rva": "0x676BD0",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_tech_demo_news": "窥见未来！",
+        "event_cosmetic_tech_demo_desc": "上层区组织了一场科技展，展示了初创公司和科技企业的最新创新成果。展出的大多数产品均面向高端买家。"
+      },
+      "scalarEffects": {},
+      "name": "窥见未来！",
+      "currentRule": {
+        "EventId": "TechDemoDay",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "NewTransitLine",
+      "factory": "EventListCosmetic.NewTransitLine",
+      "rva": "0x676510",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_transit_news": "中层区新交通线开通",
+        "event_cosmetic_transit_desc": "中层区开通了一条新的交通线，将多个住宅区与一个商业中心连接起来。交通条件的改善预计将略微缓解中层区居民的通勤压力。"
+      },
+      "scalarEffects": {},
+      "name": "中层区新交通线开通",
+      "currentRule": {
+        "EventId": "NewTransitLine",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "WaterFountainUnveiled",
+      "factory": "EventListCosmetic.WaterFountainUnveiled",
+      "rva": "0x676CF0",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_fountain_news": "装饰性喷泉公开亮相！",
+        "event_cosmetic_fountain_desc": "作为空间站美化工程的一部分，上层区落成了一座新喷泉。治安部已发出提醒，任何被发现饮用喷泉水的公民都将被逮捕并处以罚款。"
+      },
+      "scalarEffects": {},
+      "name": "装饰性喷泉公开亮相！",
+      "currentRule": {
+        "EventId": "WaterFountainUnveiled",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "CommunityGardenExpansion",
+      "factory": "EventListCosmetic.CommunityGardenExpansion",
+      "rva": "0x6761B0",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_garden_news": "下层区公共园圃扩建",
+        "event_cosmetic_garden_desc": "下层区居民扩建了他们的公共园圃，增加了几块用于种植基础蔬菜的新区域。此举不太可能影响食物价格。"
+      },
+      "scalarEffects": {},
+      "name": "下层区公共园圃扩建",
+      "currentRule": {
+        "EventId": "CommunityGardenExpansion",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "ArtContestHeld",
+      "factory": "EventListCosmetic.ArtContestHeld",
+      "rva": "0x675F70",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_art_contest_news": "中层区举办艺术比赛",
+        "event_cosmetic_art_contest_desc": "中层区某社区中心举办了一场艺术比赛，邀请居民们投稿自己的创作，优秀作品将在公共场所展示一周。"
+      },
+      "scalarEffects": {},
+      "name": "中层区举办艺术比赛",
+      "currentRule": {
+        "EventId": "ArtContestHeld",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "CulturalCelebration",
+      "factory": "EventListCosmetic.CulturalCelebration",
+      "rva": "0x6762D0",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_cultural_news": "上层区举办文化庆典",
+        "event_cosmetic_cultural_desc": "某上层区文化组织正举办一场小型庆祝活动，内容包括传统表演、音乐和美食。该活动主要由上层区居民参加，对市场影响甚微。"
+      },
+      "scalarEffects": {},
+      "name": "上层区举办文化庆典",
+      "currentRule": {
+        "EventId": "CulturalCelebration",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "RoutineSpacewalkTraining",
+      "factory": "EventListCosmetic.RoutineSpacewalkTraining",
+      "rva": "0x676990",
+      "length": "0x11C",
+      "modifiers": [],
+      "localization": {
+        "event_cosmetic_spacewalk_news": "例行舱外活动训练演习",
+        "event_cosmetic_spacewalk_desc": "针对空间站技术人员的例行舱外活动训练演习已顺利完成，未对空间站的日常活动造成干扰。据报道，下层区的一名男子错把进行舱外活动的人员当成了外星人而当场休克，目前正在接受治疗。"
+      },
+      "scalarEffects": {},
+      "name": "例行舱外活动训练演习",
+      "currentRule": {
+        "EventId": "RoutineSpacewalkTraining",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "原版定位为背景新闻，没有直接调价；部分正文也明确市场影响甚微。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "rent_day",
+      "factory": "EventListInnate.CreateRentDayEvent",
+      "rva": "0x6770F0",
+      "length": "0x167",
+      "modifiers": [],
+      "localization": {
+        "event_rent_due": "交租日"
+      },
+      "scalarEffects": {},
+      "name": "交租日",
+      "currentRule": {
+        "EventId": "rent_day",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "属于玩家付款或特定顾客流程；不应直接当作全市场经营数据。相关真实商品成交另行计入。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "mortgage_payment",
+      "factory": "EventListInnate.CreateMortgagePaymentEvent",
+      "rva": "0x676F80",
+      "length": "0x167",
+      "modifiers": [],
+      "localization": {
+        "event_mortgage_payment": "按揭还款"
+      },
+      "scalarEffects": {},
+      "name": "按揭还款",
+      "currentRule": {
+        "EventId": "mortgage_payment",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "属于玩家付款或特定顾客流程；不应直接当作全市场经营数据。相关真实商品成交另行计入。",
+      "ruleKind": "未映射"
+    },
+    {
+      "eventId": "cartel_visit",
+      "factory": "EventListInnate.CreateCartelVisitEvent",
+      "rva": "0x676E10",
+      "length": "0x167",
+      "modifiers": [],
+      "localization": {
+        "event_cartel_visit": "卡特尔来访"
+      },
+      "scalarEffects": {},
+      "name": "卡特尔来访",
+      "currentRule": {
+        "EventId": "cartel_visit",
+        "Source": "none",
+        "DirectionVersion": 0,
+        "Impacts": {},
+        "Unmapped": []
+      },
+      "assessment": "合理保持无直接影响",
+      "review": "属于玩家付款或特定顾客流程；不应直接当作全市场经营数据。相关真实商品成交另行计入。",
+      "ruleKind": "未映射"
+    }
+  ]
+}

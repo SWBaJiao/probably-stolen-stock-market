@@ -5,7 +5,7 @@ static class BrokerIntroductionTests
 {
     static MarketEngine Engine()
     {
-        var config = MarketConfig.CreateDefault();
+        var config = TestConfig.Create();
         config.Events.Clear();
         config.Events.Add(new EventRule { EventId = "intro-event", Sectors = new() { "water" }, Impacts = new() { ["water"] = .1m } });
         var engine = new MarketEngine(config);

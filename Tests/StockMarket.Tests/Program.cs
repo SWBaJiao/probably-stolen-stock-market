@@ -15,7 +15,7 @@ void Check(bool ok, string description)
 }
 MarketEngine Engine()
 {
-    var c = MarketConfig.CreateDefault();
+    var c = TestConfig.Create();
     // 通用旧场景只验证原有交易、存档和图表；持续事件行为由专用生命周期用例覆盖。
     c.EventContinuationScale = 0m;
     c.EventShockWindowDays = 1;
@@ -123,7 +123,7 @@ var invalid = false;
 try { MarketEngine.Deserialize("{\"Version\":99}", engine.Config); } catch (ArgumentException) { invalid = true; }
 Check(invalid, "未知存档版本拒绝加载");
 invalid = false;
-try { var c = MarketConfig.CreateDefault(); c.Sectors[0].Weights["harvest"] = .9m; c.Validate(); } catch (ArgumentException) { invalid = true; }
+try { var c = TestConfig.Create(); c.Sectors[0].Weights["harvest"] = .9m; c.Validate(); } catch (ArgumentException) { invalid = true; }
 Check(invalid, "配置权重异常拒绝启用");
 engine = Engine();
 engine.Config.DailyLimit = 0m; engine.AdvanceDay(1);
@@ -133,7 +133,7 @@ engine.State.Companies["water"].Price = .01m;
 engine.State.Positions["water"].Quantity = 1;
 Check(!engine.QuoteOrder("water", OrderSide.Sell, 1, 1000).Success, "拒绝手续费超过卖出收入的订单");
 invalid = false;
-try { var c = MarketConfig.CreateDefault(); c.Events.Add(null!); c.Validate(); } catch (ArgumentException) { invalid = true; }
+try { var c = TestConfig.Create(); c.Events.Add(null!); c.Validate(); } catch (ArgumentException) { invalid = true; }
 Check(invalid, "配置含空事件时清晰拒绝启用");
 engine = Engine();
 var other = Engine();
@@ -173,7 +173,7 @@ var relatedConfidence = Reliability(.75m, new[] { "water" });
 Check(baseConfidence == .75m && relatedConfidence == .85m, "身份基准加相关行业十个百分点");
 Check(Reliability(.75m, new[] { "water" }, correct: 1) > relatedConfidence && Reliability(.75m, new[] { "water" }, incorrect: 1) < relatedConfidence, "历史正确与错误分别提升和降低后续可信度");
 Check(Reliability(.9m, new[] { "water" }, correct: 100) == .9m && Reliability(.2m, Array.Empty<string>(), incorrect: 100) == .2m, "内幕可信度始终限制在百分之二十至九十");
-var configuredHints = MarketConfig.CreateDefault();
+var configuredHints = TestConfig.Create();
 var hintEngine = new MarketEngine(configuredHints);
 Check(configuredHints.Events.All(rule => !string.IsNullOrWhiteSpace(rule.TrueHint) && !string.IsNullOrWhiteSpace(rule.FalseHint) && rule.TrueHint != rule.FalseHint && !hintEngine.BuildRumorHint(rule, true).Contains(rule.Description) && !hintEngine.BuildRumorHint(rule, false).Contains(rule.Description)), "默认事件提供相反供需的模糊陈述且不复制真实事件标题");
 var fallbackRule = new EventRule { EventId = "private-test", Description = "绝密事件标题", Sectors = new() { "medical" }, Impacts = new() { ["medical"] = .1m } };
@@ -230,7 +230,7 @@ engine.ActivateEvent("candle-rise", "8/up", 8);
 engine.ActivateEvent("candle-drop", "8/down", 8);
 engine.RecordTrade("candle-customer", "candle-trade", new[] { "WATER" }, 1000m);
 engine.CloseCustomer("candle-customer");
-Check(currentCandle.Open == 100m && currentCandle.High == 110m && currentCandle.Low == 88m && currentCandle.Close == 88m && candles.Count == 2, "同日事件更新高低收但顾客成交只留作次日信号");
+Check(currentCandle.Open == 100m && currentCandle.High == 110m && currentCandle.Low == 90m && currentCandle.Close == 90m && candles.Count == 2, "同日事件更新高低收但顾客成交只留作次日信号");
 var beforeDuplicate = engine.Serialize();
 engine.AdvanceDay(8); engine.ActivateEvent("candle-rise", "8/up", 8); engine.CloseCustomer("candle-customer");
 Check(engine.Serialize() == beforeDuplicate, "重复日事件和遣散回调不重复更新日 K 线");
@@ -323,7 +323,7 @@ try
 catch (ArgumentException) { invalid = true; }
 Check(invalid, "分时样本混入其他日期时拒绝损坏存档");
 BrokerTests.Run(Check);
-var openConfig = MarketConfig.CreateDefault();
+var openConfig = TestConfig.Create();
 var openMarket = new MarketEngine(openConfig);
 openMarket.ApplyStorageAccess(false);
 var openWallet = new Wallet { Cash = 1000 };
@@ -333,7 +333,7 @@ var openedSnapshot = openMarket.Serialize();
 var openWrites = 0;
 var openedFailure = openMarket.PlaceOrder("water", OrderSide.Buy, 1, openWallet, () => { if (openWrites++ == 0) throw new IOException("模拟开放交易后的保存失败"); });
 Check(!openedFailure.Success && openWallet.Cash == 998 && openMarket.Serialize() == openedSnapshot, "默认开放交易的资金与持仓失败回滚仍然生效");
-var strictConfig = MarketConfig.CreateDefault(); strictConfig.RequireSaveReloadVerification = true;
+var strictConfig = TestConfig.Create(); strictConfig.RequireSaveReloadVerification = true;
 var strictMarket = new MarketEngine(strictConfig);
 strictMarket.ApplyStorageAccess(false);
 Check(!strictMarket.State.StorageVerified && !strictMarket.PlaceOrder("water", OrderSide.Buy, 1, new Wallet { Cash = 1000 }, () => { }).Success, "严格模式未确认保存重读时继续拒绝交易");
@@ -351,6 +351,8 @@ EventShockTimingTests.Run(Check);
 EventDirectionTests.Run(Check);
 MultiBrokerTests.Run(Check);
 SharedBrokerPhoneTests.Run(Check);
+StockScenarioTests.Run(Check);
+StockEventTests.Run(Check);
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet

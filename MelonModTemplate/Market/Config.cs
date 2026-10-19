@@ -5,8 +5,19 @@ using System.Text.Json;
 
 namespace MelonModTemplate.Market;
 
-public sealed class MarketConfig
+public sealed partial class MarketConfig
 {
+    public bool EnableStockEvents { get; set; } = true;
+    public int StockScheduleDays { get; set; } = 7;
+    public int StockEventIntervalMinDays { get; set; } = 2;
+    public int StockEventIntervalMaxDays { get; set; } = 4;
+    public int StockTemplateCooldownDays { get; set; } = 14;
+    public int StockDurationMinDays { get; set; } = 2;
+    public int StockDurationMaxDays { get; set; } = 4;
+    public decimal StockIntensityMin { get; set; } = .80m;
+    public decimal StockIntensityMax { get; set; } = 1.20m;
+    public decimal EventShockDailyLimit { get; set; } = .15m;
+    public List<StockEventTemplate> StockEventTemplates { get; set; } = CreateStockEventTemplates();
     public bool RequireSaveReloadVerification { get; set; }
     public decimal InitialPrice { get; set; } = 100m;
     public decimal DailyLimit { get; set; } = .03m;
@@ -95,7 +106,18 @@ public sealed class MarketConfig
     }
 
     public string Serialize() => JsonSerializer.Serialize(this, MarketEngine.JsonOptions);
-    public static MarketConfig Deserialize(string json) { var c = JsonSerializer.Deserialize<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空"); c.UpgradeLegacyDefaultEventRules(); c.UpgradeLegacyCompanyDescriptions(); c.Validate(); return c; }
+    public static MarketConfig Deserialize(string json)
+    {
+        var c = JsonSerializer.Deserialize<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空");
+        using var document = JsonDocument.Parse(json);
+        // 旧自定义公司与行业列表只获得完整可用的新模板，不补改用户的业务定义。
+        if (!document.RootElement.TryGetProperty(nameof(StockEventTemplates), out _) && c.Companies != null && c.Sectors != null)
+        {
+            c.StockEventTemplates = c.StockEventTemplates.Where(t => t.Impacts.Keys.All(id => c.Companies.Any(x => x?.Id == id)) && t.Sectors.All(id => c.Sectors.Any(x => x?.Id == id))).ToList();
+            if (c.StockEventTemplates.Count == 0) c.EnableStockEvents = false;
+        }
+        c.UpgradeLegacyDefaultEventRules(); c.UpgradeLegacyCompanyDescriptions(); c.Validate(); return c;
+    }
     // 只替换原有短介绍；公司数值、行业映射及玩家自写的故事均不参与本次升级。
     public bool UpgradeLegacyCompanyDescriptions()
     {
@@ -128,6 +150,7 @@ public sealed class MarketConfig
 
     public void Validate()
     {
+        ValidateStockConfiguration();
         if (TradeDailyLimit < 0 || TradeDailyLimit > .2m) throw new ArgumentException("每日成交影响幅度无效");
         if (EventShockWindowDays < 1 || EventShockWindowDays > 3650 || EventPreheatChance < 0 || EventPreheatChance > 1 || EventPreheatScale < 0 || EventPreheatScale > 1 || EventPreheatLimit < 0 || EventPreheatLimit > .1m) throw new ArgumentException("事件冲击窗口与预热参数无效");
         if (EventContinuationScale < 0 || EventContinuationScale > 1 || EventContinuationLimit < 0 || EventContinuationLimit > .1m || EventContinuationBudget < 0 || EventContinuationBudget > 1 || EventRecoveryRate <= 0 || EventRecoveryRate > 1 || EventDailyDriftLimit < 0 || EventDailyDriftLimit > .1m || EventRetentionMin <= 0 || EventRetentionMax >= 1 || EventRetentionMin > EventRetentionMax) throw new ArgumentException("事件持续与保留参数无效");

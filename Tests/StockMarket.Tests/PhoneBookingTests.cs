@@ -6,7 +6,7 @@ static class PhoneBookingTests
 {
     static MarketEngine Engine()
     {
-        var config = MarketConfig.CreateDefault();
+        var config = TestConfig.Create();
         config.Events.Clear();
         config.Events.Add(new EventRule { EventId = "phone-private-event", Description = "电话不应透露的事件标题", Sectors = new() { "weapons" }, Impacts = new() { ["defense"] = .1m, ["commerce"] = -.05m } });
         var engine = new MarketEngine(config);

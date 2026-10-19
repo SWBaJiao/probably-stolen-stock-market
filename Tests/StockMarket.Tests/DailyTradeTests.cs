@@ -6,7 +6,7 @@ static class DailyTradeTests
 {
     static MarketEngine Engine()
     {
-        var config = MarketConfig.CreateDefault();
+        var config = TestConfig.Create();
         config.DailyLimit = 0m; config.EventShockWindowDays = 1;
         var engine = new MarketEngine(config);
         engine.ApplyStorageAccess(false); engine.AdvanceDay(1);
@@ -17,7 +17,7 @@ static class DailyTradeTests
     static bool EqualPrices(MarketEngine a, MarketEngine b) => a.State.Companies.All(c => c.Value.Price == b.State.Companies[c.Key].Price);
     public static void Run(Action<bool, string> check)
     {
-        var unknownDay = new MarketEngine(MarketConfig.CreateDefault());
+        var unknownDay = new MarketEngine(TestConfig.Create());
         string? diagnosis = null; unknownDay.Diagnostic = message => diagnosis = message;
         check(!unknownDay.RecordTrade("no-day", "x", new[] { "water" }, 1000m) && unknownDay.State.Sessions.Count == 0 && diagnosis?.Contains("日期") == true, "尚未接入游戏日的成交拒绝猜测日期并输出诊断");
         var e = Engine(); var control = Clone(e);
@@ -76,11 +76,11 @@ static class DailyTradeTests
         }
         e = Engine(); e.Config.Events.Add(new EventRule { EventId = "shock", Impacts = new() { ["water"] = .2m } });
         e.ActivateEvent("shock", "once", 1);
-        check(e.State.Companies["water"].Price == 120m && e.State.Companies["water"].IntradayPoints.Last().Reason != "每日行情", "事件仍在激活时独立大幅跳价且不受日常百分之三限制");
+        check(e.State.Companies["water"].Price == 115m && e.State.Companies["water"].IntradayPoints.Last().Reason != "每日行情", "事件仍在激活时独立大幅跳价且不受日常百分之三限制");
 
-        var oldConfigJson = JsonNode.Parse(MarketConfig.CreateDefault().Serialize())!; oldConfigJson.AsObject().Remove("TradeDailyLimit");
+        var oldConfigJson = JsonNode.Parse(TestConfig.Create().Serialize())!; oldConfigJson.AsObject().Remove("TradeDailyLimit");
         check(MarketConfig.Deserialize(oldConfigJson.ToJsonString()).TradeDailyLimit == .02m, "旧本地配置缺少新字段时自动采用百分之二成交影响上限");
-        var legacyConfig = MarketConfig.CreateDefault();
+        var legacyConfig = TestConfig.Create();
         var legacy = new MarketState { LastDay = 1, Companies = legacyConfig.Companies.ToDictionary(c => c.Id, _ => new CompanyState()), Sessions = new() { ["pending"] = new CustomerSession { Signals = new() { ["medical"] = 700m }, TradeIds = new() { "legacy-trade" } }, ["closed"] = new CustomerSession { Closed = true, Signals = new() { ["water"] = 650m } } } };
         legacy.Companies["water"].Price = 101m;
         var legacyJson = JsonNode.Parse(JsonSerializer.Serialize(legacy, MarketEngine.JsonOptions))!;

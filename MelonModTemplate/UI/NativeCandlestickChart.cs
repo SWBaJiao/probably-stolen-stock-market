@@ -38,6 +38,7 @@ public sealed class NativeCandlestickChart : IDisposable
     private float _previousWidth = -1, _previousHeight = -1;
     private bool _hasRendered, _disposed, _faulted;
     private ChartHoverOverlay? _hover;
+    private Func<int, string>? _publicEventSummary;
     private HoverRect _hoverPlot;
     private bool _hoverReady, _hoverWarned;
 
@@ -292,6 +293,9 @@ public sealed class NativeCandlestickChart : IDisposable
 
     public void HideHover() => _hover?.Hide(this);
 
+    // 仅由面板提供已公开新闻，图表不读取未来排程或内幕真值。
+    public void SetPublicEventSummary(Func<int, string>? summary) => _publicEventSummary = summary;
+
     public void TickHover()
     {
         if (_disposed || _hover == null) return;
@@ -307,6 +311,8 @@ public sealed class NativeCandlestickChart : IDisposable
             var text = $"第 {candle.Day} 日" + (candle.Day == _previousCurrentDay ? " · 当日未收盘" : "")
                 + $"\n开 {KnownPrice(candle.Open)}    高 {KnownPrice(candle.High)}\n低 {KnownPrice(candle.Low)}    收 {Price(candle.Close)}";
             if (!candle.IsComplete) text += "\n旧档或首次接入记录不完整；未知开高低显示 —。";
+            var news = _publicEventSummary?.Invoke(candle.Day);
+            if (!string.IsNullOrWhiteSpace(news)) text += "\n公开事件：" + news;
             var guideX = (float)(_hoverPlot.X + (index + .5) * _hoverPlot.Width / _previous.Length);
             _hover.Show(this, _rect, _hoverPlot, guideX, text, screen, camera);
         }
@@ -324,6 +330,7 @@ public sealed class NativeCandlestickChart : IDisposable
     {
         if (_disposed) return;
         _disposed = true;
+        _publicEventSummary = null;
         try { _hover?.Release(this); } catch (Exception ex) { HoverWarning(ex); }
         _hover = null;
         // 只销毁本图的对象树；字体与材质属于游戏，不能释放。

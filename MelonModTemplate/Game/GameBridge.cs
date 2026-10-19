@@ -104,6 +104,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
             _intelCalendar = new IntelCalendarAdapter(this, _intelDelivery, _log);
             _broker = new IntelBrokerAdapter(this, _log);
             _intelPhone = new IntelPhoneAdapter(this, _log);
+            _intelDelivery.Initialize(harmony);
             _broker.Initialize(harmony);
             _intelCalendar.Initialize(harmony);
             _intelPhone.Initialize(harmony);
@@ -385,6 +386,8 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
     private IReadOnlyList<ScheduledEvent> ScheduledEvents()
     {
         var result = new List<ScheduledEvent>();
+        // 专用事件由正常日期推进生成，此处只读取既定排程，电话和购买不会临时造事件。
+        if (Engine != null) result.AddRange(Engine.GetStockScheduledEvents());
         var manager = StoreStation.Instance?.storeEventManager;
         if (manager?.futurEvents == null || manager.futurEventsDay == null) return result;
         for (int i = 0; i < Math.Min(manager.futurEvents.Count, manager.futurEventsDay.Count); i++)
@@ -396,7 +399,7 @@ public sealed class GameBridge : IMarketHost, IWallet, IDisposable
                 result.Add(new ScheduledEvent { EventId = e.identifier, Day = day, OccurrenceKey = Occurrence(e.identifier, day) });
             }
         }
-        return result;
+        return result.GroupBy(e => (e.EventId, e.OccurrenceKey, e.Day)).Select(g => g.First()).ToList();
     }
     private static string Occurrence(string eventId, int day) => $"{eventId}:{day}";
     private void EnsureEventRule(StoreEvent ev)
