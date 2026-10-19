@@ -1,6 +1,6 @@
 # 股市 Mod 开发与使用
 
-程序集为 `ProbablyStolenStockMarket.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.12.1`。成功部署后自动将旧 DLL 移至 UserData 下的 `LegacyBackup`，避免重复加载；旧配置与资源路径保留升级兼容。
+程序集为 `ProbablyStolenStockMarket.dll`，模组显示名称为 `Probably Stolen Stock Market`，版本 `0.13.0`。成功部署后自动将旧 DLL 移至 UserData 下的 `LegacyBackup`，避免重复加载；旧配置与资源路径保留升级兼容。
 
 ## 安装与构建
 

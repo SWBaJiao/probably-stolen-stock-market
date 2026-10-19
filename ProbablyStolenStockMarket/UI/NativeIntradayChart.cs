@@ -1,4 +1,5 @@
 using System;
+using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -53,7 +54,7 @@ public sealed class NativeIntradayChart : IDisposable
             background.raycastTarget = false;
             _title = Text("Title", 13, TextAlignmentOptions.TopLeft, Ink);
             _legend = Text("Legend", 11, TextAlignmentOptions.TopRight, Ink);
-            _legend.Text!.text = "青：走势/日结  橙：成交记录  紫：事件/异动";
+            _legend.Text!.text = Localizer.Text("青：走势/日结  橙：成交记录  紫：事件/异动");
             _summary = Text("Summary", 11, TextAlignmentOptions.TopLeft, Ink);
             _note = Text("Note", 10, TextAlignmentOptions.TopLeft, StockUiTheme.Muted);
             _note.Text!.enableWordWrapping = true;
@@ -97,7 +98,7 @@ public sealed class NativeIntradayChart : IDisposable
 
             HideHover(); _hoverReady = false;
 
-            _title.Text!.text = $"当日分时 · 第 {currentDay} 日 · 按变价顺序（{samples.Length} 条）";
+            _title.Text!.text = Localizer.Text($"当日分时 · 第 {currentDay} 日 · 按变价顺序（{samples.Length} 条）");
             Place(_title, 8, Math.Max(0, height - 22), Math.Max(80, width - (width >= 540 ? 250 : 16)), 21);
             Place(_legend, Math.Max(8, width - 250), Math.Max(0, height - 22), 242, 20);
             Visible(_legend, width >= 540);
@@ -107,20 +108,20 @@ public sealed class NativeIntradayChart : IDisposable
             if (width < 180 || height < 140)
             {
                 HidePlot();
-                _summary.Text!.text = "现价 " + Price(currentPrice);
-                _note.Text!.text = "分时图等待窗口布局完成。";
+                _summary.Text!.text = Localizer.Text("现价 " + Price(currentPrice));
+                _note.Text!.text = Localizer.Text("分时图等待窗口布局完成。");
             }
             else if (samples.Length == 0)
             {
                 HidePlot();
-                _summary.Text!.text = "现价 " + Price(currentPrice) + "    日内高低 —";
-                _note.Text!.text = "当前日暂无可确认的采样，等待实际行情更新；不会模拟缺失走势。";
+                _summary.Text!.text = Localizer.Text("现价 " + Price(currentPrice) + "    日内高低 —");
+                _note.Text!.text = Localizer.Text("当前日暂无可确认的采样，等待实际行情更新；不会模拟缺失走势。");
             }
             else if (samples.Any(p => p.Day != currentDay || p.Price <= 0))
             {
                 HidePlot();
-                _summary.Text!.text = "现价 " + Price(currentPrice);
-                _note.Text!.text = "样本日期或价格与当前日不符，等待行情同步；没有丢弃部分记录继续绘制。";
+                _summary.Text!.text = Localizer.Text("现价 " + Price(currentPrice));
+                _note.Text!.text = Localizer.Text("样本日期或价格与当前日不符，等待行情同步；没有丢弃部分记录继续绘制。");
             }
             else Draw(samples, currentPrice, isPartial, width, height);
 
@@ -131,7 +132,7 @@ public sealed class NativeIntradayChart : IDisposable
         {
             _faulted = true;
             MelonLogger.Warning("[原生分时图] 绘制失败，本窗口不再重试：" + Environment.NewLine + ex);
-            try { HidePlot(); _note.Text!.text = "分时图暂不可用，请查看加载日志。"; } catch { }
+            try { HidePlot(); _note.Text!.text = Localizer.Text("分时图暂不可用，请查看加载日志。"); } catch { }
         }
     }
 
@@ -153,7 +154,7 @@ public sealed class NativeIntradayChart : IDisposable
 
         var baseline = samples[0].Price;
         var movement = (price / baseline - 1) * 100;
-        _summary.Text!.text = $"现价 {Price(price)}    较{(isPartial ? "首采样" : "开盘")} {(movement > 0 ? "+" : "")}{movement:0.00}%    {(isPartial ? "已记录" : "日内")}高 {Price(recordedHigh)} / 低 {Price(recordedLow)}";
+        _summary.Text!.text = Localizer.Text($"现价 {Price(price)}    较{(isPartial ? "首采样" : "开盘")} {(movement > 0 ? "+" : "")}{movement:0.00}%    {(isPartial ? "已记录" : "日内")}高 {Price(recordedHigh)} / 低 {Price(recordedLow)}");
         for (int i = 0; i < _grid.Length; i++)
         {
             var fraction = i / (decimal)(_grid.Length - 1);
@@ -161,7 +162,7 @@ public sealed class NativeIntradayChart : IDisposable
             var y = bottom + (float)fraction * plotHeight;
             Place(_grid[i], left, y, plotWidth, 1); Visible(_grid[i], true);
             Place(_priceLabels[i], left + plotWidth + 6, y - 9, right - 8, 18);
-            _priceLabels[i].Text!.text = Price(value);
+            _priceLabels[i].Text!.text = Localizer.Text(Price(value));
             Visible(_priceLabels[i], Math.Abs(y - Y(price)) > 12);
         }
 
@@ -197,7 +198,7 @@ public sealed class NativeIntradayChart : IDisposable
             var index = tickCount == 1 ? 0 : (int)Math.Round((double)i * (samples.Length - 1) / (tickCount - 1));
             var text = index == 0 ? (isPartial ? "最早" : "开盘") : index == samples.Length - 1 ? "最新" : "采样";
             if (samples.Length == 1) text += "/最新";
-            _xLabels[i].Text!.text = text + " #" + (index + 1);
+            _xLabels[i].Text!.text = Localizer.Text(text + " #" + (index + 1));
             Place(_xLabels[i], Math.Clamp(X(index) - 39, left, left + plotWidth - 78), bottom - 22, 78, 20);
             Visible(_xLabels[i], true);
         }
@@ -205,11 +206,11 @@ public sealed class NativeIntradayChart : IDisposable
         var currentY = Y(price);
         Place(_currentLine, left, currentY, plotWidth, 1); Visible(_currentLine, true);
         Place(_currentLabel, left + plotWidth + 6, Math.Clamp(currentY + 1, bottom, bottom + plotHeight - 18), right - 8, 18);
-        _currentLabel.Text!.text = Price(price) + " 现"; Visible(_currentLabel, true);
+        _currentLabel.Text!.text = Localizer.Text(Price(price) + " 现"); Visible(_currentLabel, true);
         var latestReason = SafeReason(samples[^1].Reason);
-        _note.Text!.text = "最新原因：" + (latestReason.Length == 0 ? "行情采样" : latestReason)
+        _note.Text!.text = Localizer.Text("最新原因：" + (latestReason.Length == 0 ? "行情采样" : latestReason)
             + "\n" + (isPartial ? "当前日采样不完整，接入前走势、真实开盘及全日极值未知；" : "")
-            + (samples.Length == 1 ? "当前仅有一条真实样本，等待实际变化；" : "") + "横轴为采样顺序，不代表真实时分。";
+            + (samples.Length == 1 ? "当前仅有一条真实样本，等待实际变化；" : "") + "横轴为采样顺序，不代表真实时分。");
         _hoverPlot = new HoverRect(left, bottom, plotWidth, plotHeight);
         _hoverReady = true;
     }

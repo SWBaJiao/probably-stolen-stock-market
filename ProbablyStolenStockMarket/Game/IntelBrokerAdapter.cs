@@ -7,6 +7,7 @@ using Il2Cpp;
 using Il2CppInterop.Runtime;
 using Il2CppTMPro;
 using MelonLoader;
+using ProbablyStolenStockMarket.Localization;
 using ProbablyStolenStockMarket.Market;
 
 namespace ProbablyStolenStockMarket.Game;
@@ -130,6 +131,8 @@ internal sealed class IntelBrokerAdapter : IDisposable
         private readonly List<object> _factoryRoots = new();
         private readonly List<object> _visitRoots = new();
         private readonly List<StoreClient> _ownedClients = new();
+        private readonly List<(Dialogue Dialog, string Canonical)> _localizedDialogues = new();
+        private int _languageRevision = -1;
         private Il2CppSystem.Func<StoreClient>? _factory;
         private StoreClientManager? _queue;
         private string _identity = "";
@@ -150,7 +153,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
         internal void Tick()
         {
             if (_disposed || !_host.BrokerReady) return;
-            try { QueueDueVisit(); }
+            try { RefreshLanguage(); QueueDueVisit(); }
             catch (Exception ex) { Report(ex); }
         }
 
@@ -237,7 +240,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
             var client = new StoreClient();
             _ownedClients.Add(client);
             StoreClientFactionSetup.InitBlackMarket(client);
-            client.identifier = _npcId; client.displayName = _npcName + " · 行情掮客";
+            client.identifier = _npcId; client.displayName = Localizer.Text(_npcName + " · 行情掮客");
             var customSprite = _resolveVisual();
             client.spriteName = customSprite ?? ResolveAppearance(visit.AppearanceKey);
             if (customSprite == null) _log.Warning($"[{_npcName}] 专属人物图像暂未就绪，本次使用原版人物素材。");
@@ -246,7 +249,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
             client.serviceCost = visit.Price;
             client.CompleteClientCreation(true);
             // 完成原版通用初始化后，仅重置此专属顾客的交易和对话行为。
-            client.identifier = _npcId; client.displayName = _npcName + " · 行情掮客";
+            client.identifier = _npcId; client.displayName = Localizer.Text(_npcName + " · 行情掮客");
             client.clientIntent = StoreClient.ClientIntent.INFORMATION_DEALER;
             client.serviceCost = visit.Price; client.dismissable = true;
             client.arrestable = false; client.nonDismissableArrestable = false; client.nonShootable = true;
@@ -355,6 +358,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
 
         private static void SetText(TextMeshProUGUI? label, string text)
         {
+            text = Localizer.Text(text);
             if (label != null && label.text != text) label.text = text;
         }
 
@@ -423,7 +427,23 @@ internal sealed class IntelBrokerAdapter : IDisposable
         private bool Valid(string identity, string visitId) => !_disposed && _host.BrokerReady && identity == _host.BrokerSaveIdentity && _host.Engine?.GetBrokerVisit(_brokerId)?.VisitId == visitId;
         private bool CurrentVisit(StoreClient client, string identity, string visitId, int epoch) => epoch == _epoch && Valid(identity, visitId) && _host.CurrentClient?.Pointer == client.Pointer;
         internal bool IsBroker(StoreClient? client) => client != null && client.identifier == _npcId;
-        private Dialogue Text(string value) => new Dialogue().SetText(_npcName, value);
+        private Dialogue Text(string value)
+        {
+            var dialog = new Dialogue().SetText(Localizer.Text(_npcName), Localizer.Text(value));
+            _localizedDialogues.Add((dialog, value));
+            return dialog;
+        }
+        private void RefreshLanguage()
+        {
+            if (_languageRevision == Localizer.Revision) return;
+            _languageRevision = Localizer.Revision;
+            // 每份对话保留原文，语言变化后刷新本 Mod 的实例，不改写领域存档。
+            foreach (var entry in _localizedDialogues)
+                entry.Dialog.SetText(Localizer.Text(_npcName), Localizer.Text(entry.Canonical));
+            foreach (var client in _ownedClients)
+                client.displayName = Localizer.Text(_npcName + " · 行情掮客");
+            UpdateUi();
+        }
         private Il2CppSystem.Action RootAction(Action managed)
         {
             Action guarded = () => { try { managed(); } catch (Exception ex) { Report(ex); } };
@@ -443,7 +463,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
                 try { client.OnArrival = null; client.OnDismiss = null; } catch (Exception ex) { Report(ex); }
             foreach (var value in _visitRoots) if (value is Dialogue dialog)
                 try { dialog.startAction = null; dialog.endAction = null; } catch (Exception ex) { Report(ex); }
-            _ownedClients.Clear(); _visitRoots.Clear();
+            _ownedClients.Clear(); _visitRoots.Clear(); _localizedDialogues.Clear(); _languageRevision = -1;
         }
         internal void Reset()
         {

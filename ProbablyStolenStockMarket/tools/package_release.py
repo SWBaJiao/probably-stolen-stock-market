@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import re
+import struct
 import subprocess
 import sys
 import zipfile
@@ -19,6 +20,129 @@ NAME = "ProbablyStolenStockMarket"
 
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def assembly_mod_version(data: bytes) -> str:
+    """直接读取程序集 ModInfo.Version 常量，不加载游戏或 MelonLoader 依赖。"""
+    def number(offset: int, size: int) -> int:
+        formats = {1: "<B", 2: "<H", 4: "<I", 8: "<Q"}
+        return struct.unpack_from(formats[size], data, offset)[0]
+
+    pe = number(0x3C, 4)
+    if data[:2] != b"MZ" or data[pe:pe + 4] != b"PE\0\0":
+        raise ValueError("Release DLL 不是有效的 PE 程序集。")
+    optional = pe + 24
+    magic = number(optional, 2)
+    if magic not in (0x10B, 0x20B):
+        raise ValueError("Release DLL 的 PE 可选头格式无法识别。")
+    section_start = optional + number(pe + 20, 2)
+    sections = [section_start + i * 40 for i in range(number(pe + 6, 2))]
+
+    def file_offset(rva: int) -> int:
+        for section in sections:
+            address = number(section + 12, 4)
+            length = max(number(section + 8, 4), number(section + 16, 4))
+            if address <= rva < address + length:
+                return number(section + 20, 4) + rva - address
+        raise ValueError("Release DLL 包含无法定位的 CLR 数据。")
+
+    directories = optional + (96 if magic == 0x10B else 112)
+    clr = file_offset(number(directories + 14 * 8, 4))
+    metadata = file_offset(number(clr + 8, 4))
+    if data[metadata:metadata + 4] != b"BSJB":
+        raise ValueError("Release DLL 缺少有效 CLR 元数据。")
+    cursor = metadata + 16 + number(metadata + 12, 4)
+    cursor = (cursor + 3) & ~3
+    stream_count = number(cursor + 2, 2)
+    cursor += 4
+    streams: dict[str, int] = {}
+    for _ in range(stream_count):
+        offset = number(cursor, 4)
+        name_end = data.index(b"\0", cursor + 8)
+        name = data[cursor + 8:name_end].decode("ascii")
+        streams[name] = metadata + offset
+        cursor = (name_end + 4) & ~3
+    table = streams.get("#~", streams.get("#-"))
+    if table is None or "#Strings" not in streams or "#Blob" not in streams:
+        raise ValueError("Release DLL 缺少常量验证所需的 CLR 数据流。")
+    flags = number(table + 6, 1)
+    string_size, guid_size, blob_size = (4 if flags & flag else 2 for flag in (1, 2, 4))
+    valid = number(table + 8, 8)
+    cursor = table + 24
+    rows: dict[int, int] = {}
+    for index in range(64):
+        if valid & (1 << index):
+            rows[index] = number(cursor, 4)
+            cursor += 4
+
+    def index_size(index: int) -> int:
+        return 4 if rows.get(index, 0) >= 65536 else 2
+
+    def coded_size(bits: int, indices: tuple[int, ...]) -> int:
+        return 4 if max((rows.get(i, 0) for i in indices), default=0) >= (1 << (16 - bits)) else 2
+
+    type_ref = coded_size(2, (2, 1, 27))
+    constant_parent = coded_size(2, (4, 8, 23))
+    widths = {
+        0: 2 + string_size + guid_size * 3,
+        1: coded_size(2, (0, 26, 35, 1)) + string_size * 2,
+        2: 4 + string_size * 2 + type_ref + index_size(4) + index_size(6),
+        3: index_size(4),
+        4: 2 + string_size + blob_size,
+        5: index_size(6),
+        6: 8 + string_size + blob_size + index_size(8),
+        7: index_size(8),
+        8: 4 + string_size,
+        9: index_size(2) + type_ref,
+        10: coded_size(3, (2, 1, 26, 6, 27)) + string_size + blob_size,
+        11: 2 + constant_parent + blob_size,
+    }
+    starts: dict[int, int] = {}
+    for index in range(12):
+        starts[index] = cursor
+        cursor += rows.get(index, 0) * widths[index]
+
+    def string(index: int) -> str:
+        start = streams["#Strings"] + index
+        return data[start:data.index(b"\0", start)].decode("utf-8")
+
+    field_number = None
+    for row in range(rows.get(2, 0)):
+        start = starts[2] + row * widths[2]
+        if string(number(start + 4, string_size)) != "ModInfo":
+            continue
+        if string(number(start + 4 + string_size, string_size)) != NAME:
+            continue
+        field_column = 4 + string_size * 2 + type_ref
+        first = number(start + field_column, index_size(4))
+        end = (number(start + widths[2] + field_column, index_size(4))
+               if row + 1 < rows.get(2, 0) else rows.get(4, 0) + 1)
+        for field in range(first, end):
+            position = starts[4] + (field - 1) * widths[4]
+            if string(number(position + 2, string_size)) == "Version":
+                field_number = field
+                break
+    if field_number is None:
+        raise ValueError("Release DLL 没有 ProbablyStolenStockMarket.ModInfo.Version 字段。")
+    for row in range(rows.get(11, 0)):
+        start = starts[11] + row * widths[11]
+        if number(start + 2, constant_parent) != field_number << 2:
+            continue
+        if number(start, 1) != 0x0E:
+            raise ValueError("Release DLL 中的 ModInfo.Version 不是字符串常量。")
+        blob = streams["#Blob"] + number(start + 2 + constant_parent, blob_size)
+        first = number(blob, 1)
+        if first & 0x80 == 0:
+            length, prefix = first, 1
+        elif first & 0xC0 == 0x80:
+            length, prefix = ((first & 0x3F) << 8) | number(blob + 1, 1), 2
+        elif first & 0xE0 == 0xC0:
+            length = ((first & 0x1F) << 24) | int.from_bytes(data[blob + 1:blob + 4], "big")
+            prefix = 4
+        else:
+            raise ValueError("Release DLL 的版本常量长度无效。")
+        return data[blob + prefix:blob + prefix + length].decode("utf-16-le")
+    raise ValueError("Release DLL 缺少 ModInfo.Version 常量，请重新编译。")
 
 
 def tracked_assets() -> dict[str, bytes]:
@@ -90,12 +214,16 @@ def main() -> int:
         raise FileNotFoundError(
             f"缺少 Release DLL：{dll}\n请先执行：dotnet build {NAME}/{NAME}.csproj -c Release"
         )
+    dll_data = dll.read_bytes()
+    binary_version = assembly_mod_version(dll_data)
+    if binary_version != version:
+        raise ValueError(f"Release DLL 版本为 {binary_version}，源码版本为 {version}；请重新编译，避免发布旧文件。")
     instructions = ROOT / "docs" / "RELEASE-INSTALL.md"
     if not instructions.is_file():
         raise FileNotFoundError(f"缺少安装说明：{instructions}")
 
     files = tracked_assets()
-    files[f"Mods/{NAME}.dll"] = dll.read_bytes()
+    files[f"Mods/{NAME}.dll"] = dll_data
     files["安装说明.md"] = instructions.read_bytes()
     manifest = "".join(f"{digest(data)}  {name}\n" for name, data in sorted(files.items()))
     files["SHA256SUMS"] = manifest.encode("utf-8")
@@ -129,6 +257,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (OSError, ValueError, subprocess.CalledProcessError, zipfile.BadZipFile) as error:
+    except (OSError, ValueError, struct.error, subprocess.CalledProcessError, zipfile.BadZipFile) as error:
         print(f"打包失败：{error}", file=sys.stderr)
         raise SystemExit(1)

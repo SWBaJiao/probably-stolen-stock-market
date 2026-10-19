@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Il2Cpp;
 using Il2CppInterop.Runtime;
 using MelonLoader;
+using ProbablyStolenStockMarket.Localization;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -45,8 +46,8 @@ internal sealed class IntelPhoneQuickDial : IDisposable
                 if (component?.TryCast<Button>() is { } button) buttons.Add(button);
             if (buttons.Count != 1) throw new InvalidOperationException("联系人视图未提供唯一快捷按钮，已跳过。");
             if (contact.titleTMP == null || contact.statusTMP == null) throw new InvalidOperationException("联系人视图缺少原版姓名或状态文本。");
-            contact.titleTMP.text = _name;
-            contact.statusTMP.text = $"{_number} · 预约明日到访";
+            contact.titleTMP.text = Localizer.Text(_name);
+            contact.statusTMP.text = Localizer.Text($"{_number} · 预约明日到访");
             contact.number = _number;
             _button = buttons[0];
             // 替换整个事件对象，清除序列化的 OnQuickDial 监听，不能仅 RemoveAllListeners。

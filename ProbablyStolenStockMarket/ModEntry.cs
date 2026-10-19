@@ -57,7 +57,7 @@ public sealed class ModEntry : MelonMod
 
     public override void OnUpdate()
     {
-        try { _market?.Tick(); _panel?.Tick(); }
+        try { GameLanguageAdapter.Update(); _market?.Tick(); _panel?.Tick(); }
         catch (Exception ex) { LogRuntimeError(ex); }
     }
 

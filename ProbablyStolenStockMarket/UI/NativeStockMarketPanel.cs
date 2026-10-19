@@ -1,4 +1,5 @@
 using System;
+using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -28,6 +29,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private readonly Dictionary<string, CustomUIElement> _elements = new(StringComparer.Ordinal);
     private readonly HashSet<string> _selectedButtons = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _textCache = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _staticTexts = new(StringComparer.Ordinal);
     private readonly Dictionary<string, float> _minimumHeights = new(StringComparer.Ordinal);
     private readonly Dictionary<string, float> _measuredWidths = new(StringComparer.Ordinal);
     private NativeCandlestickChart? _chart;
@@ -50,6 +52,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private int _page;
     private float _nextRefresh, _width = 1040, _height = 750;
     private bool _refreshing;
+    private int _languageRevision = -1;
 
     public NativeStockMarketPanel(IMarketHost host)
     {
@@ -106,6 +109,15 @@ public sealed class NativeStockMarketPanel : IDisposable
             // 不允许保留上一个存档的原生控件、输入或委托。
             if (engine == null || !IsCurrentContext() || !IsAlive() || !_window!.IsVisible)
             { Hide(); return; }
+            if (_languageRevision != Localizer.Revision)
+            {
+                // 语言切换重建静态标签，保留页签、公司、数量和买卖模式，并释放旧监听器。
+                var detailsOpen = _companyWindow?.IsVisible == true;
+                ReleaseWindow(true);
+                _boundEngine = engine; _saveIdentity = engine.State.SaveIdentity;
+                Build(); Refresh();
+                if (detailsOpen) OpenCompanyDetails();
+            }
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             if (_companyWindow?.IsVisible == true)
@@ -143,7 +155,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         var bounds = canvas != null ? canvas.rect : new Rect(0, 0, Screen.width, Screen.height);
         _width = Math.Min(1040f, Math.Max(420f, bounds.width - 32f));
         _height = Math.Min(750f, Math.Max(350f, bounds.height - 32f));
-        _builder = CustomUIManager.Window(WindowId, "远星证券 · 股市投资", CustomUIManager.LAYER_OVERLAY);
+        _builder = CustomUIManager.Window(WindowId, Localizer.Text("远星证券 · 股市投资"), CustomUIManager.LAYER_OVERLAY);
         _window = _builder.window;
         _builder.SetSize(_width, _height).Center().SetDraggable(true).SetCloseOnEscape(true);
         _nativeClosed = DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(_managedClosed)
@@ -186,9 +198,10 @@ public sealed class NativeStockMarketPanel : IDisposable
         _builder.BeginScroll(wide ? 260 : 76);
         Container(_builder.CurrentParent, -1);
         ConfigureCompanyScroll(wide && !scrollMarket, wide ? 260 : 76);
-        if (!wide) _builder.BeginGrid(2, (_width - 84) / 2, 38, 4);
+        var companyRowHeight = Localizer.Language == ModLanguage.Chinese ? 38 : 52;
+        if (!wide) _builder.BeginGrid(2, (_width - 84) / 2, companyRowHeight, 4);
         foreach (var company in engine.Config.Companies)
-            Button("company." + company.Id, company.Name, "company:" + company.Id, -1, 38);
+            Button("company." + company.Id, company.Name, "company:" + company.Id, -1, companyRowHeight);
         if (!wide) _builder.End();
         _builder.End();
         if (wide) Label("market.legend", "涨红 / 跌绿 · 较昨收\n昨日成交日结 · 事件与余波", 54);
@@ -200,7 +213,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         _builder.BeginRow(5);
         // 名称和介绍入口紧邻，行情数字使用本行余下空间，不再占用图表高度。
         var companyName = Label("company.title", "", 30, true);
-        Container(companyName.root.transform.Cast<RectTransform>(), 88, 30);
+        Container(companyName.root.transform.Cast<RectTransform>(), Localizer.Language == ModLanguage.Chinese ? 88 : 195, 30);
         if (companyName.text != null) companyName.text.enableWordWrapping = false;
         Button("company.introduction", "介绍", "details", 48, 28);
         var companyQuote = Label("company.quote", "", 30, true);
@@ -240,7 +253,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         Button("mode.buy", "买入", "mode:buy", 72, 32);
         Button("mode.sell", "卖出", "mode:sell", 72, 32);
         Button("quantity.minus", "−", "quantity:-1", 32, 32);
-        _builder.AddInput("股数", _quantity, null, "quantity");
+        _builder.AddInput(Localizer.Text("股数"), _quantity, null, "quantity");
         var input = Remember("quantity", _builder.Last, 32, -1);
         StyleInput(input);
         _bindings.Add(new NativeQuantityBinding(input, this));
@@ -296,6 +309,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         SetPage(_page);
         if (!engine.Config.Companies.Any(c => c.Id == _companyId)) _companyId = engine.Config.Companies[0].Id;
         _window = _builder.Show();
+        _languageRevision = Localizer.Revision;
         _builder = null;
         MelonLogger.Msg("[原生股市] 已使用游戏 CustomUI 窗体、按钮、TMP 字体和滚动预制件创建独立投资窗口。");
     }
@@ -352,11 +366,13 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     private CustomUIElement Label(string id, string text, float height, bool heading = false)
     {
-        _builder!.AddLabel(text, id);
+        _builder!.AddLabel(Localizer.Text(text), id);
         var element = Remember(id, _builder.Last, height);
         _minimumHeights[id] = height;
+        if (!string.IsNullOrEmpty(text)) _staticTexts[id] = text;
         if (element.text != null)
         {
+            NativeUiBootstrap.ApplyCurrentFont(element.text);
             element.text.fontSize = heading ? 18 : 16;
             element.text.color = heading ? AccentColor : TextColor;
             element.text.fontStyle = heading ? FontStyles.Bold : FontStyles.Normal;
@@ -370,10 +386,10 @@ public sealed class NativeStockMarketPanel : IDisposable
     private CustomUIElement Button(string id, string text, string command, float width, float height = 34)
     {
         // 由游戏工厂生成全新通用按钮，绝不复制带有成交逻辑的商店按钮。
-        _builder!.AddButton(text, null, id);
+        _builder!.AddButton(Localizer.Text(text), null, id);
         var element = Remember(id, _builder.Last, height, width);
 
-        if (element.text != null) { element.text.color = TextColor; element.text.fontSize = 16; element.text.richText = false; element.text.enableWordWrapping = true; }
+        if (element.text != null) { NativeUiBootstrap.ApplyCurrentFont(element.text); element.text.color = TextColor; element.text.fontSize = 16; element.text.richText = false; element.text.enableWordWrapping = true; }
         if (element.image != null) element.image.color = Color.white;
         if (element.button != null)
         {
@@ -413,13 +429,14 @@ public sealed class NativeStockMarketPanel : IDisposable
         }
         if (_window.frame?.titleText != null)
         {
+            NativeUiBootstrap.ApplyCurrentFont(_window.frame.titleText);
             _window.frame.titleText.color = TextColor;
             _window.frame.titleText.richText = false;
             _window.frame.titleText.fontStyle = FontStyles.Bold;
             try
             {
                 var font = _window.frame.titleText.font;
-                if (font != null && !font.HasCharacter('股', true, true))
+                if (Localizer.Language == ModLanguage.Chinese && font != null && !font.HasCharacter('股', true, true))
                     Warn("font", "游戏原生 TMP 字体未包含“股”字。窗口沿用游戏字体，请在游戏语言设置及字体回退中检查中文支持。");
             }
             catch (Exception ex) { Warn("font", "原生字体覆盖检查失败，继续使用游戏字体。", ex); }
@@ -433,6 +450,8 @@ public sealed class NativeStockMarketPanel : IDisposable
         try
         {
             var engine = _host.Engine;
+            // 翻译后的说明按实际列宽测量高度，避免较长的外语文案覆盖下方控件。
+            foreach (var entry in _staticTexts) Text(entry.Key, entry.Value);
             Text("summary", $"第 {Math.Max(0, engine.State.LastDay)} 日    可用资金 {Money(_host.Cash)}    现货交易 · 无杠杆");
             Text("status", _host.Status, _host.CanTrade ? StockUiTheme.Falling : StockUiTheme.Warning);
             Text("feedback", _feedback, StockUiTheme.Warning);
@@ -441,7 +460,7 @@ public sealed class NativeStockMarketPanel : IDisposable
                 if (!engine.State.Companies.TryGetValue(company.Id, out var stock)) continue;
                 var close = PreviousClose(engine, stock);
                 var change = close == 0 ? 0 : stock.Price / close - 1;
-                Text("company." + company.Id, $"{company.Name}  {stock.Price:0.00}  {SignedPercent(change)}");
+                Text("company." + company.Id, company.Name + (Localizer.Language == ModLanguage.Chinese ? "  " : "\n") + $"{stock.Price:0.00}  {SignedPercent(change)}");
                 Tint("company." + company.Id, company.Id == _companyId);
                 if (_elements["company." + company.Id].text != null) _elements["company." + company.Id].text.color = change > 0 ? StockUiTheme.Rising : change < 0 ? StockUiTheme.Falling : TextColor;
             }
@@ -698,6 +717,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private void Text(string id, string value, Color? color = null)
     {
         if (!_elements.TryGetValue(id, out var element)) return;
+        value = Localizer.Text(value);
         if (id == "feedback") element.root.SetActive(!string.IsNullOrWhiteSpace(value));
         bool changed = !_textCache.TryGetValue(id, out var previous) || previous != value;
         if (changed) { element.SetText(value); _textCache[id] = value; }
@@ -806,8 +826,13 @@ public sealed class NativeStockMarketPanel : IDisposable
         var colors = input.colors; colors.m_NormalColor = StockUiTheme.Surface; input.colors = colors;
         input.customCaretColor = true; input.caretColor = AccentColor;
         input.selectionColor = new Color(.35f, .65f, .85f, .55f);
-        if (input.textComponent != null) { input.textComponent.color = TextColor; input.textComponent.fontSize = 17; }
-        if (input.placeholder != null) input.placeholder.color = MutedColor;
+        if (input.textComponent != null) { NativeUiBootstrap.ApplyCurrentFont(input.textComponent); input.textComponent.color = TextColor; input.textComponent.fontSize = 17; }
+        if (input.placeholder != null)
+        {
+            input.placeholder.color = MutedColor;
+            var placeholderText = input.placeholder.TryCast<TMP_Text>();
+            if (placeholderText != null) NativeUiBootstrap.ApplyCurrentFont(placeholderText);
+        }
     }
 
     internal static Image Surface(GameObject parent, string name, Color color, float left, float top, float right, float bottom)
@@ -855,7 +880,7 @@ public sealed class NativeStockMarketPanel : IDisposable
             try { binding.Dispose(); }
             catch (Exception ex) { Warn("unbind", "原生控件监听器移除失败，窗口销毁后将释放控件。", ex); }
         _chart?.Dispose(); _chart = null;
-        _bindings.Clear(); _elements.Clear(); _pages.Clear(); _textCache.Clear(); _minimumHeights.Clear(); _measuredWidths.Clear(); _builder = null;
+        _bindings.Clear(); _elements.Clear(); _pages.Clear(); _textCache.Clear(); _staticTexts.Clear(); _minimumHeights.Clear(); _measuredWidths.Clear(); _builder = null;
         _selectedButtons.Clear();
         _boundEngine = null; _saveIdentity = "";
         if (window != null)

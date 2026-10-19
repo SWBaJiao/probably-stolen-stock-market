@@ -1,4 +1,5 @@
 using System;
+using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -60,7 +61,7 @@ public sealed class NativeCandlestickChart : IDisposable
             background.raycastTarget = false;
             _title = Text("Title", TextAlignmentOptions.TopLeft, 13, Ink);
             _legend = Text("Legend", TextAlignmentOptions.TopRight, 11, Ink);
-            _legend.Text!.text = "红涨  绿跌  灰横标：不完整";
+            _legend.Text!.text = Localizer.Text("红涨  绿跌  灰横标：不完整");
             _note = Text("Note", TextAlignmentOptions.TopLeft, 11, StockUiTheme.Muted);
             _note.Text!.enableWordWrapping = true;
             _currentLabel = Text("CurrentPrice", TextAlignmentOptions.MidlineLeft, 11, Accent);
@@ -102,7 +103,7 @@ public sealed class NativeCandlestickChart : IDisposable
 
             HideHover(); _hoverReady = false;
 
-            _title.Text!.text = $"日 K 线 · 最近 {selected.Length} 个有记录的游戏日";
+            _title.Text!.text = Localizer.Text($"日 K 线 · 最近 {selected.Length} 个有记录的游戏日");
             Place(_title, 8, Math.Max(0, height - 23), Math.Max(80, width - (width < 430 ? 16 : 200)), 22);
             Place(_legend, Math.Max(8, width - 202), Math.Max(0, height - 22), 194, 20);
             Visible(_legend, width >= 430);
@@ -110,12 +111,12 @@ public sealed class NativeCandlestickChart : IDisposable
             if (width < 180 || height < 120)
             {
                 HidePlot();
-                _note.Text!.text = "图表等待窗口布局完成。";
+                _note.Text!.text = Localizer.Text("图表等待窗口布局完成。");
             }
             else if (selected.Length == 0)
             {
                 HidePlot();
-                _note.Text!.text = "暂无日行情记录；首次接入只记录可确认的收盘采样，不补造历史 K 线。";
+                _note.Text!.text = Localizer.Text("暂无日行情记录；首次接入只记录可确认的收盘采样，不补造历史 K 线。");
             }
             else Draw(selected, currentPrice, currentDay, width, height);
 
@@ -127,7 +128,7 @@ public sealed class NativeCandlestickChart : IDisposable
             // 原生图形出现异常时停用本图，避免每次轮询继续触发错误；交易面板仍可使用。
             _faulted = true;
             MelonLogger.Warning("[原生日K线] 绘制失败，本窗口不再重试：" + Environment.NewLine + ex);
-            try { HidePlot(); _note.Text!.text = "日 K 线暂不可用，请查看加载日志。"; } catch { }
+            try { HidePlot(); _note.Text!.text = Localizer.Text("日 K 线暂不可用，请查看加载日志。"); } catch { }
         }
     }
 
@@ -152,7 +153,7 @@ public sealed class NativeCandlestickChart : IDisposable
             var y = bottom + (float)fraction * plotHeight;
             Place(_grid[i], left, y, plotWidth, 1);
             Place(_priceLabels[i], left + plotWidth + 6, y - 9, right - 8, 18);
-            _priceLabels[i].Text!.text = Price(value);
+            _priceLabels[i].Text!.text = Localizer.Text(Price(value));
             Visible(_grid[i], true);
             Visible(_priceLabels[i], currentPrice <= 0 || Math.Abs(y - Y(currentPrice)) > 12);
         }
@@ -192,7 +193,7 @@ public sealed class NativeCandlestickChart : IDisposable
             var index = tickCount == 1 ? 0 : (int)Math.Round((double)i * (candles.Length - 1) / (tickCount - 1));
             var center = left + (index + .5f) * slotWidth;
             Place(_dayLabels[i], Math.Clamp(center - 25, left, left + plotWidth - 50), bottom - 22, 50, 20);
-            _dayLabels[i].Text!.text = "第" + candles[index].Day + "日";
+            _dayLabels[i].Text!.text = Localizer.Text("第" + candles[index].Day + "日");
             Visible(_dayLabels[i], true);
         }
 
@@ -201,7 +202,7 @@ public sealed class NativeCandlestickChart : IDisposable
             var y = Y(currentPrice);
             Place(_currentLine, left, y, plotWidth, 1);
             Place(_currentLabel, left + plotWidth + 6, Math.Clamp(y + 1, bottom, bottom + plotHeight - 18), right - 8, 18);
-            _currentLabel.Text!.text = Price(currentPrice) + " 现";
+            _currentLabel.Text!.text = Localizer.Text(Price(currentPrice) + " 现");
             Visible(_currentLine, true); Visible(_currentLabel, true);
         }
         else { Visible(_currentLine, false); Visible(_currentLabel, false); }
@@ -213,8 +214,8 @@ public sealed class NativeCandlestickChart : IDisposable
         if (hasPartial) messages.Add("灰色收盘标记：旧档或首次接入采样，开/高/低未知");
         if (!live && !hasPartial) messages.Add("实体为开盘至收盘，影线为当日最低至最高");
         var latest = candles[^1];
-        _note.Text!.text = $"第 {latest.Day} 日  开 {KnownPrice(latest.Open)}  高 {KnownPrice(latest.High)}  低 {KnownPrice(latest.Low)}  收 {Price(latest.Close)}\n"
-            + string.Join("；", messages) + "。";
+        _note.Text!.text = Localizer.Text($"第 {latest.Day} 日  开 {KnownPrice(latest.Open)}  高 {KnownPrice(latest.High)}  低 {KnownPrice(latest.Low)}  收 {Price(latest.Close)}\n"
+            + string.Join("；", messages) + "。");
         _hoverPlot = new HoverRect(left, bottom, plotWidth, plotHeight);
         _hoverReady = true;
     }

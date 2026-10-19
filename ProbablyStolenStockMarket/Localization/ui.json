@@ -1,0 +1,1137 @@
+{
+  "上一家公司": {
+    "en": "Previous company",
+    "ja": "前の会社",
+    "ko": "이전 회사"
+  },
+  "下一家公司": {
+    "en": "Next company",
+    "ja": "次の会社",
+    "ko": "다음 회사"
+  },
+  "不完整": {
+    "en": "Incomplete",
+    "ja": "不完全",
+    "ko": "불완전"
+  },
+  "与": {
+    "en": " and ",
+    "ja": "と",
+    "ko": " 및 "
+  },
+  "个有记录的游戏日": {
+    "en": " recorded game days",
+    "ja": "日分の記録",
+    "ko": "일의 기록"
+  },
+  "中性": {
+    "en": "Neutral",
+    "ja": "中立",
+    "ko": "중립"
+  },
+  "买入": {
+    "en": "Buy",
+    "ja": "買う",
+    "ko": "매수"
+  },
+  "事件": {
+    "en": "Event",
+    "ja": "イベント",
+    "ko": "이벤트"
+  },
+  "事件与余波": {
+    "en": "Events and aftermath",
+    "ja": "イベントと余波",
+    "ko": "이벤트와 여파"
+  },
+  "事件累计影响": {
+    "en": "Cumulative event impact",
+    "ja": "イベント累計影響",
+    "ko": "이벤트 누적 영향"
+  },
+  "仅展示已经公开的股市专用事件。新闻中的公司影响为本事件已施加的累计影响，当前股价还会受到日行情和其他事件影响。": {
+    "en": "Only public stock-market events are shown. Company impacts are cumulative changes applied by that event; daily trading and other events also affect the current price.",
+    "ja": "公開済みの株式市場専用イベントのみ表示します。各社への影響は当該イベントによる累計値です。現在の株価は日々の相場や他のイベントでも変動します。",
+    "ko": "공개된 주식시장 전용 이벤트만 표시합니다. 회사별 영향은 해당 이벤트가 적용한 누적 변동이며, 현재 주가는 일일 시황과 다른 이벤트의 영향도 받습니다."
+  },
+  "介绍": {
+    "en": "About",
+    "ja": "紹介",
+    "ko": "소개"
+  },
+  "企业消息与市场动态": {
+    "en": "Company news and market updates",
+    "ja": "企業ニュースと市場動向",
+    "ko": "기업 소식 및 시장 동향"
+  },
+  "位置待核实": {
+    "en": "Location unverified",
+    "ja": "位置未確認",
+    "ko": "위치 미확인"
+  },
+  "低": {
+    "en": " L ",
+    "ja": "安値",
+    "ko": "저가"
+  },
+  "低未知": {
+    "en": "Low unknown",
+    "ja": "安値不明",
+    "ko": "저가 미상"
+  },
+  "公司介绍": {
+    "en": "Company profile",
+    "ja": "会社紹介",
+    "ko": "회사 소개"
+  },
+  "公司介绍与公开消息": {
+    "en": "Company profile and public news",
+    "ja": "会社紹介と公開情報",
+    "ko": "회사 소개 및 공개 소식"
+  },
+  "公司列表缺少原生滚动容器。": {
+    "en": "Company list has no native scroll container.",
+    "ja": "会社一覧の標準スクロール領域がありません。",
+    "ko": "회사 목록에 기본 스크롤 영역이 없습니다."
+  },
+  "公司窗口关闭回调转换失败。": {
+    "en": "Could not bind the company window close callback.",
+    "ja": "会社画面の終了処理を登録できませんでした。",
+    "ko": "회사 창 닫기 콜백을 연결하지 못했습니다."
+  },
+  "公司窗口按钮回调转换失败。": {
+    "en": "Could not bind the company window button callback.",
+    "ja": "会社画面のボタン処理を登録できませんでした。",
+    "ko": "회사 창 버튼 콜백을 연결하지 못했습니다."
+  },
+  "公司窗口按钮缺少": {
+    "en": "Company window button missing ",
+    "ja": "会社画面のボタンに不足：",
+    "ko": "회사 창 버튼에 누락됨: "
+  },
+  "公司窗口缺少原生根节点。": {
+    "en": "Company window has no native root.",
+    "ja": "会社画面の標準ルートがありません。",
+    "ko": "회사 창에 기본 루트가 없습니다."
+  },
+  "公司窗口缺少原生覆盖层。": {
+    "en": "Company window has no native overlay.",
+    "ja": "会社画面の標準オーバーレイがありません。",
+    "ko": "회사 창에 기본 오버레이가 없습니다."
+  },
+  "公司行情": {
+    "en": "Stock quotes",
+    "ja": "株価一覧",
+    "ko": "회사 시세"
+  },
+  "公开事件：": {
+    "en": "Public events: ",
+    "ja": "公開イベント：",
+    "ko": "공개 이벤트: "
+  },
+  "公开消息：": {
+    "en": "Public news: ",
+    "ja": "公開情報：",
+    "ko": "공개 소식: "
+  },
+  "关联公司：": {
+    "en": "Related companies: ",
+    "ja": "関連企業：",
+    "ko": "관련 회사: "
+  },
+  "关闭": {
+    "en": "Close",
+    "ja": "閉じる",
+    "ko": "닫기"
+  },
+  "内幕档案": {
+    "en": "Tip archive",
+    "ja": "情報アーカイブ",
+    "ko": "내부 정보 기록"
+  },
+  "分时图暂不可用，请查看加载日志。": {
+    "en": "Intraday chart unavailable. Check the loader log.",
+    "ja": "日中チャートを表示できません。ローダーログを確認してください。",
+    "ko": "장중 차트를 사용할 수 없습니다. 로더 로그를 확인하세요."
+  },
+  "分时图等待窗口布局完成。": {
+    "en": "Waiting for the intraday chart layout.",
+    "ja": "日中チャートの配置を待っています。",
+    "ko": "장중 차트 배치를 기다리는 중입니다."
+  },
+  "分时悬停": {
+    "en": "Intraday tooltip",
+    "ja": "日中チャートのツールチップ",
+    "ko": "장중 차트 툴팁"
+  },
+  "初始化失败": {
+    "en": "Initialization failed",
+    "ja": "初期化に失敗",
+    "ko": "초기화 실패"
+  },
+  "利好": {
+    "en": "Bullish",
+    "ja": "好材料",
+    "ko": "호재"
+  },
+  "利空": {
+    "en": "Bearish",
+    "ja": "悪材料",
+    "ko": "악재"
+  },
+  "刷新当前数据": {
+    "en": "Refresh",
+    "ja": "更新",
+    "ko": "새로 고침"
+  },
+  "单价": {
+    "en": "Unit price ",
+    "ja": "単価 ",
+    "ko": "단가 "
+  },
+  "卖出": {
+    "en": "Sell",
+    "ja": "売る",
+    "ko": "매도"
+  },
+  "历史属实": {
+    "en": "Verified tips",
+    "ja": "過去の的中",
+    "ko": "과거 적중"
+  },
+  "原因：": {
+    "en": "Reason: ",
+    "ja": "理由：",
+    "ko": "원인: "
+  },
+  "原场景没有": {
+    "en": "Scene has no ",
+    "ja": "元のシーンに存在しません：",
+    "ko": "기존 장면에 없음: "
+  },
+  "原版事件公开记录": {
+    "en": "Base-game event records",
+    "ja": "本編イベントの公開記録",
+    "ko": "기본 게임 이벤트 공개 기록"
+  },
+  "原生": {
+    "en": "Native ",
+    "ja": "標準",
+    "ko": "기본 "
+  },
+  "原生分时图": {
+    "en": "Native intraday chart",
+    "ja": "標準日中チャート",
+    "ko": "기본 장중 차트"
+  },
+  "原生字体覆盖检查失败，继续使用游戏字体。": {
+    "en": "Font coverage check failed; using the game font.",
+    "ja": "文字収録の確認に失敗しました。ゲームのフォントを使用します。",
+    "ko": "글꼴 지원 확인에 실패했습니다. 게임 글꼴을 사용합니다."
+  },
+  "原生按钮委托转换失败。": {
+    "en": "Could not bind the native button delegate.",
+    "ja": "標準ボタンの処理を登録できませんでした。",
+    "ko": "기본 버튼 델리게이트를 연결하지 못했습니다."
+  },
+  "原生按钮预制件缺少": {
+    "en": "Native button prefab missing ",
+    "ja": "標準ボタンのプレハブに不足：",
+    "ko": "기본 버튼 프리팹에 누락됨: "
+  },
+  "原生控件监听器移除失败，窗口销毁后将释放控件。": {
+    "en": "Could not remove a control listener; it will be released when the window is destroyed.",
+    "ja": "リスナーを解除できませんでした。画面の破棄時に解放されます。",
+    "ko": "컨트롤 리스너를 제거하지 못했습니다. 창이 파괴되면 해제됩니다."
+  },
+  "原生文本高度计算失败，将使用初始高度。": {
+    "en": "Could not measure text height; using the initial height.",
+    "ja": "文字の高さを計算できませんでした。初期値を使用します。",
+    "ko": "텍스트 높이를 계산하지 못했습니다. 초기 높이를 사용합니다."
+  },
+  "原生日": {
+    "en": "Native daily ",
+    "ja": "標準日次",
+    "ko": "기본 일일 "
+  },
+  "原生窗口关闭回调转换失败。": {
+    "en": "Could not bind the native window close callback.",
+    "ja": "標準画面の終了処理を登録できませんでした。",
+    "ko": "기본 창 닫기 콜백을 연결하지 못했습니다."
+  },
+  "原生股市": {
+    "en": "Native stock market",
+    "ja": "標準株式市場",
+    "ko": "기본 주식시장"
+  },
+  "原生股市命令执行失败。": {
+    "en": "Stock-market command failed.",
+    "ja": "株式市場の操作に失敗しました。",
+    "ko": "주식시장 명령 실행에 실패했습니다."
+  },
+  "原生股市委托": {
+    "en": "Native stock-market order",
+    "ja": "標準株式注文",
+    "ko": "기본 주식 주문"
+  },
+  "原生股市引导": {
+    "en": "Stock-market UI setup",
+    "ja": "株式市場 UI 準備",
+    "ko": "주식시장 UI 준비"
+  },
+  "原生股市窗口创建失败；没有操作玩家背包或原版交易窗口。": {
+    "en": "Could not create the stock-market window; inventory and base-game trade windows were untouched.",
+    "ja": "株式画面を作成できませんでした。所持品や本編の取引画面は操作していません。",
+    "ko": "주식시장 창을 생성하지 못했습니다. 가방과 기본 거래 창은 변경되지 않았습니다."
+  },
+  "原生股市窗口更新失败，已关闭并释放自己的控件。": {
+    "en": "Stock-market window update failed; its controls were closed and released.",
+    "ja": "株式画面の更新に失敗し、画面と専用コントロールを解放しました。",
+    "ko": "주식시장 창 갱신에 실패하여 창을 닫고 전용 컨트롤을 해제했습니다."
+  },
+  "原生股市资源释放失败。": {
+    "en": "Could not release stock-market UI resources.",
+    "ja": "株式市場 UI のリソースを解放できませんでした。",
+    "ko": "주식시장 UI 리소스를 해제하지 못했습니다."
+  },
+  "原生输入委托转换失败。": {
+    "en": "Could not bind the native input delegate.",
+    "ja": "標準入力欄の処理を登録できませんでした。",
+    "ko": "기본 입력 델리게이트를 연결하지 못했습니다."
+  },
+  "原生输入框预制件缺少": {
+    "en": "Native input prefab missing ",
+    "ja": "標準入力欄のプレハブに不足：",
+    "ko": "기본 입력 프리팹에 누락됨: "
+  },
+  "可用资金": {
+    "en": "Cash ",
+    "ja": "利用可能資金 ",
+    "ko": "가용 자금 "
+  },
+  "同类来源历史": {
+    "en": "Source-category record",
+    "ja": "同種の情報源の実績",
+    "ko": "동일 유형 출처 기록"
+  },
+  "图表对象清理失败：": {
+    "en": "Could not clean up chart objects: ",
+    "ja": "チャートの解放に失敗：",
+    "ko": "차트 객체 정리 실패: "
+  },
+  "图表等待窗口布局完成。": {
+    "en": "Waiting for chart layout.",
+    "ja": "チャートの配置を待っています。",
+    "ko": "차트 배치를 기다리는 중입니다."
+  },
+  "均价": {
+    "en": "Average ",
+    "ja": "平均価格 ",
+    "ko": "평균가 "
+  },
+  "失实": {
+    "en": "False",
+    "ja": "不的中",
+    "ko": "거짓"
+  },
+  "委托数量预览失败。": {
+    "en": "Could not preview the order quantity.",
+    "ja": "注文数量を表示できませんでした。",
+    "ko": "주문 수량을 미리 표시하지 못했습니다."
+  },
+  "字体不完整": {
+    "en": "Incomplete font",
+    "ja": "フォントが不完全",
+    "ko": "글꼴 불완전"
+  },
+  "字体和滚动预制件创建独立投资窗口。": {
+    "en": "font and scroll prefabs create a separate investment window.",
+    "ja": "フォントとスクロール用プレハブで独立した投資画面を作成します。",
+    "ko": "글꼴과 스크롤 프리팹으로 독립 투자 창을 생성합니다."
+  },
+  "字体未包含“股”字。窗口沿用游戏字体，请在游戏语言设置及字体回退中检查中文支持。": {
+    "en": "The font lacks a required Chinese glyph. Check the game language and fallback fonts.",
+    "ja": "必要な中国語文字がありません。ゲーム言語と代替フォントを確認してください。",
+    "ko": "필요한 중국어 글자가 없습니다. 게임 언어와 대체 글꼴을 확인하세요."
+  },
+  "字体资源。": {
+    "en": "font resource.",
+    "ja": "フォントリソース。",
+    "ko": "글꼴 리소스."
+  },
+  "实体为开盘至收盘，影线为当日最低至最高": {
+    "en": "Body: open to close; wick: daily low to high",
+    "ja": "実体：始値から終値、ヒゲ：当日の安値から高値",
+    "ko": "몸통: 시가~종가, 꼬리: 당일 저가~고가"
+  },
+  "尚未找到已加载原版窗口背景素材。": {
+    "en": "No loaded base-game window background was found.",
+    "ja": "読み込み済みの標準画面背景がありません。",
+    "ko": "로드된 기본 게임 창 배경을 찾지 못했습니다."
+  },
+  "尚未找到游戏已加载的": {
+    "en": "No loaded game ",
+    "ja": "読み込み済みのゲーム素材がありません：",
+    "ko": "로드된 게임 리소스 없음: "
+  },
+  "属实": {
+    "en": "True",
+    "ja": "的中",
+    "ko": "사실"
+  },
+  "已交付": {
+    "en": "Delivered",
+    "ja": "配達済み",
+    "ko": "전달 완료"
+  },
+  "已使用游戏": {
+    "en": "Using game ",
+    "ja": "ゲームの素材を使用：",
+    "ko": "게임 리소스 사용: "
+  },
+  "已创建独立": {
+    "en": "Created a separate ",
+    "ja": "独立して作成：",
+    "ko": "독립 생성: "
+  },
+  "已实现": {
+    "en": "Realized ",
+    "ja": "確定損益 ",
+    "ko": "실현 "
+  },
+  "已实现盈亏": {
+    "en": "Realized P/L",
+    "ja": "確定損益",
+    "ko": "실현 손익"
+  },
+  "已记录": {
+    "en": "Recorded ",
+    "ja": "記録済み",
+    "ko": "기록된 "
+  },
+  "已购买情报簿": {
+    "en": "Purchased tips",
+    "ja": "購入済み情報",
+    "ko": "구매한 정보"
+  },
+  "已逐项通过；实际交互仍需游戏验证。": {
+    "en": "checks passed; in-game interaction still requires verification.",
+    "ja": "各確認を通過しました。実際の操作はゲーム内での確認が必要です。",
+    "ko": "검사를 통과했습니다. 실제 상호작용은 게임 내 확인이 필요합니다."
+  },
+  "市场新闻": {
+    "en": "Market news",
+    "ja": "市場ニュース",
+    "ko": "시장 뉴스"
+  },
+  "开": {
+    "en": " O ",
+    "ja": "始値",
+    "ko": "시가"
+  },
+  "开盘": {
+    "en": "Open",
+    "ja": "始値",
+    "ko": "시가"
+  },
+  "异动": {
+    "en": "Unusual move",
+    "ja": "急変動",
+    "ko": "이상 변동"
+  },
+  "引用不完整": {
+    "en": "Incomplete references",
+    "ja": "参照が不完全",
+    "ko": "참조 불완전"
+  },
+  "当前仅有一条真实样本，等待实际变化；": {
+    "en": "Only one real sample is available; waiting for a change. ",
+    "ja": "実測値は 1 件のみです。変動を待っています。",
+    "ko": "실제 표본이 1개뿐입니다. 변동을 기다리는 중입니다. "
+  },
+  "当前日暂无可确认的采样，等待实际行情更新；不会模拟缺失走势。": {
+    "en": "No confirmed samples today. Waiting for real updates; missing prices are not simulated.",
+    "ja": "本日の確認済みデータはありません。実際の更新を待ちます。欠損部分は補いません。",
+    "ko": "오늘 확인된 표본이 없습니다. 실제 시세 갱신을 기다리며 누락된 흐름은 생성하지 않습니다."
+  },
+  "当前日采样不完整，接入前走势、真实开盘及全日极值未知；": {
+    "en": "Today's data is partial; earlier prices, actual open and full-day extremes are unknown. ",
+    "ja": "本日の記録は不完全です。導入前の推移、実際の始値、全日の高安は不明です。",
+    "ko": "오늘 표본은 불완전하며 도입 전 흐름, 실제 시가, 전체 일중 최고·최저가는 알 수 없습니다. "
+  },
+  "当日分时": {
+    "en": "Intraday",
+    "ja": "日中推移",
+    "ko": "장중"
+  },
+  "当日未收盘": {
+    "en": "Session still open",
+    "ja": "本日未確定",
+    "ko": "당일 미마감"
+  },
+  "当日未收盘，反映每日结算及事件变价": {
+    "en": "Live session: daily settlement and event price changes",
+    "ja": "本日未確定：日次精算とイベント変動を反映",
+    "ko": "당일 미마감: 일일 정산 및 이벤트 변동 반영"
+  },
+  "当日记录不完整；序号仅代表已保存采样顺序。": {
+    "en": "Partial daily record; numbers indicate saved sample order only.",
+    "ja": "当日の記録は不完全です。番号は保存済みデータの順序のみを示します。",
+    "ko": "당일 기록이 불완전합니다. 번호는 저장된 표본 순서만 나타냅니다."
+  },
+  "当时价格": {
+    "en": "Price at sample ",
+    "ja": "時点価格 ",
+    "ko": "당시 가격 "
+  },
+  "待柜台交付": {
+    "en": "Awaiting counter delivery",
+    "ja": "カウンター配達待ち",
+    "ko": "카운터 전달 대기"
+  },
+  "恢复原光标状态失败，继续释放原生窗口。": {
+    "en": "Could not restore the cursor; continuing window cleanup.",
+    "ja": "カーソルを復元できませんでした。画面の解放を続けます。",
+    "ko": "커서 상태를 복원하지 못했습니다. 창 정리를 계속합니다."
+  },
+  "情报": {
+    "en": "Tip",
+    "ja": "情報",
+    "ko": "정보"
+  },
+  "成交后余额": {
+    "en": "Cash after trade ",
+    "ja": "取引後残高 ",
+    "ko": "거래 후 잔액 "
+  },
+  "成交汇总": {
+    "en": "Trade summary",
+    "ja": "取引集計",
+    "ko": "거래 합계"
+  },
+  "成本": {
+    "en": "Cost ",
+    "ja": "取得費用 ",
+    "ko": "원가 "
+  },
+  "我的持仓": {
+    "en": "My holdings",
+    "ja": "保有株式",
+    "ko": "내 보유 주식"
+  },
+  "手续费": {
+    "en": "Fee ",
+    "ja": "手数料 ",
+    "ko": "수수료 "
+  },
+  "持仓市值": {
+    "en": "Market value ",
+    "ja": "保有評価額 ",
+    "ko": "보유 평가액 "
+  },
+  "持仓成本": {
+    "en": "Total cost ",
+    "ja": "取得総額 ",
+    "ko": "보유 원가 "
+  },
+  "持有股市面板后，可用游戏电话预约掮客次日到访。购买后会收到署名便笺，并登记游戏日历。": {
+    "en": "With a stock-market terminal, use the game phone to book a broker for tomorrow. Purchased tips arrive as signed notes and are added to the calendar.",
+    "ja": "株式端末を持っていれば、電話で翌日の仲介人訪問を予約できます。購入後は署名入りメモを受け取り、カレンダーにも記録されます。",
+    "ko": "주식시장 단말기를 보유하면 전화로 다음 날 중개인 방문을 예약할 수 있습니다. 구매한 정보는 서명된 쪽지로 전달되고 달력에도 등록됩니다."
+  },
+  "按变价顺序（": {
+    "en": "Price-change order (",
+    "ja": "変動順（",
+    "ko": "가격 변동 순서 ("
+  },
+  "接入": {
+    "en": "Integration",
+    "ja": "導入",
+    "ko": "도입"
+  },
+  "提交委托": {
+    "en": "Place order",
+    "ja": "注文する",
+    "ko": "주문 제출"
+  },
+  "提示边界和尺寸必须是有效正数。": {
+    "en": "Tooltip bounds and dimensions must be positive.",
+    "ja": "ツールチップの範囲と寸法は正数が必要です。",
+    "ko": "툴팁 경계와 크기는 양수여야 합니다."
+  },
+  "操作未完成，请查看加载日志。": {
+    "en": "Action failed. Check the loader log.",
+    "ja": "操作に失敗しました。ローダーログを確認してください。",
+    "ko": "작업을 완료하지 못했습니다. 로더 로그를 확인하세요."
+  },
+  "收": {
+    "en": " C ",
+    "ja": "終値",
+    "ko": "종가"
+  },
+  "无杠杆": {
+    "en": "No leverage",
+    "ja": "レバレッジなし",
+    "ko": "레버리지 없음"
+  },
+  "日": {
+    "en": " day",
+    "ja": "日",
+    "ko": "일"
+  },
+  "日内": {
+    "en": "Intraday ",
+    "ja": "日中",
+    "ko": "장중 "
+  },
+  "日内高低": {
+    "en": "Intraday high/low",
+    "ja": "日中高値・安値",
+    "ko": "장중 최고·최저"
+  },
+  "日历第": {
+    "en": "Calendar day ",
+    "ja": "カレンダー：第",
+    "ko": "달력 제"
+  },
+  "日结": {
+    "en": "Daily close",
+    "ja": "日次精算",
+    "ko": "일일 정산"
+  },
+  "日行情": {
+    "en": "Daily market",
+    "ja": "日次相場",
+    "ko": "일일 시황"
+  },
+  "日购买": {
+    "en": " purchased",
+    "ja": "日購入",
+    "ko": "일 구매"
+  },
+  "旧档或首次接入记录不完整；未知开高低显示": {
+    "en": "Old saves or first-time records are partial; unknown O/H/L shown as ",
+    "ja": "旧セーブや初回導入の記録は不完全です。不明な始値・高値・安値は次で表示：",
+    "ko": "기존 저장 또는 첫 도입 기록은 불완전합니다. 미상의 시가·고가·저가 표시: "
+  },
+  "旧档线索": {
+    "en": "Legacy tip",
+    "ja": "旧情報",
+    "ko": "기존 정보"
+  },
+  "昨日成交": {
+    "en": "Previous-day trades",
+    "ja": "前日取引",
+    "ko": "전일 거래"
+  },
+  "昨日成交日结": {
+    "en": "Previous-day trade settlement",
+    "ja": "前日取引の日次精算",
+    "ko": "전일 거래 일일 정산"
+  },
+  "显示最近": {
+    "en": "Showing latest ",
+    "ja": "直近を表示：",
+    "ko": "최근 표시: "
+  },
+  "暂无原版事件公开记录。": {
+    "en": "No public base-game event records.",
+    "ja": "本編イベントの公開記録はありません。",
+    "ko": "공개된 기본 게임 이벤트 기록이 없습니다."
+  },
+  "暂无已公开的股市专用新闻。": {
+    "en": "No public stock-market news yet.",
+    "ja": "公開済みの株式市場ニュースはありません。",
+    "ko": "아직 공개된 주식시장 전용 뉴스가 없습니다."
+  },
+  "暂无已购线索。购买后保存在此处；到期按实际事件验证。": {
+    "en": "No purchased tips. New tips are kept here and checked against actual events when due.",
+    "ja": "購入済み情報はありません。購入後はここに保存され、期限時に実際のイベントで検証されます。",
+    "ko": "구매한 정보가 없습니다. 구매 후 여기에 저장되며 기한이 되면 실제 이벤트로 검증됩니다."
+  },
+  "暂无日行情记录；首次接入只记录可确认的收盘采样，不补造历史": {
+    "en": "No daily history yet. Initial integration records only confirmed closing samples and does not fabricate past ",
+    "ja": "日次記録はありません。初回導入では確認できる終値のみを記録し、過去の記録は補いません：",
+    "ko": "일일 시황 기록이 없습니다. 첫 도입에서는 확인 가능한 종가만 기록하며 과거 기록을 생성하지 않습니다: "
+  },
+  "暂无流水。": {
+    "en": "No transactions yet.",
+    "ja": "履歴はありません。",
+    "ko": "아직 내역이 없습니다."
+  },
+  "最新": {
+    "en": "Latest",
+    "ja": "最新",
+    "ko": "최신"
+  },
+  "最新原因：": {
+    "en": "Latest reason: ",
+    "ja": "直近の理由：",
+    "ko": "최근 원인: "
+  },
+  "最早": {
+    "en": "Earliest",
+    "ja": "最初",
+    "ko": "최초"
+  },
+  "最近": {
+    "en": "Last ",
+    "ja": "直近 ",
+    "ko": "최근 "
+  },
+  "未核实": {
+    "en": "Unverified",
+    "ja": "未検証",
+    "ko": "미확인"
+  },
+  "未激活。": {
+    "en": "not active.",
+    "ja": "未有効化。",
+    "ko": "활성화되지 않음."
+  },
+  "未登记所创建的管理器。": {
+    "en": "did not register the created manager.",
+    "ja": "作成したマネージャーが登録されませんでした。",
+    "ko": "생성한 관리자가 등록되지 않았습니다."
+  },
+  "未能验证": {
+    "en": "Inconclusive",
+    "ja": "検証不能",
+    "ko": "검증 불가"
+  },
+  "本窗口悬停暂不可用：": {
+    "en": "Tooltips unavailable in this window: ",
+    "ja": "この画面のツールチップは使用不可：",
+    "ko": "이 창에서 툴팁을 사용할 수 없음: "
+  },
+  "条": {
+    "en": " entries",
+    "ja": "件",
+    "ko": "건"
+  },
+  "条、失实": {
+    "en": " true, false ",
+    "ja": "件、不的中 ",
+    "ko": "건, 거짓 "
+  },
+  "条公开新闻。": {
+    "en": " public news items.",
+    "ja": "件の公開ニュース。",
+    "ko": "건의 공개 뉴스."
+  },
+  "条已购买情报；原始预测始终保留，核验结果不会改写预测正文。": {
+    "en": " purchased tips. Original predictions are preserved even after verification.",
+    "ja": "件の購入済み情報。元の予測は保持され、検証結果によって書き換わりません。",
+    "ko": "건의 구매한 정보. 검증 후에도 원래 예측 내용은 변경되지 않습니다."
+  },
+  "条记录。": {
+    "en": " records.",
+    "ja": "件の記録。",
+    "ko": "건의 기록."
+  },
+  "条）": {
+    "en": " samples)",
+    "ja": "件）",
+    "ko": "개)"
+  },
+  "来源历史": {
+    "en": "Source record",
+    "ja": "情報源の実績",
+    "ko": "출처 기록"
+  },
+  "样本日期或价格与当前日不符，等待行情同步；没有丢弃部分记录继续绘制。": {
+    "en": "Sample dates or prices do not match today. Waiting for synchronization; records have not been discarded.",
+    "ja": "日付または価格が本日と一致しません。同期を待っています。記録を捨てて描画はしません。",
+    "ko": "표본 날짜 또는 가격이 오늘과 일치하지 않습니다. 동기화를 기다리며 일부 기록을 버리고 그리지 않습니다."
+  },
+  "横轴为采样顺序，不代表真实时分。": {
+    "en": "The X-axis shows sample order, not real time.",
+    "ja": "横軸は記録順で、実際の時刻ではありません。",
+    "ko": "가로축은 표본 순서이며 실제 시간이 아닙니다."
+  },
+  "橙：成交记录": {
+    "en": "Orange: trades",
+    "ja": "橙：取引記録",
+    "ko": "주황: 거래 기록"
+  },
+  "正整数股数": {
+    "en": "Positive whole shares",
+    "ja": "正の整数の株数",
+    "ko": "양의 정수 주식 수"
+  },
+  "每日": {
+    "en": "Daily",
+    "ja": "毎日",
+    "ko": "매일"
+  },
+  "没有活动存档。": {
+    "en": "No active save.",
+    "ja": "有効なセーブがありません。",
+    "ko": "활성 저장이 없습니다."
+  },
+  "浮动盈亏": {
+    "en": "Unrealized P/L ",
+    "ja": "含み損益 ",
+    "ko": "평가 손익 "
+  },
+  "浮盈": {
+    "en": "Unrealized P/L ",
+    "ja": "含み損益 ",
+    "ko": "평가 손익 "
+  },
+  "涨红": {
+    "en": "Red: up",
+    "ja": "上昇：赤",
+    "ko": "상승: 빨강"
+  },
+  "清理对象失败：": {
+    "en": "Object cleanup failed: ",
+    "ja": "オブジェクトの解放に失敗：",
+    "ko": "객체 정리 실패: "
+  },
+  "游戏原生": {
+    "en": "Game-native ",
+    "ja": "ゲーム標準",
+    "ko": "게임 기본 "
+  },
+  "游戏的原生自定义窗口、文本、按钮、输入或滚动预制件尚未配置。": {
+    "en": "The game's native UI prefabs are not configured.",
+    "ja": "ゲームの標準 UI プレハブが未設定です。",
+    "ko": "게임 기본 UI 프리팹이 설정되지 않았습니다."
+  },
+  "灰横标：不完整": {
+    "en": "Gray dash: partial",
+    "ja": "灰色の横線：不完全",
+    "ko": "회색 가로선: 불완전"
+  },
+  "灰色收盘标记：旧档或首次接入采样，开": {
+    "en": "Gray close marker: legacy or first-time sample; O",
+    "ja": "灰色の終値：旧セーブや初回データ。始値",
+    "ko": "회색 종가 표시: 기존 저장 또는 첫 표본. 시가"
+  },
+  "点击": {
+    "en": "Click ",
+    "ja": "クリック",
+    "ko": "클릭 "
+  },
+  "点击切换": {
+    "en": "Click to select",
+    "ja": "クリックで切替",
+    "ko": "클릭하여 전환"
+  },
+  "点击持仓卡片查看": {
+    "en": "Select a holding for ",
+    "ja": "保有カードを選ぶと表示：",
+    "ko": "보유 카드를 선택하여 확인: "
+  },
+  "点击查看行情": {
+    "en": "View quote",
+    "ja": "株価を見る",
+    "ko": "시세 보기"
+  },
+  "独立原生股市窗口清理失败。": {
+    "en": "Could not clean up the stock-market window.",
+    "ja": "株式画面を解放できませんでした。",
+    "ko": "독립 주식시장 창 정리에 실패했습니다."
+  },
+  "现": {
+    "en": " now",
+    "ja": "現在",
+    "ko": "현재"
+  },
+  "现价": {
+    "en": "Price ",
+    "ja": "現在値 ",
+    "ko": "현재가 "
+  },
+  "现货交易": {
+    "en": "Spot trading",
+    "ja": "現物取引",
+    "ko": "현물 거래"
+  },
+  "确认买入": {
+    "en": "Confirm buy",
+    "ja": "購入を確定",
+    "ko": "매수 확인"
+  },
+  "确认卖出": {
+    "en": "Confirm sell",
+    "ja": "売却を確定",
+    "ko": "매도 확인"
+  },
+  "确认委托": {
+    "en": "Confirm order",
+    "ja": "注文を確定",
+    "ko": "주문 확인"
+  },
+  "窗体、按钮、": {
+    "en": "windows, buttons, ",
+    "ja": "画面・ボタン・",
+    "ko": "창, 버튼, "
+  },
+  "第": {
+    "en": "Day ",
+    "ja": "第",
+    "ko": "제"
+  },
+  "管理器仍被其他窗口使用，保留正在共享的模板、管理器与事件系统，不销毁游戏素材。": {
+    "en": "The manager is shared by another window; shared templates, manager, event system and game assets are retained.",
+    "ja": "他の画面が使用中のため、共有テンプレート、マネージャー、イベントシステムとゲーム素材を保持します。",
+    "ko": "다른 창에서 사용 중이므로 공유 템플릿, 관리자, 이벤트 시스템과 게임 리소스를 유지합니다."
+  },
+  "管理器初始化失败。": {
+    "en": "Manager initialization failed.",
+    "ja": "マネージャーの初期化に失敗しました。",
+    "ko": "관리자 초기화 실패."
+  },
+  "紫：事件": {
+    "en": "Purple: events",
+    "ja": "紫：イベント",
+    "ko": "보라: 이벤트"
+  },
+  "红涨": {
+    "en": "Red: up",
+    "ja": "赤：上昇",
+    "ko": "빨강: 상승"
+  },
+  "纸条": {
+    "en": "Note",
+    "ja": "メモ",
+    "ko": "쪽지"
+  },
+  "线": {
+    "en": " chart",
+    "ja": "チャート",
+    "ko": " 차트"
+  },
+  "线。": {
+    "en": " chart.",
+    "ja": "チャート。",
+    "ko": " 차트."
+  },
+  "线并委托。持仓成本与已实现盈亏均包含手续费。": {
+    "en": " charts and orders. Costs and realized P/L include fees.",
+    "ja": "チャートと注文。取得費用と確定損益には手数料を含みます。",
+    "ko": " 차트 및 주문. 보유 원가와 실현 손익에는 수수료가 포함됩니다."
+  },
+  "线悬停": {
+    "en": " chart tooltip",
+    "ja": "チャートのツールチップ",
+    "ko": " 차트 툴팁"
+  },
+  "线暂不可用，请查看加载日志。": {
+    "en": " chart unavailable. Check the loader log.",
+    "ja": "チャートを使用できません。ローダーログを確認してください。",
+    "ko": " 차트를 사용할 수 없습니다. 로더 로그를 확인하세요."
+  },
+  "组件。": {
+    "en": "component.",
+    "ja": "コンポーネント。",
+    "ko": "컴포넌트."
+  },
+  "绘制失败，本窗口不再重试：": {
+    "en": "Drawing failed; no further retries in this window: ",
+    "ja": "描画失敗。この画面では再試行しません：",
+    "ko": "그리기 실패. 이 창에서는 재시도하지 않음: "
+  },
+  "绿跌": {
+    "en": "Green: down",
+    "ja": "緑：下落",
+    "ko": "초록: 하락"
+  },
+  "股": {
+    "en": " shares",
+    "ja": "株",
+    "ko": "주"
+  },
+  "股市专用新闻": {
+    "en": "Stock-market news",
+    "ja": "株式市場専用ニュース",
+    "ko": "주식시장 전용 뉴스"
+  },
+  "股市投资": {
+    "en": "Stock investment",
+    "ja": "株式投資",
+    "ko": "주식 투자"
+  },
+  "股市新闻": {
+    "en": "Stock news",
+    "ja": "株式ニュース",
+    "ko": "주식 뉴스"
+  },
+  "股数": {
+    "en": "Shares",
+    "ja": "株数",
+    "ko": "주식 수"
+  },
+  "自有": {
+    "en": "Owned ",
+    "ja": "自前",
+    "ko": "자체 "
+  },
+  "行情与委托": {
+    "en": "Quotes & orders",
+    "ja": "株価・注文",
+    "ko": "시세 및 주문"
+  },
+  "行情掮客与消息来源": {
+    "en": "Brokers and sources",
+    "ja": "仲介人と情報源",
+    "ko": "중개인 및 정보 출처"
+  },
+  "行情采样": {
+    "en": "Market sample",
+    "ja": "相場データ",
+    "ko": "시세 표본"
+  },
+  "补领股市面板道具": {
+    "en": "Replace terminal",
+    "ja": "株式端末を再発行",
+    "ko": "주식 단말기 재발급"
+  },
+  "请输入正整数股数。": {
+    "en": "Enter a positive whole number of shares.",
+    "ja": "株数を正の整数で入力してください。",
+    "ko": "양의 정수로 주식 수를 입력하세요."
+  },
+  "购入时参考可信度": {
+    "en": "Credibility at purchase",
+    "ja": "購入時の参考信頼度",
+    "ko": "구매 시 참고 신뢰도"
+  },
+  "资金": {
+    "en": "Cash",
+    "ja": "資金",
+    "ko": "자금"
+  },
+  "资金与行情流水": {
+    "en": "Cash & market log",
+    "ja": "資金・相場履歴",
+    "ko": "자금 및 시세 내역"
+  },
+  "资金变动": {
+    "en": "Cash change ",
+    "ja": "資金変動 ",
+    "ko": "자금 변동 "
+  },
+  "跌绿": {
+    "en": "Green: down",
+    "ja": "下落：緑",
+    "ko": "하락: 초록"
+  },
+  "较": {
+    "en": " vs. ",
+    "ja": "比",
+    "ko": " 대비 "
+  },
+  "较昨收": {
+    "en": "vs. previous close",
+    "ja": "前日終値比",
+    "ko": "전일 종가 대비"
+  },
+  "近": {
+    "en": "Last ",
+    "ja": "直近",
+    "ko": "최근 "
+  },
+  "近期资金与行情流水（新记录在前）": {
+    "en": "Recent cash and market log (newest first)",
+    "ja": "最近の資金・相場履歴（新しい順）",
+    "ko": "최근 자금 및 시세 내역 (최신순)"
+  },
+  "返回空。": {
+    "en": "returned null.",
+    "ja": "空を返しました。",
+    "ko": "빈 값을 반환했습니다."
+  },
+  "返回行情": {
+    "en": "Back to quotes",
+    "ja": "株価に戻る",
+    "ko": "시세로 돌아가기"
+  },
+  "进入存档后才能打开原生股市窗口。": {
+    "en": "Load a save before opening the stock market.",
+    "ja": "セーブを読み込んでから株式市場を開いてください。",
+    "ko": "저장을 불러온 후 주식시장을 열 수 있습니다."
+  },
+  "远星证券": {
+    "en": "Farstar Securities",
+    "ja": "遠星証券",
+    "ko": "원성 증권"
+  },
+  "采样": {
+    "en": "Sample",
+    "ja": "サンプル",
+    "ko": "표본"
+  },
+  "青：走势": {
+    "en": "Cyan: prices",
+    "ja": "青緑：推移",
+    "ko": "청록: 추이"
+  },
+  "顾客": {
+    "en": "Customer",
+    "ja": "客",
+    "ko": "손님"
+  },
+  "顾客结算": {
+    "en": "Customer settlement",
+    "ja": "顧客精算",
+    "ko": "손님 정산"
+  },
+  "首采样": {
+    "en": "First sample",
+    "ja": "初回データ",
+    "ko": "첫 표본"
+  },
+  "高": {
+    "en": " H ",
+    "ja": "高値",
+    "ko": "고가"
+  },
+  "日 K 线": {
+    "en": "Daily candles",
+    "ja": "日足",
+    "ko": "일봉"
+  },
+  "红涨  绿跌  灰横标：不完整": {
+    "en": "Red up · Green down · Gray partial",
+    "ja": "赤：上昇　緑：下落　灰：不完全",
+    "ko": "빨강 상승 · 초록 하락 · 회색 불완전"
+  },
+  "灰色收盘标记：旧档或首次接入采样，开/高/低未知": {
+    "en": "Gray close marker: legacy or initial sample; O/H/L unknown",
+    "ja": "灰色の終値：旧セーブや初回データ。始値・高値・安値は不明",
+    "ko": "회색 종가: 기존 저장 또는 첫 표본. 시가·고가·저가 미상"
+  },
+  "点击持仓卡片查看 K 线并委托。持仓成本与已实现盈亏均包含手续费。": {
+    "en": "Select a holding to view candles or place an order. Costs and realized P/L include fees.",
+    "ja": "保有カードを選ぶと日足と注文を表示します。取得費用と確定損益には手数料を含みます。",
+    "ko": "보유 카드를 선택하여 일봉을 보거나 주문하세요. 원가와 실현 손익에는 수수료가 포함됩니다."
+  },
+  "日 K 线暂不可用，请查看加载日志。": {
+    "en": "Daily chart unavailable. Check the loader log.",
+    "ja": "日足を使用できません。ローダーログを確認してください。",
+    "ko": "일봉 차트를 사용할 수 없습니다. 로더 로그를 확인하세요."
+  },
+  "暂无日行情记录；首次接入只记录可确认的收盘采样，不补造历史 K 线。": {
+    "en": "No daily records. Initial integration records confirmed closing samples only; historical candles are not fabricated.",
+    "ja": "日次記録はありません。初回導入では確認できる終値のみを記録し、過去の日足は作成しません。",
+    "ko": "일일 기록이 없습니다. 첫 도입에서는 확인 가능한 종가만 기록하며 과거 일봉은 생성하지 않습니다."
+  },
+  "最新变化": {
+    "en": "Latest change",
+    "ja": "直近の変動",
+    "ko": "최근 변동"
+  },
+  "公司行情 · 点击切换": {
+    "en": "Stocks · Select company",
+    "ja": "株価一覧・クリックで切替",
+    "ko": "회사 시세 · 클릭하여 전환"
+  },
+  "涨红 / 跌绿 · 较昨收\n昨日成交日结 · 事件与余波": {
+    "en": "Red up / Green down · vs. prev. close\nDaily trades · Events and aftermath",
+    "ja": "上昇は赤・下落は緑・前日終値比\n前日取引の日次精算・イベントと余波",
+    "ko": "빨강 상승 / 초록 하락 · 전일 종가 대비\n전일 거래 정산 · 이벤트와 여파"
+  }
+}

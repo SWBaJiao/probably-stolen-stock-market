@@ -5,6 +5,7 @@ using System.Reflection;
 using HarmonyLib;
 using Il2Cpp;
 using MelonLoader;
+using ProbablyStolenStockMarket.Localization;
 using ProbablyStolenStockMarket.Market;
 using UnityEngine.EventSystems;
 using NativeEvents = Il2CppSystem.Collections.Generic.List<Il2Cpp.StoreEvent>;
@@ -75,9 +76,9 @@ internal sealed class IntelCalendarAdapter : IDisposable
     {
         if (_displayEvents.TryGetValue(record.OfferId, out var found))
         {
-            found.displayName = IntelDeliveryAdapter.StatusLabel(record.Status) + " · " + record.Industry;
+            found.displayName = Localizer.Text(IntelDeliveryAdapter.StatusLabel(record.Status) + " · " + record.Industry);
             found.newsName = found.displayName;
-            found.newsDescription = IntelDeliveryAdapter.BuildBody(record);
+            found.newsDescription = Localizer.Text(IntelDeliveryAdapter.BuildBody(record));
             return found;
         }
         int span = Math.Max(1, record.ObservationEndDay - record.ObservationStartDay + 1);
@@ -86,9 +87,9 @@ internal sealed class IntelCalendarAdapter : IDisposable
             identifier = "stock_intel_display:" + record.OfferId,
             eventType = StoreEvent.EventType.NORMALE,
             eventArea = StoreEvent.EventArea.ALL,
-            displayName = IntelDeliveryAdapter.StatusLabel(record.Status) + " · " + record.Industry,
-            newsName = IntelDeliveryAdapter.StatusLabel(record.Status) + " · " + record.Industry,
-            newsDescription = IntelDeliveryAdapter.BuildBody(record),
+            displayName = Localizer.Text(IntelDeliveryAdapter.StatusLabel(record.Status) + " · " + record.Industry),
+            newsName = Localizer.Text(IntelDeliveryAdapter.StatusLabel(record.Status) + " · " + record.Industry),
+            newsDescription = Localizer.Text(IntelDeliveryAdapter.BuildBody(record)),
             startDay = record.ObservationStartDay,
             duration = span,
             totalDuration = span,

@@ -5,6 +5,7 @@ using System.Reflection;
 using HarmonyLib;
 using Il2Cpp;
 using MelonLoader;
+using ProbablyStolenStockMarket.Localization;
 
 namespace ProbablyStolenStockMarket.Game;
 
@@ -35,6 +36,7 @@ internal static class GamePatches
         Patch(harmony, typeof(GameItem), "ActivateSlotItem", prefix: nameof(ActivatePrefix));
         Patch(harmony, typeof(GameItem), "Target", prefix: nameof(ProtectTargetPrefix));
         Patch(harmony, typeof(GameItem), "MayRemove", prefix: nameof(MayRemovePrefix));
+        Patch(harmony, typeof(GameItem), "GetDisplayName", postfix: nameof(ItemDisplayNamePostfix));
         Patch(harmony, typeof(ItemMouseDragHandler), "StartDrag", prefix: nameof(InputPrefix));
         // 原版独立输入分发不受 UGUI 窗口遮挡影响，模态期间在入口暂停，EventSystem 仍处理股市控件。
         Patch(harmony, typeof(InputActionManager), "Update", prefix: nameof(InputPrefix));
@@ -132,6 +134,12 @@ internal static class GamePatches
     {
         if (GameBridge.Current?.IsTerminal(__0) != true) return true;
         __result = false; return false;
+    }
+    private static void ItemDisplayNamePostfix(GameItem __instance, ref string __result)
+    {
+        // 只翻译专用入口与已认领情报纸条，名称标记仍以原文随存档保存。
+        if (GameBridge.Current?.IsTerminal(__instance) == true) __result = Localizer.Text("股市面板");
+        else if (IntelDeliveryAdapter.IsOwnPaper(__instance)) __result = Localizer.Text("股市情报纸条");
     }
     private static bool MayRemovePrefix(GameItem __instance, ref bool __result)
     {

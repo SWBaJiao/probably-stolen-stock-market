@@ -1,4 +1,5 @@
 using System;
+using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using System.Linq;
 using Il2Cpp;
@@ -93,6 +94,20 @@ internal sealed class NativeUiBootstrap : IDisposable
         }
     }
 
+    internal static void ApplyCurrentFont(TMP_Text text)
+    {
+        try
+        {
+            var operation = UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocaleAsync;
+            if (!operation.IsDone || operation.Result == null || FontLoader.Instance == null) return;
+            var font = FontLoader.Instance.GetFontByRole(FontLoader.FontRole.Noto_Sans, operation.Result);
+            if (font == null) return;
+            text.font = font;
+            if (font.material != null) text.fontSharedMaterial = font.material;
+        }
+        catch { /* 原版字体尚未完成加载时，沿用控件现有字体。 */ }
+    }
+
     private static readonly string[] RequiredFields = { "windowPrefab", "labelPrefab", "buttonPrefab", "inputFieldPrefab", "scrollViewPrefab" };
     private static GameObject? GetPrefab(CustomUIManager manager, string field) => field switch
     {
@@ -180,7 +195,7 @@ internal sealed class NativeUiBootstrap : IDisposable
     {
         var text = Add<TextMeshProUGUI>(go); text.font = _font!;
         if (_fontMaterial != null) text.fontSharedMaterial = _fontMaterial;
-        text.text = value; text.fontSize = size; text.color = new Color(.93f, .87f, .73f, 1);
+        text.text = Localizer.Text(value); text.fontSize = size; text.color = new Color(.93f, .87f, .73f, 1);
         text.enableWordWrapping = true; text.raycastTarget = false; text.alignment = TextAlignmentOptions.MidlineLeft;
         return text;
     }

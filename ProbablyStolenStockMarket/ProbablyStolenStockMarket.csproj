@@ -8,6 +8,10 @@
     <RootNamespace>ProbablyStolenStockMarket</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Localization/*.json" LogicalName="ProbablyStolenStockMarket.Localization.%(Filename)%(Extension)" />
+  </ItemGroup>
+
   <!-- 加载器及代理程序集由游戏侧提供，不复制它们覆盖现有安装。 -->
   <ItemGroup>
     <Reference Include="MelonLoader">

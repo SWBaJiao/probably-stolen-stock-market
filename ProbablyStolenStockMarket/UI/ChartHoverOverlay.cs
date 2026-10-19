@@ -1,4 +1,5 @@
 using System;
+using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
@@ -121,6 +122,7 @@ internal sealed class ChartHoverOverlay
         { Hide(owner); return; }
         var rect = _window.rect;
         if (rect.width < 30 || rect.height < 30) { Hide(owner); return; }
+        text = Localizer.Text(text);
         if (_text != text) { _label.text = text; _text = text; }
         if (!VisibleWindowBounds(camera, out var visibleBounds)) { Hide(owner); return; }
         if (visibleBounds.Width < 40 || visibleBounds.Height < 30) { Hide(owner); return; }

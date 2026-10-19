@@ -13,6 +13,10 @@
 
 发布包仅包含 Mod DLL、版本控制中的配套资源、安装说明和校验清单。不包含个人存档、本地游戏路径、用户运行配置、游戏程序集、原始人物参考照片或构建调试符号。
 
+## 游戏语言
+
+Mod 界面、公司介绍、事件消息、内幕对话、纸条、档案与日历内容支持中文、日文、英文和韩文，并跟随游戏当前语言，无需单独安装语言包。翻译资源内置于 Mod DLL。自行修改配置中的文字不会自动机器翻译，请根据需要自行编写相应内容。
+
 ## 保留配置和旧存档
 
 新配置路径为 `UserData/ProbablyStolenStockMarket/market-config.json`。发布包中的 `Assets/market-config.default.json` 是默认配置资源，请不要用它覆盖自己的运行配置。
@@ -26,7 +30,7 @@
 Release 同时提供 `.zip.sha256` 校验文件。macOS 可在下载目录运行：
 
 ```sh
-shasum -a 256 -c ProbablyStolenStockMarket-v0.12.1.zip.sha256
+shasum -a 256 -c ProbablyStolenStockMarket-v0.13.0.zip.sha256
 ```
 
 后续版本请将命令中的文件名替换为实际下载名称。ZIP 内的 `SHA256SUMS` 记录每个安装文件和本说明的 SHA-256，不包含其自身。解压后也可在解压根目录执行 `shasum -a 256 -c SHA256SUMS`。
@@ -39,4 +43,4 @@ shasum -a 256 -c ProbablyStolenStockMarket-v0.12.1.zip.sha256
 python3 ProbablyStolenStockMarket/tools/package_release.py
 ```
 
-脚本默认从 `ModInfo.cs` 读取版本，将 ZIP 和外部 SHA-256 校验文件写入 `artifacts/`。可用 `--version 0.12.1` 明确校验版本，或使用 `--output-directory /目标目录` 修改输出位置。打包会检查 DLL、资源清单、ZIP 内容及 CRC；脚本不会自动编译或修改游戏安装目录。
+脚本默认从 `ModInfo.cs` 读取版本，将 ZIP 和外部 SHA-256 校验文件写入 `artifacts/`。可用 `--version 0.13.0` 明确校验版本，或使用 `--output-directory /目标目录` 修改输出位置。打包会直接读取 DLL 中的 `ModInfo.Version` 常量，版本与源码不一致时拒绝发布，避免将更新前的 DLL 打入新版本压缩包。脚本同时检查资源清单、ZIP 内容及 CRC，不会自动编译或修改游戏安装目录。

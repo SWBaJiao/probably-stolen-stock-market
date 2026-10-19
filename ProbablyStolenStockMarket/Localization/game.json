@@ -1,0 +1,1687 @@
+{
+  "三日来访冷却已记录。": {
+    "en": "The three-day visit cooldown has been recorded.",
+    "ja": "来訪の 3 日間クールダウンを記録しました。",
+    "ko": "방문 대기 기간 3일을 기록했습니다."
+  },
+  "下一日起逐步回归。": {
+    "en": "Gradual recovery begins tomorrow.",
+    "ja": "翌日から徐々に回帰します。",
+    "ko": "다음 날부터 서서히 회복됩니다."
+  },
+  "不再用于发放。": {
+    "en": "No longer used for delivery.",
+    "ja": "配布には使用しません。",
+    "ko": "더 이상 지급에 사용하지 않습니다."
+  },
+  "不确定状态保存失败：": {
+    "en": "Failed to save uncertain state: ",
+    "ja": "未確定状態の保存に失敗：",
+    "ko": "미확정 상태 저장 실패: "
+  },
+  "与现金变化": {
+    "en": "and the cash change",
+    "ja": "および所持金の変化",
+    "ko": "및 현금 변동"
+  },
+  "专号": {
+    "en": "Dedicated number",
+    "ja": "専用番号",
+    "ko": "전용 번호"
+  },
+  "专属人物图像暂未就绪，本次使用原版人物素材。": {
+    "en": "Custom character art is not ready; using the game's original art for this visit.",
+    "ja": "専用の人物画像が未準備のため、今回は原作の素材を使います。",
+    "ko": "전용 캐릭터 이미지가 준비되지 않아 이번에는 원본 이미지를 사용합니다."
+  },
+  "专属情报商工厂返回了其他顾客，已停止本次排队。": {
+    "en": "The broker factory returned a different customer. Queue insertion was stopped.",
+    "ja": "専用の情報屋生成処理が別の客を返したため、追加を中止しました。",
+    "ko": "전용 정보상 생성 과정에서 다른 손님이 반환되어 대기열 추가를 중단했습니다."
+  },
+  "专属顾客标识已被其他工厂占用，未覆盖原值。": {
+    "en": "This customer ID is already registered by another factory; its value was preserved.",
+    "ja": "専用の客 ID は他の生成処理が使用中のため、既存値を維持しました。",
+    "ko": "전용 손님 ID를 다른 생성기가 사용 중이므로 기존 값을 유지했습니다."
+  },
+  "专用图像应用失败，保留原版便笺图像。": {
+    "en": "Failed to apply custom artwork; retaining the original note image.",
+    "ja": "専用画像を適用できず、原作の付箋画像を維持します。",
+    "ko": "전용 이미지 적용에 실패하여 원본 메모 이미지를 유지합니다."
+  },
+  "专用图集缓存清理失败。": {
+    "en": "Failed to clear the custom atlas cache.",
+    "ja": "専用アトラスのキャッシュ削除に失敗しました。",
+    "ko": "전용 아틀라스 캐시 삭제에 실패했습니다."
+  },
+  "专用图集键已被其他资源占用，保留便笺图像。": {
+    "en": "The custom atlas key is in use; retaining the note image.",
+    "ja": "専用アトラスのキーが使用中のため、付箋画像を維持します。",
+    "ko": "전용 아틀라스 키가 사용 중이므로 메모 이미지를 유지합니다."
+  },
+  "专用道具的": {
+    "en": "the dedicated item's ",
+    "ja": "専用アイテムの ",
+    "ko": "전용 아이템의 "
+  },
+  "严格读档验证": {
+    "en": "Strict save-load verification",
+    "ja": "厳格なセーブ再読込検証",
+    "ko": "엄격한 저장·불러오기 검증"
+  },
+  "严格验证": {
+    "en": "Strict verification",
+    "ja": "厳格な検証",
+    "ko": "엄격한 검증"
+  },
+  "个人": {
+    "en": "Individual",
+    "ja": "個人",
+    "ko": "개인"
+  },
+  "个人记录": {
+    "en": "Individual record",
+    "ja": "個人の記録",
+    "ko": "개인 기록"
+  },
+  "个原生方法补丁。": {
+    "en": " native method patches.",
+    "ja": " 個の原生メソッドパッチ。",
+    "ko": "개의 원본 메서드 패치."
+  },
+  "临时便笺清理失败，停止再次创建：": {
+    "en": "Temporary note cleanup failed; no further creation: ",
+    "ja": "一時付箋の削除に失敗したため、再生成を停止：",
+    "ko": "임시 메모 삭제 실패로 재생성을 중단합니다: "
+  },
+  "临时快捷联系人；原版电话簿存档未改写。": {
+    "en": " temporary speed-dial entry; the original phone book save was not changed.",
+    "ja": " の一時短縮ダイヤル項目。原作の電話帳セーブは変更していません。",
+    "ko": " 임시 단축 번호 항목. 원본 전화번호부 저장 데이터는 변경하지 않았습니다."
+  },
+  "临时文档清理未确认：": {
+    "en": "Temporary document cleanup is unconfirmed: ",
+    "ja": "一時文書の削除を確認できません：",
+    "ko": "임시 문서 삭제 여부를 확인하지 못했습니다: "
+  },
+  "临时纸条清理后的领域状态不匹配，保持锁定。": {
+    "en": "Domain state did not match after temporary note cleanup; keeping the lock.",
+    "ja": "一時紙片の削除後に領域状態が一致しないため、ロックを維持します。",
+    "ko": "임시 쪽지 삭제 후 상태가 일치하지 않아 잠금을 유지합니다."
+  },
+  "为负，本次不新造发生键、不登记行情计划，等待原生数据恢复。": {
+    "en": "is negative. No new occurrence key or market schedule was created; waiting for original data to recover.",
+    "ja": " が負数のため、発生キーと相場予定を作成せず、原生データの復旧を待ちます。",
+    "ko": "이 음수입니다. 새 발생 키나 시장 일정을 만들지 않고 원본 데이터 복구를 기다립니다."
+  },
+  "主背包尚未就绪，稍后重试。": {
+    "en": "The main inventory is not ready. Retrying later.",
+    "ja": "メイン所持品が未準備です。後で再試行します。",
+    "ko": "주 인벤토리가 준비되지 않았습니다. 나중에 다시 시도합니다."
+  },
+  "主背包未接收道具，稍后重试。": {
+    "en": "The main inventory did not receive the item. Retrying later.",
+    "ja": "メイン所持品がアイテムを受け取れませんでした。後で再試行します。",
+    "ko": "주 인벤토리에 아이템이 들어가지 않았습니다. 나중에 다시 시도합니다."
+  },
+  "主背包直接成员已确认": {
+    "en": "Confirmed as a direct member of the main inventory",
+    "ja": "メイン所持品の直接の子要素として確認済み",
+    "ko": "주 인벤토리의 직접 소속으로 확인됨"
+  },
+  "主背包空间不足，稍后重试。": {
+    "en": "The main inventory is full. Retrying later.",
+    "ja": "メイン所持品に空きがありません。後で再試行します。",
+    "ko": "주 인벤토리에 공간이 없습니다. 나중에 다시 시도합니다."
+  },
+  "之前的预约已过期，可再拨电话查询。": {
+    "en": "The previous appointment has expired. Call again to check availability.",
+    "ja": "以前の予約は期限切れです。もう一度電話でお問い合わせください。",
+    "ko": "이전 예약이 만료되었습니다. 다시 전화해 확인하세요."
+  },
+  "买入": {
+    "en": "Buy",
+    "ja": "購入",
+    "ko": "매수"
+  },
+  "事件结束同步失败": {
+    "en": "Failed to synchronize event ending",
+    "ja": "イベント終了の同期に失敗",
+    "ko": "이벤트 종료 동기화 실패"
+  },
+  "事件结束观察失败": {
+    "en": "Failed to observe event ending",
+    "ja": "イベント終了の監視に失敗",
+    "ko": "이벤트 종료 관찰 실패"
+  },
+  "事件适配失败": {
+    "en": "Event adaptation failed",
+    "ja": "イベント連携に失敗",
+    "ko": "이벤트 연동 실패"
+  },
+  "人物": {
+    "en": "Character",
+    "ja": "人物",
+    "ko": "인물"
+  },
+  "人物图像像素数超出限制。": {
+    "en": "The character image exceeds the pixel limit.",
+    "ja": "人物画像の画素数が上限を超えています。",
+    "ko": "캐릭터 이미지의 픽셀 수가 제한을 초과했습니다."
+  },
+  "人物精灵键已被其它资源占用，未覆盖原值。": {
+    "en": "The character sprite key is already in use; its existing value was preserved.",
+    "ja": "人物スプライトのキーが使用中のため、既存値を維持しました。",
+    "ko": "캐릭터 스프라이트 키가 이미 사용 중이므로 기존 값을 유지했습니다."
+  },
+  "介绍末句进入原版购买界面": {
+    "en": "The final introduction line opened the original purchase interface",
+    "ja": "自己紹介の最終行から原作の購入画面を開きました",
+    "ko": "자기소개 마지막 대사에서 원본 구매 화면을 열었습니다"
+  },
+  "余额不足。": {
+    "en": "Insufficient funds.",
+    "ja": "所持金が足りません。",
+    "ko": "잔액이 부족합니다."
+  },
+  "余额不足，暂时无法购买。": {
+    "en": "Insufficient funds. This offer cannot be purchased yet.",
+    "ja": "所持金が足りないため、購入できません。",
+    "ko": "잔액이 부족하여 아직 구매할 수 없습니다."
+  },
+  "你需要持有本存档的股市面板道具，才能预约内幕掮客。": {
+    "en": "You need this save's stock-market terminal to book an insider broker.",
+    "ja": "このセーブの株式端末を所持していると、情報仲介人を予約できます。",
+    "ko": "이 저장 파일의 주식 단말기를 보유해야 내부 정보 중개인을 예약할 수 있습니다."
+  },
+  "保持独立。": {
+    "en": "remains independent.",
+    "ja": " は独立したままです。",
+    "ko": "은 독립적으로 유지됩니다."
+  },
+  "保留事务并停止本次会话自动创建。": {
+    "en": "The transaction was preserved and automatic creation was stopped for this session.",
+    "ja": "取引を保持し、このセッションでの自動生成を停止しました。",
+    "ko": "거래를 보존하고 이 세션의 자동 생성을 중단했습니다."
+  },
+  "像素数量与尺寸不符。": {
+    "en": "Pixel count does not match the dimensions.",
+    "ja": "画素数と寸法が一致しません。",
+    "ko": "픽셀 수와 크기가 일치하지 않습니다."
+  },
+  "先说好，风声归风声，最后怎么投资当然得你自己拿主意。要听听我这次带来的消息吗？": {
+    "en": "Just remember: a rumor is a rumor. How you invest is up to you. Want to hear what I brought today?",
+    "ja": "念のため言うけど、噂は噂。最後にどう投資するかは君次第だよ。今回の話、聞いてみる？",
+    "ko": "미리 말하지만 소문은 소문이야. 최종 투자 판단은 네 몫이지. 이번에 가져온 얘기, 들어 볼래?"
+  },
+  "内存写回失败。": {
+    "en": "Failed to write back to memory.",
+    "ja": "メモリへの書き戻しに失敗しました。",
+    "ko": "메모리 쓰기 복원에 실패했습니다."
+  },
+  "内幕购买探针": {
+    "en": "Insider-purchase probe",
+    "ja": "内幕情報購入プローブ",
+    "ko": "내부 정보 구매 점검"
+  },
+  "内幕资金操作异常，交易已冻结": {
+    "en": "Insider payment failed; trading is frozen",
+    "ja": "内幕情報の支払い異常により、取引を凍結しました",
+    "ko": "내부 정보 결제 오류로 거래가 동결되었습니다"
+  },
+  "分配商品信号。": {
+    "en": "allocate commodity signals.",
+    "ja": "商品シグナルを配分。",
+    "ko": "상품 신호를 배분합니다."
+  },
+  "创建人物精灵失败。": {
+    "en": "Failed to create the character sprite.",
+    "ja": "人物スプライトの作成に失敗しました。",
+    "ko": "캐릭터 스프라이트 생성에 실패했습니다."
+  },
+  "创建准备": {
+    "en": "Preparing creation",
+    "ja": "生成準備",
+    "ko": "생성 준비"
+  },
+  "到访状态暂未保存，正在重试；保存成功后才能购买。": {
+    "en": "Arrival has not been saved. Retrying; purchases unlock after a successful save.",
+    "ja": "来訪状態が未保存です。再試行中のため、保存成功後に購入できます。",
+    "ko": "방문 상태가 아직 저장되지 않았습니다. 다시 시도 중이며 저장에 성공하면 구매할 수 있습니다."
+  },
+  "刷新。": {
+    "en": "refresh.",
+    "ja": "更新。",
+    "ko": "갱신."
+  },
+  "剑清酱": {
+    "en": "Jianqing-chan",
+    "ja": "剣清ちゃん",
+    "ko": "젠칭짱"
+  },
+  "剑清酱亲自带来的行情消息，我的眼光可是很独到的！": {
+    "en": "Market news delivered by Jianqing-chan in person! I have quite an eye for these things!",
+    "ja": "剣清ちゃんが直々に持ってきた相場情報だよ！見る目には自信があるんだから！",
+    "ko": "젠칭짱이 직접 가져온 시황 정보야! 내 안목은 아주 특별하다고!"
+  },
+  "卖出": {
+    "en": "Sell",
+    "ja": "売却",
+    "ko": "매도"
+  },
+  "原版": {
+    "en": "Original",
+    "ja": "原作",
+    "ko": "원본"
+  },
+  "原版事件管理器已更换，等待载入或原生事件流程完成后再采信快照。": {
+    "en": "The original event manager changed. Waiting for load or the original event flow before trusting snapshots.",
+    "ja": "原作のイベント管理が変わりました。読込または原生処理の完了後にスナップショットを採用します。",
+    "ko": "원본 이벤트 관리자가 변경되었습니다. 불러오기나 원본 이벤트 처리가 끝난 뒤 스냅샷을 사용합니다."
+  },
+  "原版人物图像目录尚未就绪。": {
+    "en": "The original character-art catalog is not ready.",
+    "ja": "原作の人物画像一覧が未準備です。",
+    "ko": "원본 캐릭터 이미지 목록이 준비되지 않았습니다."
+  },
+  "原版便笺工厂不可用，稍后重试。": {
+    "en": "The original note factory is unavailable. Retrying later.",
+    "ja": "原作の付箋生成処理が利用できません。後で再試行します。",
+    "ko": "원본 메모 생성기를 사용할 수 없습니다. 나중에 다시 시도합니다."
+  },
+  "原版保存前写入": {
+    "en": "Write before the original save",
+    "ja": "原作の保存前に書込",
+    "ko": "원본 저장 전에 기록"
+  },
+  "原版图集字段已尝试恢复，渲染刷新失败。": {
+    "en": "Tried to restore the original atlas fields, but rendering refresh failed.",
+    "ja": "原作アトラスのフィールド復元を試みましたが、描画更新に失敗しました。",
+    "ko": "원본 아틀라스 필드 복원을 시도했으나 화면 갱신에 실패했습니다."
+  },
+  "原版图集缓存尚未初始化，将保留便笺图像。": {
+    "en": "The original atlas cache is not initialized; retaining the note image.",
+    "ja": "原作アトラスのキャッシュが未初期化のため、付箋画像を維持します。",
+    "ko": "원본 아틀라스 캐시가 초기화되지 않아 메모 이미지를 유지합니다."
+  },
+  "原版存档读回及资金一致性已通过；可交易。": {
+    "en": "Original save readback and cash consistency passed. Trading is available.",
+    "ja": "原作セーブの再読込と所持金の整合性を確認済み。取引できます。",
+    "ko": "원본 저장 데이터 복원과 자금 일치 검증을 통과했습니다. 거래할 수 있습니다."
+  },
+  "原版生效事件列表含缺失或无效条目，本次不以空集清除事件。": {
+    "en": "The original active-event list contains missing or invalid entries; an empty set will not clear events.",
+    "ja": "原作の有効イベント一覧に欠落・無効項目があるため、空集合でイベントを削除しません。",
+    "ko": "원본 활성 이벤트 목록에 누락되거나 잘못된 항목이 있어 빈 목록으로 이벤트를 지우지 않습니다."
+  },
+  "原版生效事件快照暂不可读，保留已有生命周期：": {
+    "en": "Cannot read the original active-event snapshot; retaining existing lifecycles: ",
+    "ja": "原作の有効イベントを取得できないため、既存のライフサイクルを維持：",
+    "ko": "원본 활성 이벤트 스냅샷을 읽을 수 없어 기존 수명 주기를 유지합니다: "
+  },
+  "原版联系人视图缺少": {
+    "en": "The original contact view is missing ",
+    "ja": "原作の連絡先ビューに不足：",
+    "ko": "원본 연락처 화면에 누락됨: "
+  },
+  "原版购买已跳过。": {
+    "en": "The original purchase was skipped.",
+    "ja": "原作の購入処理をスキップしました。",
+    "ko": "원본 구매 처리를 건너뛰었습니다."
+  },
+  "原版资金接口返回金额与预期不一致。": {
+    "en": "The original cash API returned an unexpected amount.",
+    "ja": "原作の所持金 API が想定外の金額を返しました。",
+    "ko": "원본 자금 API가 예상과 다른 금액을 반환했습니다."
+  },
+  "原版载入异常，股市未启用。": {
+    "en": "Original loading failed; the stock market is disabled.",
+    "ja": "原作の読込に失敗したため、株式市場は無効です。",
+    "ko": "원본 불러오기에 실패하여 주식 시장이 비활성화되었습니다."
+  },
+  "原版队列没有读回新掮客，请稍后重试。": {
+    "en": "The new broker was not found in the original queue. Try again later.",
+    "ja": "原作の待機列に新しい仲介人が見つかりません。後で再試行してください。",
+    "ko": "원본 대기열에서 새 중개인을 확인하지 못했습니다. 나중에 다시 시도하세요."
+  },
+  "原版顾客目录尚未初始化。": {
+    "en": "The original customer registry is not initialized.",
+    "ja": "原作の顧客一覧が未初期化です。",
+    "ko": "원본 손님 목록이 초기화되지 않았습니다."
+  },
+  "原生": {
+    "en": "Native",
+    "ja": "原生",
+    "ko": "원본"
+  },
+  "原生人物精灵解析读回不一致。": {
+    "en": "Native character-sprite readback did not match.",
+    "ja": "原生人物スプライトの読戻しが一致しません。",
+    "ko": "원본 캐릭터 스프라이트 확인 결과가 일치하지 않습니다."
+  },
+  "原生情报回调转换失败。": {
+    "en": "Failed to convert the native intel callback.",
+    "ja": "原生の情報コールバック変換に失敗しました。",
+    "ko": "원본 정보 콜백 변환에 실패했습니다."
+  },
+  "原生手写文档接口已调用": {
+    "en": "The native handwritten-document interface was called",
+    "ja": "原生の手書き文書表示を呼び出しました",
+    "ko": "원본 손글씨 문서 화면을 호출했습니다"
+  },
+  "原生日开始事件同步失败": {
+    "en": "Native day-start event synchronization failed",
+    "ja": "原生の一日開始イベント同期に失敗",
+    "ko": "원본 하루 시작 이벤트 동기화 실패"
+  },
+  "原生日开始观察失败": {
+    "en": "Native day-start observation failed",
+    "ja": "原生の一日開始監視に失敗",
+    "ko": "원본 하루 시작 관찰 실패"
+  },
+  "原生日末事件同步失败": {
+    "en": "Native day-end event synchronization failed",
+    "ja": "原生の一日終了イベント同期に失敗",
+    "ko": "원본 하루 종료 이벤트 동기화 실패"
+  },
+  "原生日末事件快照失败": {
+    "en": "Native day-end event snapshot failed",
+    "ja": "原生の一日終了イベント取得に失敗",
+    "ko": "원본 하루 종료 이벤트 스냅샷 실패"
+  },
+  "原生精灵创建返回空值。": {
+    "en": "Native sprite creation returned null.",
+    "ja": "原生スプライトの作成が null を返しました。",
+    "ko": "원본 스프라이트 생성 결과가 비어 있습니다."
+  },
+  "原生结束已确认": {
+    "en": "Native ending confirmed",
+    "ja": "原生の終了を確認済み",
+    "ko": "원본 종료 확인됨"
+  },
+  "原生解析返回专用精灵。": {
+    "en": "The native resolver returned the custom sprite.",
+    "ja": "原生の解決処理が専用スプライトを返しました。",
+    "ko": "원본 해석기가 전용 스프라이트를 반환했습니다."
+  },
+  "原生阅读窗口未打开：": {
+    "en": "The native reading window did not open: ",
+    "ja": "原生の閲覧画面を開けませんでした：",
+    "ko": "원본 읽기 창이 열리지 않았습니다: "
+  },
+  "原队列": {
+    "en": "Previous queue",
+    "ja": "元の待機列",
+    "ko": "이전 대기열"
+  },
+  "参考可信度": {
+    "en": "Reference reliability",
+    "ja": "参考信頼度",
+    "ko": "참고 신뢰도"
+  },
+  "参考可信度：": {
+    "en": "Reference reliability: ",
+    "ja": "参考信頼度：",
+    "ko": "참고 신뢰도: "
+  },
+  "又见面啦！剑清酱的独家风声已经备好了。": {
+    "en": "Good to see you again! Jianqing-chan's exclusive rumors are ready.",
+    "ja": "また会えたね！剣清ちゃんだけの噂、用意してあるよ。",
+    "ko": "또 만났네! 젠칭짱의 독점 소문을 준비해 뒀어."
+  },
+  "发放事务回滚失败：": {
+    "en": "Item-delivery rollback failed: ",
+    "ja": "配布取引のロールバックに失敗：",
+    "ko": "아이템 지급 롤백 실패: "
+  },
+  "发放入口改为": {
+    "en": "Delivery entry changed to ",
+    "ja": "配布入口を変更：",
+    "ko": "지급 진입점 변경: "
+  },
+  "发放探针": {
+    "en": "Delivery probe",
+    "ja": "配布プローブ",
+    "ko": "지급 점검"
+  },
+  "发放暂停：": {
+    "en": "Delivery paused: ",
+    "ja": "配布停止：",
+    "ko": "지급 일시 중단: "
+  },
+  "可交易": {
+    "en": "Trading available",
+    "ja": "取引可能",
+    "ko": "거래 가능"
+  },
+  "号码": {
+    "en": "Number",
+    "ja": "番号",
+    "ko": "번호"
+  },
+  "售价：": {
+    "en": "Price: ",
+    "ja": "価格：",
+    "ko": "가격: "
+  },
+  "商品成交记录失败": {
+    "en": "Failed to record a commodity trade",
+    "ja": "商品取引の記録に失敗",
+    "ko": "상품 거래 기록 실패"
+  },
+  "回调金额合计": {
+    "en": "Total callback amount",
+    "ja": "コールバック金額合計",
+    "ko": "콜백 금액 합계"
+  },
+  "均已绑定；视觉显示仍待游戏截图确认。": {
+    "en": "are bound; visual display still needs an in-game screenshot check.",
+    "ja": " を設定済み。見た目はゲーム内の画像で確認が必要です。",
+    "ko": "을 연결했습니다. 실제 표시는 게임 화면에서 확인해야 합니다."
+  },
+  "外观": {
+    "en": "Appearance",
+    "ja": "外見",
+    "ko": "외형"
+  },
+  "失实": {
+    "en": "False",
+    "ja": "不的中",
+    "ko": "거짓"
+  },
+  "存档": {
+    "en": "Save",
+    "ja": "セーブ",
+    "ko": "저장 파일"
+  },
+  "存档发生变化，本次发放停止，请重新检查背包。": {
+    "en": "The save changed. Delivery stopped; check your inventory again.",
+    "ja": "セーブが切り替わったため配布を停止しました。所持品を確認してください。",
+    "ko": "저장 파일이 변경되어 지급을 중단했습니다. 인벤토리를 다시 확인하세요."
+  },
+  "存档已记录面板，自动发放已停止。确认丢失后可按": {
+    "en": "The terminal is already recorded in the save. Automatic delivery stopped. If it is lost, press ",
+    "ja": "端末はセーブに記録済みのため、自動配布は停止中です。紛失を確認したら ",
+    "ko": "저장 파일에 단말기가 기록되어 자동 지급을 중단했습니다. 분실을 확인했다면 다음을 누르세요: "
+  },
+  "存档正在切换，无法创建情报掮客。": {
+    "en": "The save is switching. Cannot create an intel broker.",
+    "ja": "セーブ切替中のため、情報仲介人を生成できません。",
+    "ko": "저장 파일을 전환 중이므로 정보 중개인을 생성할 수 없습니다."
+  },
+  "实际": {
+    "en": "Actual",
+    "ja": "実際",
+    "ko": "실제"
+  },
+  "实际人物显示待游戏验收。": {
+    "en": "Actual character display awaits in-game verification.",
+    "ja": "人物の実際の表示はゲーム内で確認が必要です。",
+    "ko": "실제 캐릭터 표시는 게임 내 확인이 필요합니다."
+  },
+  "实际到访": {
+    "en": "Actual arrival",
+    "ja": "実際の来訪",
+    "ko": "실제 방문"
+  },
+  "实际日历显示等待游戏验收。": {
+    "en": "Actual calendar display awaits in-game verification.",
+    "ja": "日付帳の実際の表示はゲーム内で確認が必要です。",
+    "ko": "실제 달력 표시는 게임 내 확인이 필요합니다."
+  },
+  "实际显示等待游戏验收。": {
+    "en": "Actual display awaits in-game verification.",
+    "ja": "実際の表示はゲーム内で確認が必要です。",
+    "ko": "실제 표시는 게임 내 확인이 필요합니다."
+  },
+  "尚未就绪。": {
+    "en": "is not ready.",
+    "ja": " が未準備です。",
+    "ko": "이 준비되지 않았습니다."
+  },
+  "属实": {
+    "en": "True",
+    "ja": "的中",
+    "ko": "참"
+  },
+  "工厂完成": {
+    "en": "Factory completed",
+    "ja": "生成完了",
+    "ko": "생성 완료"
+  },
+  "工厂清理失败：": {
+    "en": "Factory cleanup failed: ",
+    "ja": "生成処理の後始末に失敗：",
+    "ko": "생성기 정리 실패: "
+  },
+  "工厂返回空。": {
+    "en": "The factory returned null.",
+    "ja": "生成処理が null を返しました。",
+    "ko": "생성기가 빈 결과를 반환했습니다."
+  },
+  "已公开消息：": {
+    "en": "Public news: ",
+    "ja": "公開済みニュース：",
+    "ko": "공개된 소식: "
+  },
+  "已取消本次预约确认，未创建新预约。": {
+    "en": "Appointment confirmation canceled. No new appointment was created.",
+    "ja": "予約の確認を取り消しました。新しい予約は作成していません。",
+    "ko": "예약 확인을 취소했습니다. 새 예약은 생성되지 않았습니다."
+  },
+  "已启用严格存档验证：请正常保存并重新载入此存档，验证后开放现金交易。": {
+    "en": "Strict save verification is enabled. Save normally and reload this save to unlock cash trading.",
+    "ja": "厳格なセーブ検証が有効です。通常の保存後、このセーブを再読込すると現金取引を利用できます。",
+    "ko": "엄격한 저장 검증이 켜져 있습니다. 정상 저장 후 다시 불러오면 현금 거래가 열립니다."
+  },
+  "已处理便签发放兜底。": {
+    "en": "The fallback note delivery was handled.",
+    "ja": "付箋配布の補完処理を実施済み。",
+    "ko": "메모 지급 보완 처리를 완료했습니다."
+  },
+  "已安装专用道具": {
+    "en": "Installed the dedicated item's ",
+    "ja": "専用アイテムに導入済み：",
+    "ko": "전용 아이템에 설치됨: "
+  },
+  "已安装显示层探针；不修改": {
+    "en": "Display-layer probe installed; does not change ",
+    "ja": "表示層のプローブを導入済み。変更しません：",
+    "ko": "표시 계층 점검을 설치했습니다. 변경하지 않음: "
+  },
+  "已安装确认后预约和电话簿临时快捷条目；未写原版电话簿存档。": {
+    "en": "Confirmation booking and temporary phone-book speed dial are installed; the original phone-book save was not written.",
+    "ja": "確認後の予約と電話帳の一時短縮項目を導入済み。原作の電話帳セーブは変更していません。",
+    "ko": "확인 후 예약과 임시 단축 번호를 설치했습니다. 원본 전화번호부 저장 데이터는 변경하지 않았습니다."
+  },
+  "已安装适配钩子；未运行游戏验收前不视为适配成功。": {
+    "en": "Adapter hooks installed; adaptation remains unverified until tested in game.",
+    "ja": "連携フックを導入済み。ゲーム内検証までは動作確認済みとは扱いません。",
+    "ko": "연동 훅을 설치했습니다. 게임 내 검증 전까지 연동 성공으로 간주하지 않습니다."
+  },
+  "已安装闻舟与剑清酱独立工厂、队尾来访和原版情报商购买钩子，等待游戏内验证。": {
+    "en": "Independent Wenzhou and Jianqing factories, queue-tail visits, and original intel-purchase hooks installed. Awaiting in-game verification.",
+    "ja": "聞舟と剣清ちゃんの独立生成、待機列末尾への来訪、原作情報屋購入フックを導入済み。ゲーム内検証待ちです。",
+    "ko": "원저우와 젠칭짱의 독립 생성, 대기열 끝 방문, 원본 정보 구매 훅을 설치했습니다. 게임 내 검증을 기다립니다."
+  },
+  "已封存会话，成交按原成交日汇总，不即时变价": {
+    "en": "Session closed; trades are grouped by their original trade day without immediate repricing",
+    "ja": "セッションを確定。取引は元の取引日に集計し、即時の価格変更はしません",
+    "ko": "세션 확정. 거래는 실제 거래일에 합산되며 즉시 가격을 바꾸지 않습니다"
+  },
+  "已将股市面板放入主背包。": {
+    "en": "The stock-market terminal was placed in the main inventory.",
+    "ja": "株式端末をメイン所持品に入れました。",
+    "ko": "주식 단말기를 주 인벤토리에 넣었습니다."
+  },
+  "已显示确认，尚未调用预约领域。": {
+    "en": "Confirmation displayed; booking logic has not yet been called.",
+    "ja": "確認を表示済み。予約処理はまだ呼び出していません。",
+    "ko": "확인 창을 표시했습니다. 아직 예약 처리를 호출하지 않았습니다."
+  },
+  "已有联系人，保留原版处理，不覆盖号码。": {
+    "en": "An existing contact was found. Keeping original handling without replacing the number.",
+    "ja": "既存の連絡先があるため、番号を上書きせず原作の処理を維持します。",
+    "ko": "기존 연락처가 있어 번호를 덮어쓰지 않고 원본 처리를 유지합니다."
+  },
+  "已核实失实": {
+    "en": "Verified false",
+    "ja": "検証済み・不的中",
+    "ko": "검증됨 · 거짓"
+  },
+  "已核实属实": {
+    "en": "Verified true",
+    "ja": "検証済み・的中",
+    "ko": "검증됨 · 참"
+  },
+  "已注册独立": {
+    "en": "Registered independently: ",
+    "ja": "独立登録済み：",
+    "ko": "독립 등록됨: "
+  },
+  "已注册独立精灵": {
+    "en": "Registered an independent sprite ",
+    "ja": "独立スプライトを登録：",
+    "ko": "독립 스프라이트 등록: "
+  },
+  "已约第": {
+    "en": "Booked for day ",
+    "ja": "予約済み・日数 ",
+    "ko": "예약일: "
+  },
+  "已结束没有实际顾客的来访记录，可重新电话预约。": {
+    "en": "A visit record with no actual customer was closed. You can book again by phone.",
+    "ja": "実際の客がいない来訪記録を終了しました。電話から再予約できます。",
+    "ko": "실제 손님이 없는 방문 기록을 종료했습니다. 전화로 다시 예약할 수 있습니다."
+  },
+  "已认领情报纸条": {
+    "en": "Adopted the intel note",
+    "ja": "情報メモを認領済み",
+    "ko": "정보 쪽지 확인됨"
+  },
+  "已购买": {
+    "en": "Purchased",
+    "ja": "購入済み",
+    "ko": "구매 완료"
+  },
+  "已追加": {
+    "en": "Appended ",
+    "ja": "追加済み：",
+    "ko": "추가됨: "
+  },
+  "已适配原生": {
+    "en": "Adapted native ",
+    "ja": "原生処理を連携済み：",
+    "ko": "원본 연동됨: "
+  },
+  "已采用现有股市面板。": {
+    "en": "Using the existing stock-market terminal.",
+    "ja": "既存の株式端末を使用します。",
+    "ko": "기존 주식 단말기를 사용합니다."
+  },
+  "已预约的掮客正在来访。": {
+    "en": "The booked broker is on the way.",
+    "ja": "予約した仲介人が来訪中です。",
+    "ko": "예약한 중개인이 오는 중입니다."
+  },
+  "当前": {
+    "en": "Current",
+    "ja": "現在",
+    "ko": "현재"
+  },
+  "当前内幕报价已变化。": {
+    "en": "The insider offer has changed.",
+    "ja": "現在の内幕情報の見積りが変わりました。",
+    "ko": "현재 내부 정보 제안이 변경되었습니다."
+  },
+  "当前接待对象已变化。": {
+    "en": "The current customer has changed.",
+    "ja": "接客中の相手が変わりました。",
+    "ko": "현재 응대 중인 손님이 변경되었습니다."
+  },
+  "当前没有行情掮客": {
+    "en": "No market broker is currently visiting",
+    "ja": "現在、相場仲介人はいません",
+    "ko": "현재 방문 중인 시황 중개인이 없습니다"
+  },
+  "当前没有行情掮客；普通顾客不再出售股市内幕。": {
+    "en": "No market broker is currently visiting. Ordinary customers no longer sell stock-market tips.",
+    "ja": "現在、相場仲介人はいません。一般客は株式の内幕情報を販売しません。",
+    "ko": "현재 방문 중인 시황 중개인이 없습니다. 일반 손님은 더 이상 주식 내부 정보를 판매하지 않습니다."
+  },
+  "快捷拨号失败": {
+    "en": "Speed dial failed",
+    "ja": "短縮ダイヤルに失敗",
+    "ko": "단축 번호 통화 실패"
+  },
+  "快捷拨号委托转换失败。": {
+    "en": "Failed to convert the speed-dial delegate.",
+    "ja": "短縮ダイヤルのデリゲート変換に失敗しました。",
+    "ko": "단축 번호 델리게이트 변환에 실패했습니다."
+  },
+  "快捷监听解绑失败：": {
+    "en": "Failed to detach the speed-dial listener: ",
+    "ja": "短縮ダイヤルのリスナー解除に失敗：",
+    "ko": "단축 번호 리스너 해제 실패: "
+  },
+  "快捷联系人创建失败，仍可手动拨号": {
+    "en": "Failed to create the speed-dial entry; manual dialing is still available",
+    "ja": "短縮連絡先を作成できません。手動ダイヤルは利用可能です",
+    "ko": "단축 번호 항목 생성에 실패했습니다. 직접 번호를 눌러 통화할 수 있습니다"
+  },
+  "快速拨号检查失败": {
+    "en": "Speed-dial check failed",
+    "ja": "短縮ダイヤルの確認に失敗",
+    "ko": "단축 번호 확인 실패"
+  },
+  "情报掮客适配器已初始化。": {
+    "en": "The intel broker adapter is already initialized.",
+    "ja": "情報仲介人アダプターは初期化済みです。",
+    "ko": "정보 중개인 어댑터가 이미 초기화되었습니다."
+  },
+  "情报日历适配器已经存在。": {
+    "en": "The intel calendar adapter already exists.",
+    "ja": "情報日付帳アダプターは既に存在します。",
+    "ko": "정보 달력 어댑터가 이미 있습니다."
+  },
+  "情报类型：": {
+    "en": "Intel type: ",
+    "ja": "情報の種類：",
+    "ko": "정보 유형: "
+  },
+  "情报纸条状态转换被拒绝：": {
+    "en": "Intel note state transition rejected: ",
+    "ja": "情報メモの状態遷移を拒否：",
+    "ko": "정보 쪽지 상태 변경이 거부됨: "
+  },
+  "情报纸条适配器已经存在。": {
+    "en": "The intel note adapter already exists.",
+    "ja": "情報メモのアダプターは既に存在します。",
+    "ko": "정보 쪽지 어댑터가 이미 있습니다."
+  },
+  "成交。你买到的股市线索是：": {
+    "en": "Deal. Here is the stock-market tip you bought: ",
+    "ja": "取引成立。買った株式情報はこちらだ：",
+    "ko": "거래 성립. 구매한 주식 정보는 이거야: "
+  },
+  "成交快照失败：": {
+    "en": "Trade snapshot failed: ",
+    "ja": "取引スナップショットに失敗：",
+    "ko": "거래 스냅샷 실패: "
+  },
+  "成交快照跨日，无法确认归属，未记行情：": {
+    "en": "The trade snapshot crossed a day boundary. Its date is uncertain; no market impact recorded: ",
+    "ja": "取引スナップショットが日をまたぎ、所属日を確定できないため相場に記録しません：",
+    "ko": "거래 스냅샷이 날짜를 넘어 날짜를 확정할 수 없어 시장에 반영하지 않습니다: "
+  },
+  "成交！剑清酱的消息可要听好啦：": {
+    "en": "Deal! Listen carefully to Jianqing-chan's tip: ",
+    "ja": "成立！剣清ちゃんの情報、よく聞いてね：",
+    "ko": "거래 성립! 젠칭짱의 정보, 잘 들어: "
+  },
+  "成功安装": {
+    "en": "Successfully installed ",
+    "ja": "導入成功：",
+    "ko": "설치 완료: "
+  },
+  "我会把这份预测写成情报便签交给你。消息是否属实，要等后续事件验证；你也能在股市面板中查看这份已购记录。": {
+    "en": "I'll write this forecast on an intel note for you. Later events will tell us whether it is true. You can also review your purchase in the stock-market terminal.",
+    "ja": "この予測を情報メモに書いて渡すよ。真偽は今後の出来事で確かめよう。購入済みの記録は株式端末でも確認できる。",
+    "ko": "이 예측을 정보 쪽지에 적어 줄게. 진짜인지는 나중의 사건으로 확인하게 될 거야. 주식 단말기에서도 구매 기록을 볼 수 있어."
+  },
+  "我只替他们传话，风声有真有假，消息值不值钱，还得你自己判断。": {
+    "en": "I only pass along what they tell me. Some rumors are true, some are not. You decide what the news is worth.",
+    "ja": "私は伝言を預かるだけだ。噂には本当も嘘もある。金を払う価値があるかは自分で判断してくれ。",
+    "ko": "난 그저 전해 주는 사람이야. 소문에는 진실도 거짓도 있어. 돈을 낼 가치가 있는지는 직접 판단해."
+  },
+  "我替行业消息来源转售股市线索。": {
+    "en": "I resell stock-market tips from sources across the industries.",
+    "ja": "各業界の情報源から仕入れた株式の噂を扱っている。",
+    "ko": "여러 업계의 소식통에게서 주식 정보를 받아 되팔고 있어."
+  },
+  "或主背包窗口尚未完成绑定，延后发放。": {
+    "en": "or the main inventory window is not bound yet; delivery deferred.",
+    "ja": " またはメイン所持品画面の接続が未完了のため、配布を延期します。",
+    "ko": " 또는 주 인벤토리 창 연결이 끝나지 않아 지급을 미룹니다."
+  },
+  "截流原版购买": {
+    "en": "Intercepted the original purchase",
+    "ja": "原作の購入処理を介入",
+    "ko": "원본 구매 처리 가로채기"
+  },
+  "批发整单与单件折扣取整差已核对；按实际现金变化": {
+    "en": "Wholesale total and per-item discount rounding were reconciled; using actual cash changes to ",
+    "ja": "卸売合計と単品割引の丸め差を確認済み。実際の所持金変化に基づき ",
+    "ko": "도매 총액과 개별 할인 반올림 차이를 확인했습니다. 실제 자금 변동으로 "
+  },
+  "找不到专用图像，保留原版便笺图像。": {
+    "en": "Custom artwork not found; retaining the original note image.",
+    "ja": "専用画像が見つからないため、原作の付箋画像を維持します。",
+    "ko": "전용 이미지를 찾지 못해 원본 메모 이미지를 유지합니다."
+  },
+  "抛出异常，本次保存不能用于解锁。": {
+    "en": "threw an exception; this save cannot unlock trading.",
+    "ja": " で例外が発生したため、この保存は取引解除に使用できません。",
+    "ko": "에서 예외가 발생했습니다. 이 저장으로 거래 잠금을 해제할 수 없습니다."
+  },
+  "拨号确认失败": {
+    "en": "Dial confirmation failed",
+    "ja": "ダイヤル確認に失敗",
+    "ko": "통화 확인 실패"
+  },
+  "持有本存档的股市面板后，才能预约消息商。": {
+    "en": "You must own this save's stock-market terminal to book a news dealer.",
+    "ja": "このセーブの株式端末を所持すると、情報商を予約できます。",
+    "ko": "이 저장 파일의 주식 단말기를 보유해야 정보상을 예약할 수 있습니다."
+  },
+  "持有本存档的股市面板道具后，才能预约消息商。": {
+    "en": "You must own this save's stock-market terminal item to book a news dealer.",
+    "ja": "このセーブの株式端末アイテムを所持すると、情報商を予約できます。",
+    "ko": "이 저장 파일의 주식 단말기 아이템을 보유해야 정보상을 예약할 수 있습니다."
+  },
+  "持有本存档的股市面板道具后，解锁掮客电话预约。": {
+    "en": "Own this save's stock-market terminal to unlock phone bookings.",
+    "ja": "このセーブの株式端末を所持すると、電話予約が利用できます。",
+    "ko": "이 저장 파일의 주식 단말기를 보유하면 전화 예약이 열립니다."
+  },
+  "持有股市面板后，请用游戏电话预约行情掮客，次日开门后上门售卖。": {
+    "en": "With the stock-market terminal in your inventory, call the broker on the game phone. They will visit after opening tomorrow.",
+    "ja": "株式端末を所持した状態でゲーム内の電話から仲介人を予約してください。翌日の開店後に来訪します。",
+    "ko": "주식 단말기를 보유한 상태에서 게임 내 전화로 중개인을 예약하세요. 다음 날 개점 후 방문합니다."
+  },
+  "接入": {
+    "en": "Connected ",
+    "ja": "接続 ",
+    "ko": "연결 "
+  },
+  "插入确认": {
+    "en": "Confirm insertion",
+    "ja": "追加を確認",
+    "ko": "삽입 확인"
+  },
+  "插入结果不确定": {
+    "en": "Insertion outcome uncertain",
+    "ja": "追加結果が未確定",
+    "ko": "삽입 결과 미확정"
+  },
+  "操作繁忙，请稍后再试。": {
+    "en": "Busy. Please try again shortly.",
+    "ja": "処理中です。少し待って再試行してください。",
+    "ko": "처리 중입니다. 잠시 후 다시 시도하세요."
+  },
+  "无异常返回；现货交易已默认开放，仍记录读档验证结果。": {
+    "en": "Returned without error. Spot trading is available by default; save-load verification is still recorded.",
+    "ja": "例外なしで終了。現物取引は初期状態で利用可能ですが、再読込検証は引き続き記録します。",
+    "ko": "오류 없이 반환되었습니다. 현물 거래는 기본으로 열려 있으며 저장·불러오기 검증은 계속 기록합니다."
+  },
+  "无异常返回；随后": {
+    "en": "Returned without error; then ",
+    "ja": "例外なしで終了。その後 ",
+    "ko": "오류 없이 반환됨. 이후 "
+  },
+  "无法核实": {
+    "en": "Unable to verify",
+    "ja": "検証不能",
+    "ko": "검증 불가"
+  },
+  "无法核对；本次不计行情。": {
+    "en": "Cannot reconcile; no market impact recorded.",
+    "ja": "照合できないため、今回は相場に記録しません。",
+    "ko": "대조할 수 없어 이번에는 시장에 반영하지 않습니다."
+  },
+  "日": {
+    "en": " day",
+    "ja": " 日",
+    "ko": "일"
+  },
+  "日到访，开门后在队尾等待。": {
+    "en": ". The broker will wait at the end of the queue after opening.",
+    "ja": " 日に来訪。開店後、待機列の最後で待ちます。",
+    "ko": "에 방문하며 개점 후 대기열 끝에서 기다립니다."
+  },
+  "日控件追加": {
+    "en": " calendar cell appended ",
+    "ja": " 日の欄に追加：",
+    "ko": "일의 달력 칸에 추가: "
+  },
+  "显式补领。": {
+    "en": "Request a replacement explicitly.",
+    "ja": "明示的に再受領してください。",
+    "ko": "직접 재지급을 요청하세요."
+  },
+  "显示列表扩充失败，保留原日历：": {
+    "en": "Failed to extend the display list; keeping the original calendar: ",
+    "ja": "表示一覧の拡張に失敗。原作の日付帳を維持：",
+    "ko": "표시 목록 확장에 실패하여 원본 달력을 유지합니다: "
+  },
+  "暂不预约": {
+    "en": "Not now",
+    "ja": "今は予約しない",
+    "ko": "나중에"
+  },
+  "暂无可验证情报记录": {
+    "en": "No verifiable intel records",
+    "ja": "検証できる情報記録がありません",
+    "ko": "검증 가능한 정보 기록이 없습니다"
+  },
+  "暂无预约。": {
+    "en": "No appointment.",
+    "ja": "予約はありません。",
+    "ko": "예약이 없습니다."
+  },
+  "暂用原版图像：": {
+    "en": "Using original artwork temporarily: ",
+    "ja": "原作画像を暫定使用：",
+    "ko": "원본 이미지 임시 사용: "
+  },
+  "未交付纸条事务复位被拒绝，保持锁定。": {
+    "en": "Reset of the undelivered-note transaction was rejected; keeping the lock.",
+    "ja": "未配達紙片の取引リセットが拒否されたため、ロックを維持します。",
+    "ko": "미전달 쪽지 거래 초기화가 거부되어 잠금을 유지합니다."
+  },
+  "未修改游戏资源。": {
+    "en": "Game resources were not changed.",
+    "ja": "ゲームのリソースは変更していません。",
+    "ko": "게임 리소스는 변경하지 않았습니다."
+  },
+  "未删除其他便笺，完整扫描": {
+    "en": "No other notes were deleted; full scan ",
+    "ja": "他の付箋は削除せず、完全走査 ",
+    "ko": "다른 메모는 삭제하지 않음. 전체 검사 "
+  },
+  "未替换剧情顾客。": {
+    "en": "Story customers were not replaced.",
+    "ja": "物語上の客は置き換えていません。",
+    "ko": "스토리 손님은 교체하지 않았습니다."
+  },
+  "未核实股市线索": {
+    "en": "Unverified stock-market tip",
+    "ja": "未検証の株式情報",
+    "ko": "미검증 주식 정보"
+  },
+  "未确认成交，现金变化": {
+    "en": "No confirmed trade; cash change ",
+    "ja": "取引を確認できず、所持金変化 ",
+    "ko": "확정된 거래 없음. 현금 변동 "
+  },
+  "未输出未购内容。": {
+    "en": "Unpurchased content was not disclosed.",
+    "ja": "未購入の内容は出力していません。",
+    "ko": "미구매 내용은 공개하지 않았습니다."
+  },
+  "未附加存档。": {
+    "en": "No save attached.",
+    "ja": "セーブが接続されていません。",
+    "ko": "연결된 저장 파일이 없습니다."
+  },
+  "本次会话不会再次自动创建。": {
+    "en": "Automatic creation will not run again in this session.",
+    "ja": "このセッションでは再度自動生成しません。",
+    "ko": "이 세션에서는 다시 자동 생성하지 않습니다."
+  },
+  "本次会话已确认股市面板，未重复发放；若仍找不到，请保存并重新载入后显式补领。": {
+    "en": "The stock-market terminal is already confirmed in this session. No duplicate was delivered. If you cannot find it, save and reload before requesting a replacement.",
+    "ja": "このセッションでは株式端末を確認済みのため重複配布しません。見つからない場合は保存して再読込し、再受領を要求してください。",
+    "ko": "이 세션에서 주식 단말기를 이미 확인하여 중복 지급하지 않았습니다. 찾을 수 없다면 저장 후 다시 불러와 재지급을 요청하세요."
+  },
+  "本次情报接待结束后，可再拨电话预约次日。": {
+    "en": "After this intel visit ends, call again to book for the following day.",
+    "ja": "今回の接客が終わったら、翌日の予約を電話で取れます。",
+    "ko": "이번 정보상 응대가 끝나면 전화로 다음 날 방문을 예약할 수 있습니다."
+  },
+  "本次预约已取消，可拨电话查询。": {
+    "en": "This appointment was canceled. Call to check availability.",
+    "ja": "今回の予約は取り消されました。電話でお問い合わせください。",
+    "ko": "이번 예약이 취소되었습니다. 전화로 확인하세요."
+  },
+  "条已购提示，仅显示列表副本。": {
+    "en": " purchased reminders; display-list copy only.",
+    "ja": " 件の購入済み案内。表示一覧の複製のみ。",
+    "ko": "개의 구매 알림. 표시 목록 사본에만 추가."
+  },
+  "来源记录：": {
+    "en": "Source record: ",
+    "ja": "情報源の記録：",
+    "ko": "소식통 기록: "
+  },
+  "柜台或已拥有父容器已确认": {
+    "en": "Counter or owned parent container confirmed",
+    "ja": "カウンターまたは所有済み親コンテナを確認",
+    "ko": "카운터 또는 보유 상위 컨테이너 확인됨"
+  },
+  "柜台无可用位置，纸条保持待交付": {
+    "en": "No counter space; the note remains pending delivery",
+    "ja": "カウンターに空きがなく、紙片は配達待ち",
+    "ko": "카운터 공간이 없어 쪽지는 전달 대기 중"
+  },
+  "核验对照：": {
+    "en": "Verification comparison: ",
+    "ja": "検証の照合：",
+    "ko": "검증 대조: "
+  },
+  "档案号：": {
+    "en": "Archive no.: ",
+    "ja": "記録番号：",
+    "ko": "기록 번호: "
+  },
+  "没有可用的原版掮客人物素材，本次来访延后。": {
+    "en": "No original broker artwork is available. This visit is deferred.",
+    "ja": "利用可能な原作の仲介人画像がないため、来訪を延期します。",
+    "ko": "사용 가능한 원본 중개인 이미지가 없어 방문을 미룹니다."
+  },
+  "没有有效情报来访计划。": {
+    "en": "No valid intel visit plan.",
+    "ja": "有効な情報来訪計画がありません。",
+    "ko": "유효한 정보상 방문 계획이 없습니다."
+  },
+  "消息来源：": {
+    "en": "Source: ",
+    "ja": "情報源：",
+    "ko": "소식통: "
+  },
+  "渲染对象未就绪。": {
+    "en": "The render object is not ready.",
+    "ja": "描画オブジェクトが未準備です。",
+    "ko": "렌더링 객체가 준비되지 않았습니다."
+  },
+  "渲染钩子不可用，将使用显式": {
+    "en": "Rendering hooks unavailable; explicit calls to ",
+    "ja": "描画フックが利用できないため、明示的に呼出：",
+    "ko": "렌더링 훅을 사용할 수 없어 명시적으로 호출: "
+  },
+  "游戏币": {
+    "en": " coins",
+    "ja": " コイン",
+    "ko": " 코인"
+  },
+  "游戏币。消息可能有真有假，购买后才能查看内容。": {
+    "en": " coins. The rumor may be true or false; its content is revealed after purchase.",
+    "ja": " コイン。真偽は不明。購入すると内容を確認できます。",
+    "ko": " 코인. 소문은 진실일 수도 거짓일 수도 있으며 구매 후 내용을 확인할 수 있습니다."
+  },
+  "游戏适配器已初始化。": {
+    "en": "The game adapter is already initialized.",
+    "ja": "ゲームアダプターは初期化済みです。",
+    "ko": "게임 어댑터가 이미 초기화되었습니다."
+  },
+  "游戏适配异常": {
+    "en": "Game adapter error",
+    "ja": "ゲーム連携エラー",
+    "ko": "게임 연동 오류"
+  },
+  "源纹理清理失败。": {
+    "en": "Source texture cleanup failed.",
+    "ja": "元テクスチャの削除に失敗しました。",
+    "ko": "원본 텍스처 삭제에 실패했습니다."
+  },
+  "状态": {
+    "en": "Status",
+    "ja": "状態",
+    "ko": "상태"
+  },
+  "状态记录失败：": {
+    "en": "Failed to record state: ",
+    "ja": "状態の記録に失敗：",
+    "ko": "상태 기록 실패: "
+  },
+  "独立": {
+    "en": "Independent",
+    "ja": "独立",
+    "ko": "독립"
+  },
+  "现货买卖已开放；使用原版资金，投资记录随游戏存档保存。": {
+    "en": "Spot trading is open. It uses the game's cash, and investment records are stored with the game save.",
+    "ja": "現物売買を利用できます。原作の所持金を使用し、投資記録はゲームと一緒に保存されます。",
+    "ko": "현물 매매가 열려 있습니다. 게임 자금을 사용하며 투자 기록은 게임 저장 파일에 보관됩니다."
+  },
+  "现金操作异常，交易已冻结": {
+    "en": "Cash operation failed; trading is frozen",
+    "ja": "所持金操作の異常により取引を凍結",
+    "ko": "현금 처리 오류로 거래 동결"
+  },
+  "现队列": {
+    "en": "Current queue",
+    "ja": "現在の待機列",
+    "ko": "현재 대기열"
+  },
+  "生效事件缺少有效标识或": {
+    "en": "An active event is missing a valid ID or ",
+    "ja": "有効イベントに正しい識別子または次の値がありません：",
+    "ko": "활성 이벤트에 유효한 ID 또는 다음 값이 없습니다: "
+  },
+  "用户确认已消费，已调用一次预约领域。": {
+    "en": "User confirmation consumed; booking logic called once.",
+    "ja": "ユーザー確認を消費し、予約処理を一度だけ呼び出しました。",
+    "ko": "사용자 확인을 처리하고 예약 로직을 한 번 호출했습니다."
+  },
+  "电话簿可快速拨号）": {
+    "en": "; speed dial available in the phone book)",
+    "ja": "・電話帳から短縮ダイヤル可）",
+    "ko": " · 전화번호부에서 단축 번호 사용 가능)"
+  },
+  "电话里联系过了，正式认识一下。我叫闻舟，做的是行情消息的生意。药剂师、矿工、维修工——各行都有我的消息来源。": {
+    "en": "We've spoken on the phone; let me introduce myself properly. I'm Wen Zhou, and I trade in market news. Pharmacists, miners, repair workers—my sources come from every industry.",
+    "ja": "電話では話したが、改めて自己紹介しよう。聞舟だ。相場の情報を商売にしている。薬剤師、鉱夫、修理工――各業界に情報源がいる。",
+    "ko": "전화로 얘기했지만 정식으로 소개하지. 나는 원저우, 시황 정보를 파는 사람이야. 약사, 광부, 수리공까지 여러 업계에 소식통이 있지."
+  },
+  "电话预约到期，队尾追加": {
+    "en": "Phone appointment due; appending to queue tail",
+    "ja": "電話予約が到来、待機列末尾へ追加",
+    "ko": "전화 예약일 도래, 대기열 끝에 추가"
+  },
+  "目标纹理清理失败。": {
+    "en": "Target texture cleanup failed.",
+    "ja": "対象テクスチャの削除に失敗しました。",
+    "ko": "대상 텍스처 삭제에 실패했습니다."
+  },
+  "真实与拖拽": {
+    "en": "real and drag ",
+    "ja": "実体とドラッグ ",
+    "ko": "실물 및 드래그 "
+  },
+  "确认后随机安排一人；重复拨号只查询已有预约，不重新抽取。": {
+    "en": "Confirmation randomly assigns one dealer. Calling again checks the existing appointment without rerolling.",
+    "ja": "確定後、どちらか一人をランダムに手配します。再度の電話は予約確認のみで、抽選し直しません。",
+    "ko": "확인하면 정보상 한 명을 무작위로 배정합니다. 다시 전화해도 기존 예약만 확인하며 재추첨하지 않습니다."
+  },
+  "确认回调清理失败": {
+    "en": "Confirmation callback cleanup failed",
+    "ja": "確認コールバックの解除に失敗",
+    "ko": "확인 콜백 정리 실패"
+  },
+  "确认预约失败": {
+    "en": "Booking confirmation failed",
+    "ja": "予約の確定に失敗",
+    "ko": "예약 확정 실패"
+  },
+  "禁止在订单之外修改现金。": {
+    "en": "Cash may not be changed outside an order.",
+    "ja": "注文処理以外で所持金を変更することはできません。",
+    "ko": "주문 처리 이외에는 현금을 변경할 수 없습니다."
+  },
+  "离店": {
+    "en": "Departed",
+    "ja": "退店",
+    "ko": "퇴점"
+  },
+  "第": {
+    "en": "Day ",
+    "ja": "第 ",
+    "ko": "제 "
+  },
+  "精灵清理失败。": {
+    "en": "Sprite cleanup failed.",
+    "ja": "スプライトの削除に失敗しました。",
+    "ko": "스프라이트 삭제에 실패했습니다."
+  },
+  "纸条位置待核实，停止再次创建": {
+    "en": "The note's location is unconfirmed; further creation stopped",
+    "ja": "紙片の所在を確認できないため、再生成を停止",
+    "ko": "쪽지 위치가 확인되지 않아 재생성을 중단함"
+  },
+  "纸条标签委托转换失败：": {
+    "en": "Failed to convert the note-tag delegate: ",
+    "ja": "紙片タグのデリゲート変換に失敗：",
+    "ko": "쪽지 태그 델리게이트 변환 실패: "
+  },
+  "纸条标签读回不一致：": {
+    "en": "Note-tag readback mismatch: ",
+    "ja": "紙片タグの読戻しが不一致：",
+    "ko": "쪽지 태그 확인 불일치: "
+  },
+  "纹理和精灵；实际": {
+    "en": "texture and sprite; actual ",
+    "ja": "テクスチャとスプライト。実際の ",
+    "ko": "텍스처와 스프라이트. 실제 "
+  },
+  "绑定另行核对。": {
+    "en": "binding checked separately.",
+    "ja": " の設定は別途確認。",
+    "ko": " 연결은 별도 확인."
+  },
+  "绑定尚待核对。": {
+    "en": "binding still awaits verification.",
+    "ja": " の設定は確認待ちです。",
+    "ko": " 연결은 아직 확인이 필요합니다."
+  },
+  "联系人视图未提供唯一快捷按钮，已跳过。": {
+    "en": "The contact view did not provide a unique speed-dial button. Skipped.",
+    "ja": "連絡先ビューに一意の短縮ボタンがないため、スキップしました。",
+    "ko": "연락처 화면에 유일한 단축 번호 버튼이 없어 건너뛰었습니다."
+  },
+  "联系人视图缺少原版姓名或状态文本。": {
+    "en": "The contact view is missing the original name or status label.",
+    "ja": "連絡先ビューに原作の名前または状態ラベルがありません。",
+    "ko": "연락처 화면에 원본 이름 또는 상태 텍스트가 없습니다."
+  },
+  "股市事件": {
+    "en": "Market event",
+    "ja": "株式イベント",
+    "ko": "주식 이벤트"
+  },
+  "股市事件探针": {
+    "en": "Market event probe",
+    "ja": "株式イベントプローブ",
+    "ko": "주식 이벤트 점검"
+  },
+  "股市交易": {
+    "en": "Stock trade",
+    "ja": "株式取引",
+    "ko": "주식 거래"
+  },
+  "股市人物图像": {
+    "en": "Market character art",
+    "ja": "株式人物画像",
+    "ko": "주식 캐릭터 이미지"
+  },
+  "股市保存准备失败": {
+    "en": "Failed to prepare the stock-market save",
+    "ja": "株式セーブの準備に失敗",
+    "ko": "주식 저장 준비 실패"
+  },
+  "股市内幕交易": {
+    "en": "Insider Tip Deal",
+    "ja": "内幕情報取引",
+    "ko": "내부 정보 거래"
+  },
+  "股市回调探针": {
+    "en": "Market callback probe",
+    "ja": "株式コールバックプローブ",
+    "ko": "주식 콜백 점검"
+  },
+  "股市图像": {
+    "en": "Market artwork",
+    "ja": "株式画像",
+    "ko": "주식 이미지"
+  },
+  "股市委托": {
+    "en": "Stock order",
+    "ja": "株式注文",
+    "ko": "주식 주문"
+  },
+  "股市存档为空。": {
+    "en": "The stock-market save is empty.",
+    "ja": "株式セーブが空です。",
+    "ko": "주식 저장 데이터가 비어 있습니다."
+  },
+  "股市存档版本或身份不匹配，已关闭交易。": {
+    "en": "The stock-market save version or identity does not match. Trading is disabled.",
+    "ja": "株式セーブの版または識別情報が一致しないため、取引を停止しました。",
+    "ko": "주식 저장 버전 또는 식별 정보가 일치하지 않아 거래를 비활성화했습니다."
+  },
+  "股市情报日历": {
+    "en": "Intel calendar",
+    "ja": "情報日付帳",
+    "ko": "정보 달력"
+  },
+  "股市情报纸条": {
+    "en": "Stock intel note",
+    "ja": "株式情報メモ",
+    "ko": "주식 정보 쪽지"
+  },
+  "股市成交": {
+    "en": "Stock transaction",
+    "ja": "株式約定",
+    "ko": "주식 체결"
+  },
+  "股市探针": {
+    "en": "Market probe",
+    "ja": "株式プローブ",
+    "ko": "주식 점검"
+  },
+  "股市掮客": {
+    "en": "Market broker",
+    "ja": "株式仲介人",
+    "ko": "주식 중개인"
+  },
+  "股市掮客探针": {
+    "en": "Market broker probe",
+    "ja": "株式仲介人プローブ",
+    "ko": "주식 중개인 점검"
+  },
+  "股市映射": {
+    "en": "Market mapping",
+    "ja": "株式マッピング",
+    "ko": "주식 매핑"
+  },
+  "股市电话预约": {
+    "en": "Broker phone booking",
+    "ja": "株式電話予約",
+    "ko": "주식 전화 예약"
+  },
+  "股市背包探针": {
+    "en": "Market inventory probe",
+    "ja": "株式所持品プローブ",
+    "ko": "주식 인벤토리 점검"
+  },
+  "股市营业状态": {
+    "en": "Market shop state",
+    "ja": "株式営業状態",
+    "ko": "주식 영업 상태"
+  },
+  "股市资金": {
+    "en": "Market cash",
+    "ja": "株式資金",
+    "ko": "주식 자금"
+  },
+  "股市输入隔离": {
+    "en": "Market input isolation",
+    "ja": "株式入力の分離",
+    "ko": "주식 입력 격리"
+  },
+  "股市道具": {
+    "en": "Market item",
+    "ja": "株式アイテム",
+    "ko": "주식 아이템"
+  },
+  "股市遣散": {
+    "en": "Market dismissal",
+    "ja": "株式退店処理",
+    "ko": "주식 퇴점 처리"
+  },
+  "股市面板": {
+    "en": "Stock Market Terminal",
+    "ja": "株式端末",
+    "ko": "주식 단말기"
+  },
+  "股市顾客": {
+    "en": "Market customer",
+    "ja": "株式顧客",
+    "ko": "주식 손님"
+  },
+  "股市预约电话": {
+    "en": "Broker booking phone",
+    "ja": "株式予約電話",
+    "ko": "주식 예약 전화"
+  },
+  "股市预约电话探针": {
+    "en": "Broker booking phone probe",
+    "ja": "株式予約電話プローブ",
+    "ko": "주식 예약 전화 점검"
+  },
+  "股市预约电话适配器已初始化。": {
+    "en": "The broker booking phone adapter is already initialized.",
+    "ja": "株式予約電話アダプターは初期化済みです。",
+    "ko": "주식 예약 전화 어댑터가 이미 초기화되었습니다."
+  },
+  "背包完整查询尚未就绪，未创建道具。": {
+    "en": "A complete inventory query is not ready. No item was created.",
+    "ja": "所持品の完全検索が未準備のため、アイテムは生成していません。",
+    "ko": "전체 인벤토리 조회가 준비되지 않아 아이템을 생성하지 않았습니다."
+  },
+  "背包查询与实际容器不一致，已暂停补领以避免重复创建。": {
+    "en": "The inventory query differs from the actual container. Replacement is paused to prevent duplicates.",
+    "ja": "所持品の検索結果と実コンテナが異なるため、重複防止のため再配布を停止しました。",
+    "ko": "인벤토리 조회 결과와 실제 컨테이너가 달라 중복 방지를 위해 재지급을 중단했습니다."
+  },
+  "行情掮客": {
+    "en": "Market Broker",
+    "ja": "相場仲介人",
+    "ko": "시황 중개인"
+  },
+  "行情掮客正在接待中，请完成并遣散后再预约。": {
+    "en": "The broker is being served. Finish and dismiss them before booking again.",
+    "ja": "仲介人を接客中です。取引を終えて退店させてから予約してください。",
+    "ko": "중개인을 응대 중입니다. 거래를 마치고 퇴점시킨 뒤 다시 예약하세요."
+  },
+  "行情掮客正在来访": {
+    "en": "The market broker is visiting",
+    "ja": "相場仲介人が来訪中",
+    "ko": "시황 중개인 방문 중"
+  },
+  "行情正在更新，请稍后重拨。": {
+    "en": "The market is updating. Please redial shortly.",
+    "ja": "相場を更新中です。少し待ってかけ直してください。",
+    "ko": "시황을 갱신 중입니다. 잠시 후 다시 전화하세요."
+  },
+  "行情消息专线": {
+    "en": "Market News Hotline",
+    "ja": "相場情報専用線",
+    "ko": "시황 정보 전용선"
+  },
+  "行情消息专线：": {
+    "en": "Market News Hotline: ",
+    "ja": "相場情報専用線：",
+    "ko": "시황 정보 전용선: "
+  },
+  "行情消息专线：请确认是否预约明日到访。": {
+    "en": "Market News Hotline: Please confirm tomorrow's appointment.",
+    "ja": "相場情報専用線：明日の予約をご確認ください。",
+    "ko": "시황 정보 전용선: 내일 방문 예약을 확인하세요."
+  },
+  "观察窗口：第": {
+    "en": "Observation window: days ",
+    "ja": "観察期間：第 ",
+    "ko": "관찰 기간: 제 "
+  },
+  "角色类型与阵营合并记录": {
+    "en": "Combined role and faction record",
+    "ja": "役職と派閥を合算した記録",
+    "ko": "역할 유형과 세력 통합 기록"
+  },
+  "解码与": {
+    "en": "decoding and ",
+    "ja": "デコードと ",
+    "ko": "디코딩 및 "
+  },
+  "解码失败。": {
+    "en": "decoding failed.",
+    "ja": "デコードに失敗。",
+    "ko": "디코딩 실패."
+  },
+  "解绑人物精灵失败：": {
+    "en": "Failed to detach the character sprite: ",
+    "ja": "人物スプライトの解除に失敗：",
+    "ko": "캐릭터 스프라이트 해제 실패: "
+  },
+  "记录状态：": {
+    "en": "Record status: ",
+    "ja": "記録の状態：",
+    "ko": "기록 상태: "
+  },
+  "记录：属实": {
+    "en": "Record: true ",
+    "ja": "記録：的中 ",
+    "ko": "기록: 참 "
+  },
+  "该类来源": {
+    "en": "This source category",
+    "ja": "この種類の情報源",
+    "ko": "해당 소식통 유형"
+  },
+  "请与行情掮客交谈，在原版情报界面购买。": {
+    "en": "Speak to the market broker and purchase through the original intel interface.",
+    "ja": "相場仲介人に話しかけ、原作の情報購入画面で購入してください。",
+    "ko": "시황 중개인과 대화하여 원본 정보 구매 화면에서 구매하세요."
+  },
+  "请先关闭股市面板，再使用游戏电话。": {
+    "en": "Close the stock-market terminal before using the game phone.",
+    "ja": "株式端末を閉じてからゲーム内の電話を使ってください。",
+    "ko": "주식 단말기를 닫은 뒤 게임 내 전화를 사용하세요."
+  },
+  "请先处理当前确认窗口，再重新拨号。": {
+    "en": "Resolve the current confirmation window, then dial again.",
+    "ja": "現在の確認画面を処理してから、かけ直してください。",
+    "ko": "현재 확인 창을 처리한 뒤 다시 전화하세요."
+  },
+  "请先进入存档。": {
+    "en": "Load a save first.",
+    "ja": "先にセーブを開始してください。",
+    "ko": "먼저 저장 파일에 진입하세요."
+  },
+  "请先进入游戏存档。": {
+    "en": "Enter a game save first.",
+    "ja": "先にゲームのセーブを開始してください。",
+    "ko": "먼저 게임 저장 파일에 진입하세요."
+  },
+  "请关闭股市面板，与行情掮客交谈购买；付款前仅展示商品类别。": {
+    "en": "Close the stock-market terminal and speak to the broker to buy. Only the commodity category is shown before payment.",
+    "ja": "株式端末を閉じ、仲介人に話しかけて購入してください。支払い前は商品分類のみ表示します。",
+    "ko": "주식 단말기를 닫고 중개인과 대화해 구매하세요. 결제 전에는 상품 분류만 공개됩니다."
+  },
+  "请求开始": {
+    "en": "Request started",
+    "ja": "要求開始",
+    "ko": "요청 시작"
+  },
+  "请求结束": {
+    "en": "Request finished",
+    "ja": "要求終了",
+    "ko": "요청 종료"
+  },
+  "请进入游戏存档。": {
+    "en": "Enter a game save.",
+    "ja": "ゲームのセーブを開始してください。",
+    "ko": "게임 저장 파일에 진입하세요."
+  },
+  "读回不匹配：": {
+    "en": "Readback mismatch: ",
+    "ja": "読戻しの不一致：",
+    "ko": "확인 결과 불일치: "
+  },
+  "读回新的字典与相同现金可完成严格验证。": {
+    "en": "Reading back a new dictionary with the same cash completes strict verification.",
+    "ja": "新しい辞書と同じ所持金を読み戻すと、厳格な検証が完了します。",
+    "ko": "새 사전과 동일한 현금을 다시 읽으면 엄격한 검증이 완료됩니다."
+  },
+  "读回现金不匹配：记录": {
+    "en": "Cash readback mismatch; recorded ",
+    "ja": "所持金の読戻しが不一致・記録値 ",
+    "ko": "현금 확인 결과 불일치. 기록값 "
+  },
+  "读回验证": {
+    "en": "Readback verification",
+    "ja": "読戻し検証",
+    "ko": "읽기 검증"
+  },
+  "购买于第": {
+    "en": "Purchased on day ",
+    "ja": "購入日：第 ",
+    "ko": "구매일: 제 "
+  },
+  "购买股市情报": {
+    "en": "Buy Stock Tip",
+    "ja": "株式情報を購入",
+    "ko": "주식 정보 구매"
+  },
+  "载入失败，保留原版便笺图像；本次运行不再重试分配纹理。": {
+    "en": "Loading failed; retaining the original note image. Texture allocation will not be retried this run.",
+    "ja": "読込に失敗したため原作の付箋画像を維持します。今回の実行中はテクスチャ確保を再試行しません。",
+    "ko": "불러오기에 실패하여 원본 메모 이미지를 유지합니다. 이번 실행 중에는 텍스처 할당을 다시 시도하지 않습니다."
+  },
+  "这份已购情报已记入股市情报簿，请在记录中查看。": {
+    "en": "Your purchased tip is in the stock intel archive. Check the record there.",
+    "ja": "購入した情報は株式情報帳に記録済みだ。記録から確認してくれ。",
+    "ko": "구매한 정보는 주식 정보 기록장에 남겨 뒀어. 기록에서 확인해."
+  },
+  "这条报价已失效，请稍后再来。": {
+    "en": "This offer has expired. Please come back later.",
+    "ja": "この見積りは無効だ。また後で来てくれ。",
+    "ko": "이 제안은 만료됐어. 나중에 다시 와."
+  },
+  "这笔股市情报交易已经结束。已购线索会保存在你的情报记录中。": {
+    "en": "This stock-tip deal is finished. Your purchased clue is kept in your intel records.",
+    "ja": "この株式情報の取引は終了した。購入した手がかりは情報記録に残る。",
+    "ko": "이번 주식 정보 거래는 끝났어. 구매한 단서는 정보 기록에 보관돼."
+  },
+  "这里是行情消息专线，闻舟和剑清酱共用这个号码。是否预约一位消息商明天到店？": {
+    "en": "This is the Market News Hotline, shared by Wen Zhou and Jianqing-chan. Would you like to book a dealer for tomorrow?",
+    "ja": "こちらは聞舟と剣清ちゃん共用の相場情報専用線です。明日の来店を予約しますか？",
+    "ko": "원저우와 젠칭짱이 함께 쓰는 시황 정보 전용선입니다. 내일 정보상 방문을 예약하시겠습니까?"
+  },
+  "通话中": {
+    "en": "In Call",
+    "ja": "通話中",
+    "ko": "통화 중"
+  },
+  "道具位置尚未确认，已停止重复发放。": {
+    "en": "The item's location is unconfirmed. Duplicate delivery has been stopped.",
+    "ja": "アイテムの所在を確認できないため、重複配布を停止しました。",
+    "ko": "아이템 위치가 확인되지 않아 중복 지급을 중단했습니다."
+  },
+  "道具发放尚未确认，已保留状态以避免重复。": {
+    "en": "Item delivery is unconfirmed. Its state was kept to avoid duplicates.",
+    "ja": "配布を確認できないため、重複を防ぐため状態を保持しました。",
+    "ko": "아이템 지급이 확인되지 않아 중복 방지를 위해 상태를 보존했습니다."
+  },
+  "道具发放正在处理中。": {
+    "en": "Item delivery is in progress.",
+    "ja": "アイテムを配布中です。",
+    "ko": "아이템 지급을 처리 중입니다."
+  },
+  "道具尚未就绪，稍后重试。": {
+    "en": "The item is not ready. Retrying later.",
+    "ja": "アイテムが未準備です。後で再試行します。",
+    "ko": "아이템이 준비되지 않았습니다. 나중에 다시 시도합니다."
+  },
+  "道具持有状态查询失败：": {
+    "en": "Failed to check item ownership: ",
+    "ja": "アイテム所持状態の確認に失敗：",
+    "ko": "아이템 보유 상태 확인 실패: "
+  },
+  "道具真实或拖拽图像节点未就绪。": {
+    "en": "The item's real or drag image node is not ready.",
+    "ja": "アイテムの実体またはドラッグ画像ノードが未準備です。",
+    "ko": "아이템의 실물 또는 드래그 이미지 노드가 준비되지 않았습니다."
+  },
+  "遣散会话封存失败": {
+    "en": "Failed to close the dismissed customer's session",
+    "ja": "退店セッションの確定に失敗",
+    "ko": "퇴점 세션 확정 실패"
+  },
+  "遣散后实例尚未移除，延后至下一次顾客变化封存会话。": {
+    "en": "The dismissed instance is still present. Session closure is deferred until the customer changes.",
+    "ja": "退店後のインスタンスが残っているため、次の顧客変更時まで確定を延期します。",
+    "ko": "퇴점 후 인스턴스가 남아 있어 다음 손님 변경 때까지 세션 확정을 미룹니다."
+  },
+  "采样完成，已创建": {
+    "en": "Sampling complete; created ",
+    "ja": "採取完了、作成済み：",
+    "ko": "샘플링 완료. 생성됨: "
+  },
+  "采用已有面板": {
+    "en": "Adopt existing terminal",
+    "ja": "既存端末を採用",
+    "ko": "기존 단말기 사용"
+  },
+  "钩子；实际": {
+    "en": "hook; actual ",
+    "ja": "フック。実際の ",
+    "ko": "훅. 실제 "
+  },
+  "锵锵！剑清酱到啦！电话里说的就是我。我的消息遍布各行各业，行情里那些弯弯绕绕，我可有自己的独门眼光。": {
+    "en": "Ta-da! Jianqing-chan is here! Yes, the one from the phone. My contacts span every industry, and I've got my own special eye for the twists and turns of the market.",
+    "ja": "じゃーん！剣清ちゃん参上！電話の相手は私だよ。いろんな業界に顔が利くし、相場の裏も表も、私ならではの見方があるんだ。",
+    "ko": "짜잔! 젠칭짱 등장! 전화에서 말한 사람이 바로 나야. 온갖 업계에 소식통이 있고, 복잡한 시황을 보는 나만의 특별한 안목이 있지."
+  },
+  "闻舟": {
+    "en": "Wen Zhou",
+    "ja": "聞舟",
+    "ko": "원저우"
+  },
+  "阅读前刷新失败，保留已有纸条正文：": {
+    "en": "Failed to refresh before reading; keeping the existing note text: ",
+    "ja": "閲覧前の更新に失敗。既存の紙片本文を維持：",
+    "ko": "읽기 전 갱신에 실패하여 기존 쪽지 본문을 유지합니다: "
+  },
+  "阅读钩子解绑失败，继续释放资源：": {
+    "en": "Failed to detach the reading hook; continuing resource cleanup: ",
+    "ja": "閲覧フックの解除に失敗。リソース解放を継続：",
+    "ko": "읽기 훅 해제에 실패했지만 리소스 정리를 계속합니다: "
+  },
+  "顾客工厂委托转换失败。": {
+    "en": "Failed to convert the customer factory delegate.",
+    "ja": "顧客生成デリゲートの変換に失敗しました。",
+    "ko": "손님 생성기 델리게이트 변환에 실패했습니다."
+  },
+  "预约保存尚未确认：": {
+    "en": "Appointment save is unconfirmed: ",
+    "ja": "予約の保存を確認できません：",
+    "ko": "예약 저장을 확인하지 못했습니다: "
+  },
+  "预约取消委托转换失败。": {
+    "en": "Failed to convert the appointment-cancel delegate.",
+    "ja": "予約取消デリゲートの変換に失敗しました。",
+    "ko": "예약 취소 델리게이트 변환에 실패했습니다."
+  },
+  "预约尚未确认，请稍后重拨重试；已有报价不会重新抽取。": {
+    "en": "The booking is not confirmed. Redial shortly; an existing offer will not be rerolled.",
+    "ja": "予約を確認できません。少し待ってかけ直してください。既存の見積りは抽選し直しません。",
+    "ko": "예약이 확정되지 않았습니다. 잠시 후 다시 전화하세요. 기존 제안은 재추첨하지 않습니다."
+  },
+  "预约明日到访": {
+    "en": "Book for Tomorrow",
+    "ja": "明日の来訪を予約",
+    "ko": "내일 방문 예약"
+  },
+  "预约确认委托转换失败。": {
+    "en": "Failed to convert the appointment-confirm delegate.",
+    "ja": "予約確定デリゲートの変換に失敗しました。",
+    "ko": "예약 확인 델리게이트 변환에 실패했습니다."
+  },
+  "预约确认已失效，请重新拨号。": {
+    "en": "This confirmation has expired. Please dial again.",
+    "ja": "この予約確認は無効になりました。かけ直してください。",
+    "ko": "예약 확인이 만료되었습니다. 다시 전화하세요."
+  },
+  "预约确认界面暂未就绪，请稍后重拨。": {
+    "en": "The booking confirmation screen is not ready. Please redial later.",
+    "ja": "予約確認画面が未準備です。後でかけ直してください。",
+    "ko": "예약 확인 화면이 준비되지 않았습니다. 나중에 다시 전화하세요."
+  },
+  "预约结果暂未确认，请重新拨号查询。": {
+    "en": "The booking result is unconfirmed. Call again to check.",
+    "ja": "予約結果を確認できません。もう一度電話で確認してください。",
+    "ko": "예약 결과가 확인되지 않았습니다. 다시 전화해 확인하세요."
+  },
+  "领域购买返回": {
+    "en": "Domain purchase returned ",
+    "ja": "領域購入処理の結果：",
+    "ko": "도메인 구매 반환: "
+  },
+  "首次自我介绍已完成并记录。": {
+    "en": "First introduction completed and recorded.",
+    "ja": "初回の自己紹介を完了し、記録しました。",
+    "ko": "첫 자기소개를 마치고 기록했습니다."
+  }
+}

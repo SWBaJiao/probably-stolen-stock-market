@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime;
 using MelonLoader;
+using ProbablyStolenStockMarket.Localization;
 using ProbablyStolenStockMarket.Market;
 
 namespace ProbablyStolenStockMarket.Game;
@@ -222,6 +222,7 @@ internal sealed class IntelDeliveryAdapter : IDisposable
         SetText(item, "HANDNOTE_TITLE", StatusLabel(record.Status) + " · " + record.Industry);
         SetText(item, "HANDNOTE_BODY", BuildBody(record));
         string source = record.SourceName == record.SourceIdentity ? record.SourceName : record.SourceName + " · " + record.SourceIdentity;
+        // 档案号本身保持稳定；可见前缀按语言转换，认领兼容旧纸条及所有语言。
         SetText(item, "HANDNOTE_SIGN", source + Marker(record.OfferId));
         // HANDNOTE_FONT 保留原生 handnote 工厂默认值。
     }
@@ -241,16 +242,28 @@ internal sealed class IntelDeliveryAdapter : IDisposable
     { if (!engine.SetIntelPaperState(id, state, itemId)) throw new InvalidOperationException("情报纸条状态转换被拒绝：" + state); }
     internal static string StatusLabel(RumorResolution status) => status switch
     { RumorResolution.True => "已核实属实", RumorResolution.False => "已核实失实", RumorResolution.Unverified => "无法核实", _ => "未核实股市线索" };
-    private static string Marker(string id) => "\n档案号：" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(id)))[..12];
-    private static bool HasOfferMarker(GameItem item, string id) => item.GetTagReadonly("HANDNOTE_SIGN")?.GetString()?.EndsWith(Marker(id), StringComparison.Ordinal) == true;
+    private static string Marker(string id) => IntelPaperMarker.Canonical(id);
+    private static bool HasOfferMarker(GameItem item, string id) => IntelPaperMarker.Matches(item.GetTagReadonly("HANDNOTE_SIGN")?.GetString(), id);
     private static void SetText(GameItem item, string key, string value)
     {
+        value = Localizer.Text(value);
         Action<TagState> write = state => state.Enable().SetString(value);
         var native = DelegateSupport.ConvertDelegate<Il2CppSystem.Action<TagState>>(write)
             ?? throw new InvalidOperationException("纸条标签委托转换失败：" + key);
         item.ModifyTag(key, native);
         GC.KeepAlive(native); GC.KeepAlive(write);
         if (item.GetTagReadonly(key)?.GetString() != value) throw new InvalidOperationException("纸条标签读回不一致：" + key);
+    }
+    internal static bool IsOwnPaper(GameItem item)
+    {
+        var adapter = _current;
+        if (adapter == null || adapter._disposed || !adapter._host.BrokerReady || item.identifier != "handnote") return false;
+        try
+        {
+            return adapter._host.Engine?.GetIntelRecords().Any(record => HasOfferMarker(item, record.OfferId)
+                && (record.PaperItemId == item.uniqueId || adapter._previewItems.TryGetValue(record.OfferId, out var preview) && preview.Pointer == item.Pointer)) == true;
+        }
+        catch { return false; }
     }
     private static bool IsDirectMember(GameGridInventory table, GameItem item)
     { foreach (var child in table.childItems) if (child != null && child.Pointer == item.Pointer) return true; return false; }

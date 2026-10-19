@@ -5,6 +5,7 @@ using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime;
 using MelonLoader;
+using ProbablyStolenStockMarket.Localization;
 using ProbablyStolenStockMarket.Market;
 
 namespace ProbablyStolenStockMarket.Game;
@@ -125,7 +126,7 @@ internal sealed class IntelPhoneAdapter : IDisposable
         try
         {
             _opening = true;
-            ui.OpenPanel("这里是行情消息专线，闻舟和剑清酱共用这个号码。是否预约一位消息商明天到店？\n\n确认后随机安排一人；重复拨号只查询已有预约，不重新抽取。", "预约明日到访", "暂不预约", ticket.Confirm, ticket.Cancel);
+            ui.OpenPanel(Localizer.Text("这里是行情消息专线，闻舟和剑清酱共用这个号码。是否预约一位消息商明天到店？\n\n确认后随机安排一人；重复拨号只查询已有预约，不重新抽取。"), Localizer.Text("预约明日到访"), Localizer.Text("暂不预约"), ticket.Confirm, ticket.Cancel);
             Feedback(phone, "行情消息专线：请确认是否预约明日到访。");
             _log.Msg("[股市预约电话探针] 已显示确认，尚未调用预约领域。");
         }
@@ -187,7 +188,7 @@ internal sealed class IntelPhoneAdapter : IDisposable
     private static void Feedback(PhoneUIManager phone, string text)
     {
         // 原版听筒状态区只容纳短状态，详细结果保留日志，预约状态可在内幕档案查看。
-        if (phone != null && phone.statusDisplay != null) phone.statusDisplay.text = "通话中";
+        if (phone != null && phone.statusDisplay != null) phone.statusDisplay.text = Localizer.Text("通话中");
         Current?._log.Msg("[股市预约电话] " + text);
     }
 

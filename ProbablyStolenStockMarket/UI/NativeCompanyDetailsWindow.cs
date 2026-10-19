@@ -1,4 +1,5 @@
 using System;
+using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using System.Linq;
 using Il2Cpp;
@@ -54,7 +55,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
         var bounds = overlay != null ? overlay.rect : new Rect(0, 0, Screen.width, Screen.height);
         _width = Math.Min(780, Math.Max(320, bounds.width - 48));
         var height = Math.Min(650, Math.Max(280, bounds.height - 48));
-        _builder = CustomUIManager.Window(WindowId, "公司介绍与公开消息", CustomUIManager.LAYER_OVERLAY);
+        _builder = CustomUIManager.Window(WindowId, Localizer.Text("公司介绍与公开消息"), CustomUIManager.LAYER_OVERLAY);
         _window = _builder.window;
         // Escape 统一由主窗口分发，避免同一次按键关闭两个窗口。
         _builder.SetSize(_width, height).Center().SetDraggable(true).SetCloseOnEscape(false);
@@ -87,6 +88,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
         NativeStockMarketPanel.Container(element.root.transform.Cast<RectTransform>(), -1, height);
         if (element.text != null)
         {
+            NativeUiBootstrap.ApplyCurrentFont(element.text);
             element.text.fontSize = heading ? 19 : 17;
             element.text.color = heading ? StockUiTheme.Accent : StockUiTheme.Text;
             element.text.fontStyle = heading ? FontStyles.Bold : FontStyles.Normal;
@@ -98,10 +100,10 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
 
     private void Button(string text, Action action, float width)
     {
-        _builder!.AddButton(text, null, null);
+        _builder!.AddButton(Localizer.Text(text), null, null);
         var element = _builder.Last;
         NativeStockMarketPanel.Container(element.root.transform.Cast<RectTransform>(), width, 36);
-        if (element.text != null) { element.text.color = StockUiTheme.Text; element.text.fontSize = 16; element.text.richText = false; }
+        if (element.text != null) { NativeUiBootstrap.ApplyCurrentFont(element.text); element.text.color = StockUiTheme.Text; element.text.fontSize = 16; element.text.richText = false; }
         var button = element.button ?? throw new InvalidOperationException("公司窗口按钮缺少 Button。");
         button.targetGraphic = NativeStockMarketPanel.Surface(element.root, "CompanyButton", Color.white, 2, 2, 2, 2);
         NativeStockMarketPanel.SetButtonColors(button, false);
@@ -122,7 +124,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
         rect.anchorMin = new Vector2(0, 1); rect.anchorMax = Vector2.one;
         rect.offsetMin = new Vector2(5, -46); rect.offsetMax = new Vector2(-5, -5);
         bar.transform.SetSiblingIndex(1);
-        if (window.frame.titleText != null) { window.frame.titleText.color = StockUiTheme.Text; window.frame.titleText.richText = false; }
+        if (window.frame.titleText != null) { NativeUiBootstrap.ApplyCurrentFont(window.frame.titleText); window.frame.titleText.color = StockUiTheme.Text; window.frame.titleText.richText = false; }
         if (window.frame.closeButton != null)
         {
             var close = window.frame.closeButton;
@@ -138,7 +140,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
         _engine = engine; _companyId = companyId;
         var company = engine.Config.Companies.FirstOrDefault(c => c.Id == companyId);
         if (company == null) return;
-        _window.SetTitle(company.Name + " · 公司介绍");
+        _window.SetTitle(Localizer.Text(company.Name + " · 公司介绍"));
         Text("name", company.Name);
         Text("story", company.Description);
         Text("news.title", "股市专用新闻");
@@ -152,6 +154,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
     private void Text(string id, string value)
     {
         if (!_labels.TryGetValue(id, out var element)) return;
+        value = Localizer.Text(value);
         var changed = !_texts.TryGetValue(id, out var old) || old != value;
         if (changed) { element.SetText(value); _texts[id] = value; }
         if (element.text == null) return;

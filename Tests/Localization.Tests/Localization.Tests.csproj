@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../ProbablyStolenStockMarket/Localization/Localizer.cs" Link="Localizer.cs" />
+    <Compile Include="../../ProbablyStolenStockMarket/Game/IntelPaperMarker.cs" Link="IntelPaperMarker.cs" />
+    <EmbeddedResource Include="../../ProbablyStolenStockMarket/Localization/*.json" LogicalName="ProbablyStolenStockMarket.Localization.%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

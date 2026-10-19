@@ -1,0 +1,1197 @@
+{
+  "一批防务物资可能流入市场，供应渠道正在扩张": {
+    "en": "A shipment of defense supplies may enter the market as supply channels expand",
+    "ja": "防衛物資が市場に流入し、供給経路が拡大する可能性がある",
+    "ko": "방위 물자가 시장에 유입되며 공급 경로가 확대될 수 있다"
+  },
+  "上一笔交易尚未完成。": {
+    "en": "The previous transaction is still pending.",
+    "ja": "前の取引がまだ完了していません。",
+    "ko": "이전 거래가 아직 완료되지 않았습니다."
+  },
+  "不同情报商不能共用到访标识": {
+    "en": "Different brokers cannot share a visit ID",
+    "ja": "異なる情報屋に同じ訪問 ID は使用できません",
+    "ko": "서로 다른 정보상은 방문 ID 를 공유할 수 없습니다"
+  },
+  "与": {
+    "en": " and ",
+    "ja": "と",
+    "ko": " 및 "
+  },
+  "专用生命周期缺少实例快照": {
+    "en": "A stock-only lifecycle is missing its instance snapshot",
+    "ja": "株式専用ライフサイクルにインスタンスのスナップショットがありません",
+    "ko": "주식 전용 수명 주기에 인스턴스 스냅샷이 없습니다"
+  },
+  "丰禾供给": {
+    "en": "Harvest Supply",
+    "ja": "豊禾サプライ",
+    "ko": "풍허 서플라이"
+  },
+  "丰禾供给公布新的长期食品供货合同，稳定的采购安排有望改善仓库周转。环宇商贸参与分销，晨星物流承接配套运输，因此也受到订单扩大的带动。": {
+    "en": "Harvest Supply announced a new long-term food supply contract. Steady procurement should improve warehouse turnover. Orbital Commerce handles distribution and Morningstar Logistics handles shipping, so both are also expected to benefit from the larger orders.",
+    "ja": "豊禾サプライが新たな長期食品供給契約を発表した。安定した調達により倉庫の回転率改善が期待される。流通を担う環宇商事と輸送を請け負う晨星ロジスティクスも、受注拡大の恩恵を受ける見通しだ。",
+    "ko": "풍허 서플라이가 새로운 장기 식품 공급 계약을 발표했다. 안정적인 조달로 창고 회전율 개선이 기대된다. 유통을 맡는 환우 커머스와 운송을 담당하는 샛별 로지스틱스도 주문 확대의 수혜를 입을 전망이다."
+  },
+  "丰禾供给宣布召回一批食品并开展质量复查，退换与整改成本压低了市场预期。环宇商贸需要调整分销计划，晨星物流的原定货运安排也面临缩减。": {
+    "en": "Harvest Supply announced a food batch recall and quality review. Returns and corrective costs have lowered market expectations. Orbital Commerce must revise its distribution plans, while Morningstar Logistics faces cuts to its scheduled shipments.",
+    "ja": "豊禾サプライが食品の一部ロット回収と品質再検査を発表した。返品対応や改善費用が市場の期待を押し下げている。環宇商事は流通計画の変更を迫られ、晨星ロジスティクスの予定貨物も縮小する可能性がある。",
+    "ko": "풍허 서플라이가 일부 식품의 회수와 품질 재검사를 발표했다. 반품과 시정 비용으로 시장 기대가 낮아졌다. 환우 커머스는 유통 계획을 조정해야 하며 샛별 로지스틱스의 예정 운송 물량도 줄어들 수 있다."
+  },
+  "丰禾供给最早靠一辆往返种植区的小货车起家，如今替街角商店和食堂收购营养果、农产品与耐储食品。它会向清泉循环采购灌装用水，也借晨星物流的货舱把易腐货物赶在变质前送达。丰收时仓库忙于周转，缺水或运输受阻时，采购员则得为下一批货重新讨价还价。": {
+    "en": "Harvest Supply began with a small truck shuttling to the growing districts. Today it buys nutrifruit, produce, and shelf-stable food for corner shops and canteens. It purchases bottling water from ClearSpring Recycling and uses Morningstar Logistics cargo holds to deliver perishables before they spoil. At harvest time the warehouse hums with activity; when water or transport runs short, its buyers must renegotiate the next shipment.",
+    "ja": "豊禾サプライの始まりは、栽培地区を往復する小さなトラック一台だった。今では街角の店や食堂に向け、栄養果や農産物、保存食を仕入れている。充填用の水は清泉リサイクルから調達し、傷みやすい食品は晨星ロジスティクスの貨物室で鮮度が落ちる前に届ける。豊作時には倉庫が慌ただしく回転するが、水不足や輸送障害が起きれば、買い付け担当は次の荷の価格交渉をやり直さねばならない。",
+    "ko": "풍허 서플라이는 재배 지구를 오가던 작은 트럭 한 대에서 시작했다. 지금은 동네 상점과 식당을 위해 영양 과일, 농산물, 저장 식품을 매입한다. 병입용 물은 청천 리사이클링에서 조달하고, 상하기 쉬운 식품은 샛별 로지스틱스의 화물칸으로 신선할 때 배송한다. 풍년이면 창고는 쉴 새 없이 돌아가지만, 물이 부족하거나 운송이 막히면 구매 담당자는 다음 물량의 가격부터 다시 협상해야 한다."
+  },
+  "丰禾签下长期供货合同": {
+    "en": "Harvest signs long-term supply contract",
+    "ja": "豊禾が長期供給契約を締結",
+    "ko": "풍허, 장기 공급 계약 체결"
+  },
+  "丰禾食品批次召回": {
+    "en": "Harvest food batch recall",
+    "ja": "豊禾の食品ロット回収",
+    "ko": "풍허 식품 일부 회수"
+  },
+  "主冲击": {
+    "en": "Main shock",
+    "ja": "主な衝撃",
+    "ko": "주요 충격"
+  },
+  "主冲击每日预算存档无效": {
+    "en": "Invalid saved daily main-shock budget",
+    "ja": "保存された主衝撃の日次枠が無効です",
+    "ko": "저장된 일일 주요 충격 한도가 잘못되었습니다"
+  },
+  "买入": {
+    "en": "Buy",
+    "ja": "買う",
+    "ko": "매수"
+  },
+  "事件": {
+    "en": "Event",
+    "ja": "イベント",
+    "ko": "이벤트"
+  },
+  "事件公司影响存档无效": {
+    "en": "Invalid saved company event impacts",
+    "ja": "保存されたイベントの企業影響が無効です",
+    "ko": "저장된 이벤트별 기업 영향이 잘못되었습니다"
+  },
+  "事件冲击窗口与预热参数无效": {
+    "en": "Invalid event shock window or preheat settings",
+    "ja": "イベントの衝撃期間または予兆設定が無効です",
+    "ko": "이벤트 충격 기간 또는 사전 반응 설정이 잘못되었습니다"
+  },
+  "事件冲击计划存档无效": {
+    "en": "Invalid saved event shock plan",
+    "ja": "保存されたイベント衝撃計画が無効です",
+    "ko": "저장된 이벤트 충격 계획이 잘못되었습니다"
+  },
+  "事件因子或随机保留记录无效": {
+    "en": "Invalid event factor or random retention record",
+    "ja": "イベント係数またはランダム残存率の記録が無効です",
+    "ko": "이벤트 계수 또는 무작위 잔존 비율 기록이 잘못되었습니다"
+  },
+  "事件持续与保留参数无效": {
+    "en": "Invalid event continuation or retention settings",
+    "ja": "イベントの継続または残存設定が無効です",
+    "ko": "이벤트 지속 또는 잔존 설정이 잘못되었습니다"
+  },
+  "事件生命周期存档无效": {
+    "en": "Invalid saved event lifecycle",
+    "ja": "保存されたイベントのライフサイクルが無効です",
+    "ko": "저장된 이벤트 수명 주기가 잘못되었습니다"
+  },
+  "事件配置无效或重复": {
+    "en": "Invalid or duplicate event configuration",
+    "ja": "イベント設定が無効または重複しています",
+    "ko": "이벤트 설정이 잘못되었거나 중복되었습니다"
+  },
+  "交易准备失败：": {
+    "en": "Transaction preparation failed: ",
+    "ja": "取引の準備に失敗しました：",
+    "ko": "거래 준비 실패: "
+  },
+  "交易失败并已尝试恢复：": {
+    "en": "Transaction failed; recovery was attempted: ",
+    "ja": "取引に失敗し、復旧を試みました：",
+    "ko": "거래 실패 후 복구를 시도했습니다: "
+  },
+  "交易成功。": {
+    "en": "Transaction completed.",
+    "ja": "取引が成立しました。",
+    "ko": "거래가 완료되었습니다."
+  },
+  "今日登记的预约已经结束或失效，请改日再联系。": {
+    "en": "Today's registered appointment has ended or expired. Please call another day.",
+    "ja": "本日登録した予約は終了または失効しています。別の日にお電話ください。",
+    "ko": "오늘 등록한 예약이 종료되었거나 만료되었습니다. 다른 날 연락해 주세요."
+  },
+  "余波修复": {
+    "en": "Aftershock recovery",
+    "ja": "余波の回復",
+    "ko": "여파 회복"
+  },
+  "余额不足。": {
+    "en": "Insufficient funds.",
+    "ja": "所持金が足りません。",
+    "ko": "잔액이 부족합니다."
+  },
+  "余额不足或资金超出上限。": {
+    "en": "Insufficient funds or balance limit exceeded.",
+    "ja": "所持金が不足しているか、資金の上限を超えています。",
+    "ko": "잔액이 부족하거나 자금 한도를 초과했습니다."
+  },
+  "供需变化": {
+    "en": "Supply and demand change",
+    "ja": "需給の変化",
+    "ko": "수급 변화"
+  },
+  "公司情报": {
+    "en": "Company intelligence",
+    "ja": "企業情報",
+    "ko": "기업 정보"
+  },
+  "公司或交易数量无效。": {
+    "en": "Invalid company or share quantity.",
+    "ja": "企業または取引株数が無効です。",
+    "ko": "기업 또는 거래 수량이 잘못되었습니다."
+  },
+  "公司或行业配置为空": {
+    "en": "Company or industry configuration is empty",
+    "ja": "企業または業種の設定が空です",
+    "ko": "기업 또는 업종 설정이 비어 있습니다"
+  },
+  "公司配置不完整或标识重复": {
+    "en": "Incomplete company configuration or duplicate IDs",
+    "ja": "企業設定が不完全、または ID が重複しています",
+    "ko": "기업 설정이 불완전하거나 ID 가 중복되었습니다"
+  },
+  "公司配置删除了仍有持仓的公司": {
+    "en": "The configuration removed a company with existing holdings",
+    "ja": "保有株のある企業が設定から削除されています",
+    "ko": "보유 주식이 있는 기업이 설정에서 삭제되었습니다"
+  },
+  "公开事件已生效，关联公司行情可能受影响。": {
+    "en": "A public event has taken effect and may affect related companies' shares.",
+    "ja": "公開イベントが発効し、関連企業の株価に影響する可能性があります。",
+    "ko": "공개 이벤트가 발효되어 관련 기업의 주가에 영향을 줄 수 있습니다."
+  },
+  "关联公司": {
+    "en": "Related companies",
+    "ja": "関連企業",
+    "ko": "관련 기업"
+  },
+  "农业从业者": {
+    "en": "Agricultural worker",
+    "ja": "農業従事者",
+    "ko": "농업 종사자"
+  },
+  "冰矿从业者": {
+    "en": "Ice miner",
+    "ja": "氷鉱採掘者",
+    "ko": "얼음 광산 종사자"
+  },
+  "利好": {
+    "en": "Positive",
+    "ja": "好材料",
+    "ko": "호재"
+  },
+  "利空": {
+    "en": "Negative",
+    "ja": "悪材料",
+    "ko": "악재"
+  },
+  "剑清酱": {
+    "en": "Jianqing-chan",
+    "ja": "剣清ちゃん",
+    "ko": "젠칭짱"
+  },
+  "剑清酱本人": {
+    "en": "Jianqing-chan himself",
+    "ja": "剣清ちゃん本人",
+    "ko": "젠칭짱 본인"
+  },
+  "剑清酱的反向消息概率须在零到一之间": {
+    "en": "Jianqing-chan's reversed-tip probability must be between zero and one",
+    "ja": "剣清ちゃんの逆向き情報の確率は 0 から 1 の範囲にしてください",
+    "ko": "젠칭짱의 반대 정보 확률은 0 에서 1 사이여야 합니다"
+  },
+  "化学从业者": {
+    "en": "Chemical worker",
+    "ja": "化学業界の従事者",
+    "ko": "화학 업계 종사자"
+  },
+  "化学品": {
+    "en": "Chemicals",
+    "ja": "化学品",
+    "ko": "화학 제품"
+  },
+  "化学品与工业材料": {
+    "en": "Chemicals and industrial materials",
+    "ja": "化学品・工業材料",
+    "ko": "화학 제품 및 산업 원료"
+  },
+  "医院管理者": {
+    "en": "Hospital administrator",
+    "ja": "病院管理者",
+    "ko": "병원 관리자"
+  },
+  "匿名消息人": {
+    "en": "Anonymous informant",
+    "ja": "匿名の情報提供者",
+    "ko": "익명의 제보자"
+  },
+  "卖出": {
+    "en": "Sell",
+    "ja": "売る",
+    "ko": "매도"
+  },
+  "卖出收入不足以支付手续费，请增加数量。": {
+    "en": "Sale proceeds do not cover the fee. Increase the quantity.",
+    "ja": "売却額では手数料を賄えません。株数を増やしてください。",
+    "ko": "매도 대금으로 수수료를 충당할 수 없습니다. 수량을 늘려 주세요."
+  },
+  "原线索未能验证，不计入来源信誉。": {
+    "en": "The original tip could not be verified and does not affect the source's reputation.",
+    "ja": "元の情報は検証できなかったため、情報源の評判には反映されません。",
+    "ko": "원래 정보는 검증할 수 없어 출처의 평판에 반영되지 않습니다."
+  },
+  "原预测": {
+    "en": "Original prediction",
+    "ja": "当初の予測",
+    "ko": "원래 예측"
+  },
+  "可卖持仓不足。": {
+    "en": "Insufficient shares available to sell.",
+    "ja": "売却できる保有株が足りません。",
+    "ko": "매도 가능한 보유 주식이 부족합니다."
+  },
+  "可疑来源": {
+    "en": "Dubious source",
+    "ja": "疑わしい情報源",
+    "ko": "의심스러운 출처"
+  },
+  "合计日变动": {
+    "en": "Total daily change",
+    "ja": "日次変動の合計",
+    "ko": "일일 총변동"
+  },
+  "向": {
+    "en": " to ",
+    "ja": "へ",
+    "ko": "에게 "
+  },
+  "售卖者身份配置无效": {
+    "en": "Invalid seller identity configuration",
+    "ja": "販売者の身元設定が無効です",
+    "ko": "판매자 신원 설정이 잘못되었습니다"
+  },
+  "多家诊所的联合采购订单落到白塔医疗，药品和医疗耗材的出货预期提升。聚合材料为生产提供原料，远星科技参与设备模块配套，也有望分享到新增需求。": {
+    "en": "White Tower Medical won a joint procurement order from several clinics, raising shipment expectations for drugs and medical supplies. Polymer Materials supplies production inputs and Farstar Technologies supplies equipment modules; both may share in the new demand.",
+    "ja": "白塔メディカルが複数の診療所による共同調達を受注し、医薬品と医療消耗品の出荷期待が高まっている。製造原料を供給する聚合マテリアルと機器モジュールを提供する遠星テクノロジーも、需要増の恩恵を受ける見通しだ。",
+    "ko": "백탑 메디컬이 여러 진료소의 공동 조달 주문을 수주해 의약품과 의료 소모품의 출하 기대가 높아졌다. 생산 원료를 공급하는 폴리머 머티리얼즈와 장비 모듈을 제공하는 원성 테크놀로지도 늘어난 수요의 수혜를 입을 전망이다."
+  },
+  "多项公开事件合并冲击": {
+    "en": "Combined impact of multiple public events",
+    "ja": "複数の公開イベントによる合算衝撃",
+    "ko": "여러 공개 이벤트의 합산 충격"
+  },
+  "奢侈品": {
+    "en": "Luxury goods",
+    "ja": "高級品",
+    "ko": "사치품"
+  },
+  "存档尚未验证，或交易已冻结。": {
+    "en": "Save data is unverified or trading is frozen.",
+    "ja": "セーブの検証が未完了か、取引が凍結されています。",
+    "ko": "저장 데이터가 검증되지 않았거나 거래가 동결되었습니다."
+  },
+  "安保检查员": {
+    "en": "Security inspector",
+    "ja": "保安検査官",
+    "ko": "보안 검사관"
+  },
+  "安盾获得长期安保合同": {
+    "en": "Aegis wins long-term security contract",
+    "ja": "イージスが長期警備契約を獲得",
+    "ko": "이지스, 장기 보안 계약 수주"
+  },
+  "安盾防务": {
+    "en": "Aegis Defense",
+    "ja": "イージス・ディフェンス",
+    "ko": "이지스 디펜스"
+  },
+  "安盾防务宣布召回一批防护装备，质保成本与交付延误令市场预期下降。星锻工业和远星科技面向该批装备的部件与电子组件订单也受到牵连。": {
+    "en": "Aegis Defense announced a protective equipment recall. Warranty costs and delivery delays have lowered market expectations. Orders for parts from Starforge Industries and electronic components from Farstar Technologies are also affected.",
+    "ja": "イージス・ディフェンスが防護装備の一部回収を発表した。保証費用と納入遅延により市場の期待が下がっている。対象装備向けの部品を供給する星鍛インダストリーと、電子部品を供給する遠星テクノロジーの受注にも影響が及んでいる。",
+    "ko": "이지스 디펜스가 일부 보호 장비의 회수를 발표했다. 보증 비용과 납품 지연으로 시장 기대가 낮아졌다. 해당 장비에 들어가는 성단 인더스트리의 부품과 원성 테크놀로지의 전자 부품 주문에도 영향이 미치고 있다."
+  },
+  "安盾防务最早替巡逻人员修补防护装备，后来才扩展到武器、安全器材和配套零件的供应。它向星锻工业寻找金属和机械部件，也通过环宇商贸接触分散在各处的买家。新订单会带动车间备料，运输限制和部件短缺则可能拖延交付；柜台后的采购单，往往比门前的招牌更早反映生意冷暖。": {
+    "en": "Aegis Defense started out repairing protective gear for patrol officers, later expanding into weapons, security equipment, and spare parts. It buys metals and mechanical parts from Starforge Industries and reaches scattered buyers through Orbital Commerce. New orders keep its workshops stocking up; transport restrictions and parts shortages can hold up deliveries. The purchase orders behind the counter often reveal the state of business before the sign out front does.",
+    "ja": "イージス・ディフェンスは巡回員の防護装備を修理する商売から始まり、後に武器や保安機材、交換部品へと事業を広げた。金属や機械部品は星鍛インダストリーに頼り、各地の買い手には環宇商事を通じて接触する。新規受注で工場の仕入れが増える一方、輸送規制や部品不足は納入を遅らせる。店頭の看板より先に、カウンターの裏の発注書が商売の景気を語ることも多い。",
+    "ko": "이지스 디펜스는 순찰대의 보호 장비를 수리하다가 무기, 보안 장비, 부품 공급으로 사업을 넓혔다. 성단 인더스트리에서 금속과 기계 부품을 구하고 환우 커머스를 통해 각지의 구매자를 만난다. 새 주문이 들어오면 작업장은 자재를 비축하지만 운송 제한과 부품 부족은 납기를 늦출 수 있다. 가게 간판보다 카운터 뒤 발주서가 사업의 호황과 불황을 먼저 보여 주곤 한다."
+  },
+  "安盾防务获得长期安保合同，装备和安全器材需求预期增长。星锻工业的机械部件与远星科技的电子组件参与配套，市场也上调了两家供应商的相关业务预期。": {
+    "en": "Aegis Defense won a long-term security contract, lifting expected demand for equipment and security supplies. Starforge Industries supplies mechanical parts and Farstar Technologies supplies electronics, raising expectations for both suppliers' related operations.",
+    "ja": "イージス・ディフェンスが長期警備契約を獲得し、装備や保安機材の需要増が期待される。機械部品を供給する星鍛インダストリーと電子部品を供給する遠星テクノロジーも、関連事業の見通しが上方修正された。",
+    "ko": "이지스 디펜스가 장기 보안 계약을 수주해 장비와 보안 물자의 수요 증가가 기대된다. 기계 부품을 공급하는 성단 인더스트리와 전자 부품을 제공하는 원성 테크놀로지의 관련 사업 전망도 상향되었다."
+  },
+  "安盾防护装备召回": {
+    "en": "Aegis protective equipment recall",
+    "ja": "イージスの防護装備回収",
+    "ko": "이지스 보호 장비 회수"
+  },
+  "实际事件作用": {
+    "en": "Actual event effect",
+    "ja": "実際のイベント効果",
+    "ko": "실제 이벤트 영향"
+  },
+  "巡逻警员": {
+    "en": "Patrol officer",
+    "ja": "巡回警官",
+    "ko": "순찰 경찰관"
+  },
+  "工具、机械": {
+    "en": "Tools and machinery",
+    "ja": "工具・機械",
+    "ko": "공구 및 기계"
+  },
+  "已结束": {
+    "en": "Ended",
+    "ja": "終了",
+    "ko": "종료됨"
+  },
+  "已购情报存档无效": {
+    "en": "Invalid saved purchased intelligence",
+    "ja": "保存された購入済み情報が無効です",
+    "ko": "저장된 구매 정보가 잘못되었습니다"
+  },
+  "已预约第": {
+    "en": "Visit booked for day ",
+    "ja": "訪問を予約：第",
+    "ko": "방문 예약: "
+  },
+  "市场异动": {
+    "en": "Unusual market movement",
+    "ja": "市場の異変",
+    "ko": "시장 이상 변동"
+  },
+  "延续": {
+    "en": "Continuation",
+    "ja": "継続",
+    "ko": "지속"
+  },
+  "开盘基准": {
+    "en": "Opening baseline",
+    "ja": "始値の基準",
+    "ko": "시초 기준가"
+  },
+  "当前情报商尚未离开，请先完成本次接待。": {
+    "en": "The current broker has not left. Finish this visit first.",
+    "ja": "現在の情報屋がまだ帰っていません。先に今回の応対を終えてください。",
+    "ko": "현재 정보상이 아직 떠나지 않았습니다. 이번 응대를 먼저 마쳐 주세요."
+  },
+  "当前无法登记情报商预约。": {
+    "en": "A broker appointment cannot be registered right now.",
+    "ja": "現在、情報屋の予約を登録できません。",
+    "ko": "지금은 정보상 방문을 예약할 수 없습니다."
+  },
+  "情报商": {
+    "en": "Information broker",
+    "ja": "情報屋",
+    "ko": "정보상"
+  },
+  "情报商到访存档无效": {
+    "en": "Invalid saved broker visit",
+    "ja": "保存された情報屋の訪問データが無効です",
+    "ko": "저장된 정보상 방문 데이터가 잘못되었습니다"
+  },
+  "情报商到访间隔无效": {
+    "en": "Invalid broker visit interval",
+    "ja": "情報屋の訪問間隔が無効です",
+    "ko": "정보상 방문 간격이 잘못되었습니다"
+  },
+  "情报商已离开或尚未到访。": {
+    "en": "The broker has left or has not arrived yet.",
+    "ja": "情報屋は既に帰ったか、まだ到着していません。",
+    "ko": "정보상이 떠났거나 아직 도착하지 않았습니다."
+  },
+  "情报商报价存档无效": {
+    "en": "Invalid saved broker quote",
+    "ja": "保存された情報屋の見積もりが無効です",
+    "ko": "저장된 정보상 제안이 잘못되었습니다"
+  },
+  "情报商电话预约与到访不一致": {
+    "en": "Broker phone appointment does not match the visit",
+    "ja": "情報屋の電話予約と訪問データが一致しません",
+    "ko": "정보상의 전화 예약과 방문 데이터가 일치하지 않습니다"
+  },
+  "情报商电话预约存档无效": {
+    "en": "Invalid saved broker phone appointment",
+    "ja": "保存された情報屋の電話予約が無効です",
+    "ko": "저장된 정보상 전화 예약이 잘못되었습니다"
+  },
+  "情报来源与售卖人物不一致": {
+    "en": "Intelligence source does not match the seller",
+    "ja": "情報源と販売人物が一致しません",
+    "ko": "정보 출처와 판매 인물이 일치하지 않습니다"
+  },
+  "情报纸条存档无效": {
+    "en": "Invalid saved intelligence note",
+    "ja": "保存された情報メモが無効です",
+    "ko": "저장된 정보 쪽지가 잘못되었습니다"
+  },
+  "情报观察事件存档无效": {
+    "en": "Invalid saved intelligence observation event",
+    "ja": "保存された情報の観察対象イベントが無効です",
+    "ko": "저장된 정보 관찰 이벤트가 잘못되었습니다"
+  },
+  "或受波及。": {
+    "en": " may be affected.",
+    "ja": "にも影響する可能性がある。",
+    "ko": "에도 영향이 미칠 수 있다."
+  },
+  "报价有效": {
+    "en": "Quote valid",
+    "ja": "見積もり有効",
+    "ko": "제안 유효"
+  },
+  "持仓数量超出上限。": {
+    "en": "Share quantity exceeds the limit.",
+    "ja": "保有株数が上限を超えます。",
+    "ko": "보유 주식 수량이 한도를 초과합니다."
+  },
+  "持续影响": {
+    "en": "Continuing impact",
+    "ja": "継続的な影響",
+    "ko": "지속 영향"
+  },
+  "接入时当前价": {
+    "en": "Price when tracking began",
+    "ja": "記録開始時の価格",
+    "ko": "기록 시작 시 가격"
+  },
+  "日到访。": {
+    "en": ".",
+    "ja": "日に訪問予定。",
+    "ko": "일에 방문합니다."
+  },
+  "日相关消息可能落地。": {
+    "en": " days, related news may materialize.",
+    "ja": "日以内に、関連する動きが表面化するかもしれない。",
+    "ko": "일 안에 관련 소식이 현실화될 수 있다."
+  },
+  "日行情已更新。": {
+    "en": " market updated.",
+    "ja": "日の相場を更新しました。",
+    "ko": "일 시세가 갱신되었습니다."
+  },
+  "日）成交结算影响": {
+    "en": ") trade settlement impact",
+    "ja": "日）の取引決済による影響",
+    "ko": "일) 거래 정산 영향"
+  },
+  "明日到访后没有可售的未来情报，暂时无法预约。": {
+    "en": "No future intelligence will be available for sale after tomorrow's arrival. Booking is unavailable for now.",
+    "ja": "明日の訪問後に売れる将来の情報がないため、現在は予約できません。",
+    "ko": "내일 방문한 뒤 판매할 미래 정보가 없어 지금은 예약할 수 없습니다."
+  },
+  "星锻工业": {
+    "en": "Starforge Industries",
+    "ja": "星鍛インダストリー",
+    "ko": "성단 인더스트리"
+  },
+  "星锻工业的招牌挂在老矿区旁，车间里既收矿石和金属，也修工具、组装机械，出售能让旧设备继续运转的零件。霆光能源的电池与供电设备支撑着生产线，安盾防务的装备维修又带来另一类订单。矿料进价、机器停工和客户是否补充库存，决定了工头每天先开哪一张工单。": {
+    "en": "Starforge Industries stands beside the old mining district. Its workshops buy ore and metals, repair tools, assemble machines, and sell parts that keep aging equipment running. Thunderlight Energy batteries and power equipment sustain its production lines, while Aegis Defense equipment repairs bring in another stream of orders. Ore prices, machine downtime, and customers' restocking plans determine which work order the foreman opens first each morning.",
+    "ja": "星鍛インダストリーの看板は古い鉱区の隣に掛かっている。工場では鉱石や金属の買い取りから工具の修理、機械の組み立て、旧型設備を動かし続けるための部品販売まで手がける。霆光エナジーの電池と電力設備が生産ラインを支え、イージス・ディフェンスの装備修理も別の受注をもたらす。鉱物の仕入れ値や機械の停止、顧客の補充予定を見て、職長は毎朝最初の作業票を決める。",
+    "ko": "성단 인더스트리의 간판은 옛 광산 지구 옆에 걸려 있다. 작업장에서는 광석과 금속을 사들이고 공구를 수리하며 기계를 조립하고 낡은 장비를 계속 돌릴 부품을 판다. 뇌광 에너지의 배터리와 전력 장비가 생산 라인을 지탱하고, 이지스 디펜스의 장비 수리가 또 다른 주문을 가져온다. 광물 매입가, 기계 가동 중단, 고객의 재고 보충 여부에 따라 작업반장이 매일 첫 작업 지시서를 정한다."
+  },
+  "星锻工业的生产线发生事故，检修停工令交货预期承压。安盾防务依赖的机械部件供应受到牵连，霆光能源面向该生产线的供能需求也可能下降。": {
+    "en": "An accident on a Starforge Industries production line has forced a repair shutdown, weighing on delivery expectations. Mechanical parts needed by Aegis Defense are affected, and Thunderlight Energy may see lower power demand from the line.",
+    "ja": "星鍛インダストリーの生産ラインで事故が発生し、点検による操業停止が納入見通しを圧迫している。イージス・ディフェンスが必要とする機械部品の供給にも影響し、霆光エナジーの同ライン向け電力需要も減る可能性がある。",
+    "ko": "성단 인더스트리의 생산 라인에서 사고가 발생해 점검 휴업으로 납품 전망이 악화되었다. 이지스 디펜스가 의존하는 기계 부품 공급에도 여파가 미치며 해당 라인에 대한 뇌광 에너지의 전력 수요도 줄어들 수 있다."
+  },
+  "星锻工业获得一批机械出口订单，生产线和零件采购安排转趋繁忙。晨星物流受益于设备运输需求，霆光能源也可能获得更多生产供能与能源配套订单。": {
+    "en": "Starforge Industries secured machinery export orders, boosting activity on its production lines and parts procurement. Morningstar Logistics benefits from equipment shipping demand, while Thunderlight Energy may gain more production power and energy equipment orders.",
+    "ja": "星鍛インダストリーが機械の輸出を受注し、生産ラインと部品調達が活発になっている。晨星ロジスティクスは設備輸送の需要増の恩恵を受け、霆光エナジーも生産用の電力やエネルギー設備の受注を増やす可能性がある。",
+    "ko": "성단 인더스트리가 기계 수출 주문을 확보하면서 생산 라인과 부품 조달이 분주해졌다. 샛별 로지스틱스는 장비 운송 수요의 수혜를 입고 뇌광 에너지도 생산용 전력과 에너지 설비 주문이 늘어날 수 있다."
+  },
+  "星锻生产线事故": {
+    "en": "Starforge production line accident",
+    "ja": "星鍛の生産ライン事故",
+    "ko": "성단 생산 라인 사고"
+  },
+  "星锻获得机械出口订单": {
+    "en": "Starforge wins machinery export orders",
+    "ja": "星鍛が機械輸出を受注",
+    "ko": "성단, 기계 수출 주문 수주"
+  },
+  "晨星新货运航线获批": {
+    "en": "Morningstar's new freight route approved",
+    "ja": "晨星の新貨物航路が認可",
+    "ko": "샛별 신규 화물 노선 승인"
+  },
+  "晨星物流": {
+    "en": "Morningstar Logistics",
+    "ja": "晨星ロジスティクス",
+    "ko": "샛별 로지스틱스"
+  },
+  "晨星物流的员工习惯在别人关店后清点货箱，替各行业经营运输、仓储和补货衔接。丰禾供给的食品要赶在变质前送达，白塔医疗的药品与耗材则需要分清批次妥善存放；机械、能源与奢侈品也挤在同一张调度表上。商路畅通时它忙着周转，通道受阻时便得协调改道、退货和堆积的库存。": {
+    "en": "Morningstar Logistics employees are used to counting crates after other shops close. The company handles transport, storage, and restocking across industries. Harvest Supply food must arrive before it spoils; White Tower Medical drugs and supplies need careful storage by batch. Machinery, energy goods, and luxuries compete for space on the same dispatch sheet. When trade routes are open, cargo keeps moving; when they are blocked, the staff juggle detours, returns, and mounting stockpiles.",
+    "ja": "晨星ロジスティクスの社員は、他の店が閉まった後に木箱を数えることに慣れている。各業界の輸送、保管、補充をつなぐ会社だ。豊禾サプライの食品は傷む前に届けなければならず、白塔メディカルの薬と消耗品はロットを分けて丁寧に保管する。機械もエネルギー製品も高級品も、同じ配車表にひしめき合う。商路が通じていれば回転に追われ、封鎖されれば迂回、返品、積み上がる在庫の調整に追われる。",
+    "ko": "샛별 로지스틱스 직원들은 다른 가게가 문을 닫은 뒤 화물 상자를 세는 데 익숙하다. 여러 업종의 운송, 보관, 재고 보충을 연결하는 회사다. 풍허 서플라이의 식품은 상하기 전에 도착해야 하고 백탑 메디컬의 약품과 소모품은 제조 단위를 나눠 알맞게 보관해야 한다. 기계와 에너지 물자, 사치품도 같은 배차표에 빽빽이 들어찬다. 교역로가 열리면 물량 회전에 바쁘고 길이 막히면 우회, 반품, 쌓이는 재고를 조율한다."
+  },
+  "晨星物流的新货运航线获批，运输能力与配送覆盖有望扩大。环宇商贸可以拓展货物流通，丰禾供给也多了一条食品运输通道，供应链伙伴的预期随之改善。": {
+    "en": "Morningstar Logistics received approval for a new freight route, raising expectations for greater capacity and delivery coverage. Orbital Commerce can expand distribution, while Harvest Supply gains another food transport channel, improving prospects for supply-chain partners.",
+    "ja": "晨星ロジスティクスの新貨物航路が認可され、輸送力と配送範囲の拡大が期待される。環宇商事は流通を広げられ、豊禾サプライにも新たな食品輸送路ができるため、供給網の各社の見通しが改善している。",
+    "ko": "샛별 로지스틱스의 신규 화물 노선이 승인되어 운송 능력과 배송 범위 확대가 기대된다. 환우 커머스는 유통을 확대할 수 있고 풍허 서플라이도 식품 운송 경로를 추가로 확보해 공급망 협력사들의 전망이 개선되었다."
+  },
+  "晨星物流的货运设备大面积故障，运输与环宇商贸的渠道周转预期承压。设备维修需求同时增加，星锻工业可能接到更多检修与替换部件订单，形成不同方向的影响。": {
+    "en": "Widespread failures in Morningstar Logistics freight equipment have hit transport expectations and Orbital Commerce turnover. At the same time, repair demand is rising; Starforge Industries may receive more maintenance and replacement-parts orders, creating a contrasting impact.",
+    "ja": "晨星ロジスティクスの貨物設備に広範な故障が発生し、輸送と環宇商事の流通回転の見通しを圧迫している。一方で修理需要は増え、星鍛インダストリーには点検や交換部品の注文が増える可能性があり、影響の方向が分かれている。",
+    "ko": "샛별 로지스틱스의 화물 설비에 대규모 고장이 발생해 운송과 환우 커머스의 유통 회전 전망이 악화되었다. 반면 수리 수요가 늘면서 성단 인더스트리는 점검과 교체 부품 주문이 증가할 수 있어 상반된 영향이 나타난다."
+  },
+  "晨星货运设备大面积故障": {
+    "en": "Widespread Morningstar freight equipment failures",
+    "ja": "晨星の貨物設備が大規模故障",
+    "ko": "샛별 화물 설비 대규모 고장"
+  },
+  "普通匿名来源": {
+    "en": "Ordinary anonymous source",
+    "ja": "一般の匿名情報源",
+    "ko": "일반 익명 출처"
+  },
+  "普通顾客": {
+    "en": "Regular customer",
+    "ja": "一般客",
+    "ko": "일반 손님"
+  },
+  "有人透露，未来": {
+    "en": "A source says that within ",
+    "ja": "ある筋によると、今後",
+    "ko": "한 소식통에 따르면 앞으로 "
+  },
+  "有人透露，未来数日": {
+    "en": "A source says that in the coming days ",
+    "ja": "ある筋によると、今後数日で",
+    "ko": "한 소식통에 따르면 앞으로 며칠간 "
+  },
+  "有组织正在筹集装备，相关采购规模可能扩大": {
+    "en": "An organization is gathering equipment, and procurement may expand",
+    "ja": "ある組織が装備を集めており、調達規模が拡大する可能性がある",
+    "ko": "한 조직이 장비를 모으고 있으며 조달 규모가 확대될 수 있다"
+  },
+  "有组织正在缩减装备采购，相关订单规模可能回落": {
+    "en": "An organization is reducing equipment purchases, and orders may decline",
+    "ja": "ある組織が装備の調達を縮小しており、受注規模が減る可能性がある",
+    "ko": "한 조직이 장비 구매를 줄이고 있으며 주문 규모가 감소할 수 있다"
+  },
+  "未映射事件标识：": {
+    "en": "Unmapped event ID: ",
+    "ja": "未対応のイベント ID：",
+    "ko": "미분류 이벤트 ID: "
+  },
+  "未映射商品类型：": {
+    "en": "Unmapped item type: ",
+    "ja": "未対応の商品タイプ：",
+    "ko": "미분류 상품 유형: "
+  },
+  "本次预约的情报商已经到访。": {
+    "en": "The broker for this appointment has already arrived.",
+    "ja": "今回の予約の情報屋は既に訪問しています。",
+    "ko": "이번에 예약한 정보상은 이미 방문했습니다."
+  },
+  "机械、工具与矿产": {
+    "en": "Machinery, tools, and minerals",
+    "ja": "機械・工具・鉱物",
+    "ko": "기계, 공구 및 광물"
+  },
+  "核验依据为事件事实，不以股价最终涨跌判定。": {
+    "en": "Verification is based on event facts, not the final direction of share prices.",
+    "ja": "検証はイベントの事実に基づき、株価の最終的な騰落では判断しません。",
+    "ko": "검증은 이벤트의 사실에 근거하며 최종 주가 등락으로 판단하지 않습니다."
+  },
+  "核验失实。": {
+    "en": "Verified false.",
+    "ja": "検証結果：不的中。",
+    "ko": "검증 결과: 거짓."
+  },
+  "核验属实。": {
+    "en": "Verified true.",
+    "ja": "検証結果：的中。",
+    "ko": "검증 결과: 사실."
+  },
+  "武器、防护与安全": {
+    "en": "Weapons, protection, and security",
+    "ja": "武器・防護・保安",
+    "ko": "무기, 보호 및 보안"
+  },
+  "武器、防护装备": {
+    "en": "Weapons and protective equipment",
+    "ja": "武器・防護装備",
+    "ko": "무기 및 보호 장비"
+  },
+  "武器需求增加": {
+    "en": "Increased weapons demand",
+    "ja": "武器需要の増加",
+    "ko": "무기 수요 증가"
+  },
+  "每日成交影响幅度无效": {
+    "en": "Invalid daily trade impact limit",
+    "ja": "日次取引の影響上限が無効です",
+    "ko": "일일 거래 영향 한도가 잘못되었습니다"
+  },
+  "每日行情；前一日（第": {
+    "en": "Daily market; previous day (day ",
+    "ja": "日次相場・前日（第",
+    "ko": "일일 시세; 전날("
+  },
+  "消息指向": {
+    "en": "The tip points to ",
+    "ja": "情報が指すのは",
+    "ko": "정보가 가리키는 기업: "
+  },
+  "清泉循环": {
+    "en": "ClearSpring Recycling",
+    "ja": "清泉リサイクル",
+    "ko": "청천 리사이클링"
+  },
+  "清泉循环披露滤芯质量事故，需要承担赔偿和整改成本。不过替代滤材与设备抢修需求增加，聚合材料和星锻工业因此可能获得额外订单，相关公司预期出现分化。": {
+    "en": "ClearSpring Recycling disclosed a filter quality incident and faces compensation and corrective costs. However, demand for alternative filter materials and emergency repairs has increased. Polymer Materials and Starforge Industries may gain extra orders, splitting the outlook across the affected companies.",
+    "ja": "清泉リサイクルがフィルターの品質事故を公表し、補償と改善の費用負担を抱えている。ただし代替ろ材と設備の緊急修理の需要は増え、聚合マテリアルと星鍛インダストリーには追加受注の可能性があり、関連企業の見通しが分かれている。",
+    "ko": "청천 리사이클링이 필터 품질 사고를 공개해 보상과 시정 비용을 부담하게 되었다. 다만 대체 여과재와 긴급 설비 수리 수요가 늘어 폴리머 머티리얼즈와 성단 인더스트리는 추가 주문을 확보할 수 있어 관련 기업들의 전망이 엇갈리고 있다."
+  },
+  "清泉循环接管过一座年久失修的净水站，靠检修管线、回收旧滤芯和分装饮用水慢慢站稳脚跟。如今它既供应日常用水，也经营过滤器和净水物资，处理药剂常要向聚合材料询价，设备故障时则离不开星锻工业的零件。对这家公司而言，水质、耗材和机器开工率总是同一本账上的事。": {
+    "en": "ClearSpring Recycling took over a neglected water treatment station and found its footing by repairing pipes, recycling old filters, and bottling drinking water. It now supplies everyday water as well as filters and purification supplies. Treatment chemicals often come from Polymer Materials, while equipment failures call for Starforge Industries parts. For this company, water quality, consumables, and machine uptime are entries in the same ledger.",
+    "ja": "清泉リサイクルは老朽化した浄水場を引き継ぎ、配管の修理、古いフィルターの再利用、飲料水の小分けで少しずつ基盤を築いた。今では生活用水に加え、フィルターや浄水資材も扱う。処理薬剤は聚合マテリアルに見積もりを頼み、設備が壊れれば星鍛インダストリーの部品を必要とする。この会社にとって、水質も消耗品も機械の稼働率も、同じ帳簿に載る問題なのだ。",
+    "ko": "청천 리사이클링은 낡고 방치된 정수장을 인수해 배관 수리, 헌 필터 재활용, 식수 소분으로 기반을 다졌다. 지금은 생활용수뿐 아니라 필터와 정수 물자도 취급한다. 처리 약품은 폴리머 머티리얼즈에 견적을 묻고 장비가 고장 나면 성단 인더스트리의 부품이 필요하다. 이 회사에 수질과 소모품, 기계 가동률은 언제나 같은 장부의 항목이다."
+  },
+  "清泉循环的新净水设备进入投产阶段，市场期待供应能力与处理效率改善。星锻工业获得设备配套需求，聚合材料的水处理耗材也迎来补货机会。": {
+    "en": "ClearSpring Recycling's new water treatment equipment has entered production, raising hopes for greater capacity and efficiency. Starforge Industries gains related equipment demand, while Polymer Materials has a fresh opportunity to replenish water treatment consumables.",
+    "ja": "清泉リサイクルの新浄水設備が稼働段階に入り、供給能力と処理効率の改善が期待される。星鍛インダストリーには関連設備の需要が生まれ、聚合マテリアルにも水処理用消耗品の補充機会が訪れている。",
+    "ko": "청천 리사이클링의 새 정수 설비가 가동 단계에 들어서 공급 능력과 처리 효율 개선이 기대된다. 성단 인더스트리에는 관련 장비 수요가 생기고 폴리머 머티리얼즈도 수처리 소모품을 공급할 기회를 얻었다."
+  },
+  "清泉新净水设备投产": {
+    "en": "ClearSpring's new water treatment equipment starts production",
+    "ja": "清泉の新浄水設備が稼働",
+    "ko": "청천 신규 정수 설비 가동"
+  },
+  "清泉滤芯质量事故": {
+    "en": "ClearSpring filter quality incident",
+    "ja": "清泉のフィルター品質事故",
+    "ko": "청천 필터 품질 사고"
+  },
+  "游戏日期尚未接入，跳过无法归日的事件激活。": {
+    "en": "Game date unavailable; skipping event activation that cannot be assigned to a day.",
+    "ja": "ゲームの日付を取得できないため、日付を特定できないイベントの発効を省略します。",
+    "ko": "게임 날짜를 확인할 수 없어 날짜를 지정할 수 없는 이벤트 활성화를 건너뜁니다."
+  },
+  "游戏日期尚未接入，跳过无法归日的成交信号。": {
+    "en": "Game date unavailable; skipping trade signals that cannot be assigned to a day.",
+    "ja": "ゲームの日付を取得できないため、日付を特定できない取引シグナルを省略します。",
+    "ko": "게임 날짜를 확인할 수 없어 날짜를 지정할 수 없는 거래 신호를 건너뜁니다."
+  },
+  "游戏日期跨度异常": {
+    "en": "Abnormal game date interval",
+    "ja": "ゲームの日付間隔が異常です",
+    "ko": "게임 날짜 간격이 비정상적입니다"
+  },
+  "游戏资金变更结果不符": {
+    "en": "Game balance change did not match the expected result",
+    "ja": "ゲーム内資金の変更結果が一致しません",
+    "ko": "게임 자금 변경 결과가 예상과 다릅니다"
+  },
+  "燃料、电池": {
+    "en": "Fuel and batteries",
+    "ja": "燃料・電池",
+    "ko": "연료 및 배터리"
+  },
+  "燃料、电池与供电": {
+    "en": "Fuel, batteries, and power supply",
+    "ja": "燃料・電池・電力供給",
+    "ko": "연료, 배터리 및 전력 공급"
+  },
+  "环宇取得商业区独家经销权": {
+    "en": "Orbital wins exclusive commercial district distribution rights",
+    "ja": "環宇が商業区の独占販売権を獲得",
+    "ko": "환우, 상업 지구 독점 판매권 확보"
+  },
+  "环宇商贸": {
+    "en": "Orbital Commerce",
+    "ja": "環宇商事",
+    "ko": "환우 커머스"
+  },
+  "环宇商贸取得一处商业区的独家经销权，新增渠道有望扩大货物流通。晨星物流参与配送安排，丰禾供给的食品也进入新的销售网络，相关业务预期受益。": {
+    "en": "Orbital Commerce secured exclusive distribution rights in a commercial district. The new channel should expand goods circulation. Morningstar Logistics handles delivery, while Harvest Supply foods enter a new sales network, benefiting related operations.",
+    "ja": "環宇商事がある商業区の独占販売権を取得し、新たな販路による流通拡大が期待される。晨星ロジスティクスが配送を担い、豊禾サプライの食品も新しい販売網に入るため、関連事業の見通しが改善している。",
+    "ko": "환우 커머스가 한 상업 지구의 독점 판매권을 확보해 새로운 경로를 통한 물자 유통 확대가 기대된다. 샛별 로지스틱스가 배송을 맡고 풍허 서플라이의 식품도 새 판매망에 진입하면서 관련 사업 전망이 좋아졌다."
+  },
+  "环宇商贸没有统一风格的货架：食品、医疗用品、电子设备与防护装备旁边，常摆着来自远处的奢侈品。采购员从丰禾供给这样的供应商手里凑齐货单，再借晨星物流把货分送到不同街区。它靠渠道和周转衔接买卖双方，货物涨价、商路中断或顾客口味转变，都会改写下一轮进货计划。": {
+    "en": "Orbital Commerce shelves have no single style: food, medical supplies, electronics, and protective gear sit beside luxuries from distant places. Its buyers assemble orders from suppliers such as Harvest Supply, then rely on Morningstar Logistics to deliver across neighborhoods. The company connects buyers and sellers through its channels and turnover; price rises, disrupted routes, or changing tastes can all rewrite its next procurement plan.",
+    "ja": "環宇商事の棚に統一感はない。食品、医療用品、電子機器、防護装備の隣に、遠方から届いた高級品が並ぶ。買い付け担当は豊禾サプライなどの供給業者から品物をそろえ、晨星ロジスティクスを頼って各地区へ届ける。販路と商品の回転で売り手と買い手を結ぶ会社だけに、値上がり、商路の寸断、客の好みの変化は、次の仕入れ計画をたちまち書き換える。",
+    "ko": "환우 커머스의 진열대에는 통일된 분위기가 없다. 식품, 의료용품, 전자 장비, 보호 장비 옆에 먼 곳에서 온 사치품이 놓인다. 구매 담당자는 풍허 서플라이 같은 공급사에서 주문 목록을 채우고 샛별 로지스틱스를 통해 각 구역으로 보낸다. 유통 경로와 회전율로 판매자와 구매자를 연결하는 만큼 상품 가격 상승, 교역로 단절, 고객 취향 변화가 다음 매입 계획을 바꿔 놓는다."
+  },
+  "环宇商贸的一条违规渠道遭到查封，渠道收入和晨星物流的相关配送预期受到打击。安盾防务可能接手部分合规供货需求，因此在这次消息中反而受到利好带动。": {
+    "en": "An illegal Orbital Commerce distribution channel was shut down, hurting channel revenue and Morningstar Logistics delivery expectations. Aegis Defense may take over some compliant supply demand and consequently benefits from the news.",
+    "ja": "環宇商事の不正な販路が摘発・封鎖され、その収益と晨星ロジスティクスの関連配送の見通しが打撃を受けている。一方、イージス・ディフェンスは合法的な供給需要の一部を引き継ぐ可能性があり、今回の報道は好材料となっている。",
+    "ko": "환우 커머스의 불법 유통 경로가 폐쇄되어 해당 수익과 샛별 로지스틱스의 관련 배송 전망에 타격이 생겼다. 이지스 디펜스는 일부 합법 공급 수요를 넘겨받을 수 있어 이번 소식의 수혜를 입고 있다."
+  },
+  "环宇违规渠道遭查封": {
+    "en": "Orbital's illegal channel shut down",
+    "ja": "環宇の不正販路を摘発",
+    "ko": "환우 불법 유통 경로 폐쇄"
+  },
+  "电子、模块": {
+    "en": "Electronics and modules",
+    "ja": "電子機器・モジュール",
+    "ko": "전자 제품 및 모듈"
+  },
+  "电子、模块与科研": {
+    "en": "Electronics, modules, and research",
+    "ja": "電子機器・モジュール・研究",
+    "ko": "전자 제품, 모듈 및 연구"
+  },
+  "白塔医疗": {
+    "en": "White Tower Medical",
+    "ja": "白塔メディカル",
+    "ko": "백탑 메디컬"
+  },
+  "白塔医疗从一间替诊所分装药品的小作坊发展而来，柜台上既有常用药和医疗耗材，也有需要定期维修的诊疗设备。药剂师会向聚合材料采购配药与消毒原料，技术人员则寻找远星科技提供的电子模块。原料短缺、设备停摆或诊所集中补货，都会让仓库的出货安排随之改变。": {
+    "en": "White Tower Medical grew from a small workshop repackaging drugs for clinics. Its counter now offers common medicines, medical consumables, and diagnostic equipment that needs regular servicing. Pharmacists buy formulation and disinfectant ingredients from Polymer Materials; technicians seek electronic modules from Farstar Technologies. Material shortages, stalled equipment, or clinics restocking together can all change the warehouse shipping schedule.",
+    "ja": "白塔メディカルは、診療所向けに薬を小分けする小さな工房から育った。今のカウンターには常備薬や医療消耗品に加え、定期整備が必要な診療機器も並ぶ。薬剤師は調剤や消毒の原料を聚合マテリアルから仕入れ、技術者は遠星テクノロジーの電子モジュールを探す。原料不足、設備の停止、診療所の一斉補充は、どれも倉庫の出荷予定を変えてしまう。",
+    "ko": "백탑 메디컬은 진료소용 약품을 소분하던 작은 작업장에서 성장했다. 지금은 상비약과 의료 소모품뿐 아니라 정기 수리가 필요한 진료 장비도 취급한다. 약사는 폴리머 머티리얼즈에서 조제와 소독 원료를 사고 기술자는 원성 테크놀로지의 전자 모듈을 찾는다. 원료 부족, 설비 중단, 진료소의 일제 재고 보충은 모두 창고의 출하 일정을 바꾼다."
+  },
+  "白塔医疗的新药审批进程受阻，相关产品投产与销售计划被推迟。聚合材料的原料订单预期随之减少，环宇商贸原定的渠道铺货安排也受到影响。": {
+    "en": "White Tower Medical's new drug approval has stalled, delaying production and sales plans. Expected raw material orders for Polymer Materials have fallen, and Orbital Commerce's planned distribution rollout is also affected.",
+    "ja": "白塔メディカルの新薬承認が難航し、関連製品の生産・販売計画が延期された。聚合マテリアルの原料受注見通しも減り、環宇商事の予定していた販路展開にも影響が出ている。",
+    "ko": "백탑 메디컬의 신약 승인 절차가 막혀 관련 제품의 생산과 판매 계획이 지연되었다. 폴리머 머티리얼즈의 원료 주문 기대도 줄었으며 환우 커머스가 예정한 유통망 공급에도 영향이 미치고 있다."
+  },
+  "白塔新药审批受阻": {
+    "en": "White Tower new drug approval stalled",
+    "ja": "白塔の新薬承認が難航",
+    "ko": "백탑 신약 승인 차질"
+  },
+  "白塔获得诊所联合采购订单": {
+    "en": "White Tower wins joint clinic procurement order",
+    "ja": "白塔が診療所の共同調達を受注",
+    "ko": "백탑, 진료소 공동 조달 수주"
+  },
+  "的": {
+    "en": "'s ",
+    "ja": "の",
+    "ko": "의 "
+  },
+  "相关公司行情可能": {
+    "en": " related shares may ",
+    "ja": "関連企業の株価は",
+    "ko": "관련 기업의 주가가 "
+  },
+  "相关行业": {
+    "en": "Related industry",
+    "ja": "関連業種",
+    "ko": "관련 업종"
+  },
+  "矿业从业者": {
+    "en": "Mining worker",
+    "ja": "鉱業従事者",
+    "ko": "광업 종사자"
+  },
+  "矿石、金属、工业材料": {
+    "en": "Ore, metals, and industrial materials",
+    "ja": "鉱石・金属・工業材料",
+    "ko": "광석, 금속 및 산업 원료"
+  },
+  "第": {
+    "en": "Day ",
+    "ja": "第",
+    "ko": "제 "
+  },
+  "类·": {
+    "en": " sector · ",
+    "ja": "類・",
+    "ko": " 계열 · "
+  },
+  "类商品相关的部分公司：": {
+    "en": "-related companies: ",
+    "ja": "関連の一部企業：",
+    "ko": " 관련 일부 기업: "
+  },
+  "线无效": {
+    "en": " line is invalid",
+    "ja": "足が無効です",
+    "ko": " 차트가 잘못되었습니다"
+  },
+  "维修从业者": {
+    "en": "Maintenance worker",
+    "ja": "修理業者",
+    "ko": "수리업 종사자"
+  },
+  "综合贸易": {
+    "en": "General trade",
+    "ja": "総合貿易",
+    "ko": "종합 무역"
+  },
+  "综合贸易与奢侈品": {
+    "en": "General trade and luxury goods",
+    "ja": "総合貿易・高級品",
+    "ko": "종합 무역 및 사치품"
+  },
+  "聚合净水药剂通过认证": {
+    "en": "Polymer water treatment chemicals certified",
+    "ja": "聚合の浄水薬剤が認証を取得",
+    "ko": "폴리머 정수 약품 인증 통과"
+  },
+  "聚合工厂因污染停产": {
+    "en": "Polymer plant shut down over pollution",
+    "ja": "聚合工場が汚染で操業停止",
+    "ko": "폴리머 공장 오염으로 가동 중단"
+  },
+  "聚合材料": {
+    "en": "Polymer Materials",
+    "ja": "聚合マテリアル",
+    "ko": "폴리머 머티리얼즈"
+  },
+  "聚合材料把一间旧仓库改成分装车间，经营化学品、工业原料和供下游加工使用的材料。白塔医疗需要配药与消毒原料，清泉循环需要水处理药剂，维修和电子行业也会来找适用的耗材。同一批原料有时会被几类客户同时询价，采购员必须在供应、存放条件和不同订单之间反复安排。": {
+    "en": "Polymer Materials converted an old warehouse into a repackaging workshop, dealing in chemicals, industrial inputs, and materials for downstream processing. White Tower Medical needs formulation and disinfectant ingredients; ClearSpring Recycling needs water treatment chemicals, while repair and electronics businesses seek suitable consumables. Several kinds of customers may ask about the same batch of material, forcing buyers to balance supply, storage conditions, and competing orders.",
+    "ja": "聚合マテリアルは古い倉庫を小分け加工場に変え、化学品や工業原料、下流の加工業者向け資材を扱っている。白塔メディカルは調剤と消毒の原料を、清泉リサイクルは水処理薬剤を求め、修理業や電子産業も適した消耗品を探しに来る。同じ原料ロットに複数の業種から問い合わせが重なることもあり、担当者は供給量、保管条件、それぞれの受注を何度も調整しなければならない。",
+    "ko": "폴리머 머티리얼즈는 낡은 창고를 소분 작업장으로 바꾸어 화학 제품, 산업 원료, 후속 가공에 쓰는 자재를 취급한다. 백탑 메디컬은 조제와 소독 원료가 필요하고 청천 리사이클링은 수처리 약품을 찾으며 수리업과 전자 업계도 알맞은 소모품을 구하러 온다. 같은 원료 물량을 여러 업종의 고객이 동시에 문의하기도 해 담당자는 공급량, 보관 조건, 서로 다른 주문을 끊임없이 조정해야 한다."
+  },
+  "聚合材料的净水药剂通过认证，市场期待水处理原料业务拓展。清泉循环可将其用于净水配套，白塔医疗相关卫生耗材的原料供应预期也得到改善。": {
+    "en": "Polymer Materials' water treatment chemicals passed certification, raising expectations for growth in treatment inputs. ClearSpring Recycling can use them in purification systems, while White Tower Medical's supply outlook for related hygiene materials has also improved.",
+    "ja": "聚合マテリアルの浄水薬剤が認証を取得し、水処理原料事業の拡大が期待される。清泉リサイクルは浄水設備に利用でき、白塔メディカルの関連衛生用品向け原料の供給見通しも改善した。",
+    "ko": "폴리머 머티리얼즈의 정수 약품이 인증을 통과해 수처리 원료 사업의 확대가 기대된다. 청천 리사이클링은 이를 정수 설비에 사용할 수 있고 백탑 메디컬의 관련 위생 소모품 원료 공급 전망도 개선되었다."
+  },
+  "聚合材料的工厂因污染停产，整改和停工成本令经营预期承压。清泉循环依赖的水处理原料与白塔医疗的相关原料供应也可能受到影响，预期同步转弱。": {
+    "en": "Polymer Materials' factory was shut down over pollution. Remediation and downtime costs have weighed on its business outlook. ClearSpring Recycling's treatment chemicals and White Tower Medical's related material supplies may also be affected, weakening expectations for both.",
+    "ja": "聚合マテリアルの工場が汚染のため操業停止となり、改善費用と休業コストが業績見通しを圧迫している。清泉リサイクルの水処理原料と白塔メディカルの関連原料の供給にも影響が及ぶ可能性があり、両社の見通しも弱まっている。",
+    "ko": "폴리머 머티리얼즈의 공장이 오염으로 가동을 중단해 시정 비용과 휴업 비용이 사업 전망을 압박하고 있다. 청천 리사이클링의 수처리 원료와 백탑 메디컬의 관련 원료 공급도 영향을 받을 수 있어 두 회사의 전망도 함께 약화되었다."
+  },
+  "股": {
+    "en": " shares",
+    "ja": "株",
+    "ko": " 주"
+  },
+  "股市专用事件与生命周期归属不一致": {
+    "en": "Stock-only event and lifecycle ownership do not match",
+    "ja": "株式専用イベントとライフサイクルの所属が一致しません",
+    "ko": "주식 전용 이벤트와 수명 주기의 소유 정보가 일치하지 않습니다"
+  },
+  "股市专用事件实例快照无效": {
+    "en": "Invalid stock-only event instance snapshot",
+    "ja": "株式専用イベントのインスタンススナップショットが無効です",
+    "ko": "주식 전용 이벤트 인스턴스 스냅샷이 잘못되었습니다"
+  },
+  "股市专用事件排程参数无效": {
+    "en": "Invalid stock-only event scheduling settings",
+    "ja": "株式専用イベントの予定設定が無効です",
+    "ko": "주식 전용 이벤트 일정 설정이 잘못되었습니다"
+  },
+  "股市专用事件排程存档无效": {
+    "en": "Invalid saved stock-only event schedule",
+    "ja": "保存された株式専用イベントの予定が無効です",
+    "ko": "저장된 주식 전용 이벤트 일정이 잘못되었습니다"
+  },
+  "股市专用事件模板为空": {
+    "en": "Stock-only event templates are empty",
+    "ja": "株式専用イベントのテンプレートが空です",
+    "ko": "주식 전용 이벤트 템플릿이 비어 있습니다"
+  },
+  "股市专用事件模板或公司方向无效": {
+    "en": "Invalid stock-only event template or company direction",
+    "ja": "株式専用イベントのテンプレートまたは企業の騰落方向が無効です",
+    "ko": "주식 전용 이벤트 템플릿 또는 기업 등락 방향이 잘못되었습니다"
+  },
+  "股市存档为空": {
+    "en": "Stock-market save data is empty",
+    "ja": "株式市場のセーブデータが空です",
+    "ko": "주식 시장 저장 데이터가 비어 있습니다"
+  },
+  "股市存档当日分时样本无效": {
+    "en": "Invalid saved intraday market samples",
+    "ja": "保存された当日の取引時系列サンプルが無効です",
+    "ko": "저장된 당일 주가 표본이 잘못되었습니다"
+  },
+  "股市存档成交或情报无效": {
+    "en": "Invalid saved stock trades or intelligence",
+    "ja": "保存された株式取引または情報が無効です",
+    "ko": "저장된 주식 거래 또는 정보가 잘못되었습니다"
+  },
+  "股市存档日": {
+    "en": "Stock-market save day ",
+    "ja": "株式市場のセーブ日",
+    "ko": "주식 시장 저장 일자 "
+  },
+  "股市存档每日成交信号无效": {
+    "en": "Invalid saved daily shop trade signals",
+    "ja": "保存された日次店舗取引シグナルが無効です",
+    "ko": "저장된 일일 상점 거래 신호가 잘못되었습니다"
+  },
+  "股市存档版本或结构无效": {
+    "en": "Invalid stock-market save version or structure",
+    "ja": "株式市場のセーブ形式または構造が無効です",
+    "ko": "주식 시장 저장 버전 또는 구조가 잘못되었습니다"
+  },
+  "股市存档行情或持仓无效": {
+    "en": "Invalid saved market prices or holdings",
+    "ja": "保存された株価または保有株が無効です",
+    "ko": "저장된 시세 또는 보유 주식이 잘못되었습니다"
+  },
+  "股市排程随机状态或存档身份无效": {
+    "en": "Invalid market scheduling random state or save identity",
+    "ja": "市場予定の乱数状態またはセーブ識別情報が無効です",
+    "ko": "시장 일정의 난수 상태 또는 저장 식별 정보가 잘못되었습니다"
+  },
+  "药剂师": {
+    "en": "Pharmacist",
+    "ja": "薬剤師",
+    "ko": "약사"
+  },
+  "药品、医疗耗材": {
+    "en": "Drugs and medical supplies",
+    "ja": "医薬品・医療消耗品",
+    "ko": "의약품 및 의료 소모품"
+  },
+  "药品与医疗设备": {
+    "en": "Drugs and medical equipment",
+    "ja": "医薬品・医療機器",
+    "ko": "의약품 및 의료 장비"
+  },
+  "营养果歉收，食品供应承压": {
+    "en": "Nutrifruit harvest failure puts food supply under pressure",
+    "ja": "栄養果の不作で食品供給が逼迫",
+    "ko": "영양 과일 흉작으로 식품 공급 압박"
+  },
+  "行业情报": {
+    "en": "Industry intelligence",
+    "ja": "業界情報",
+    "ko": "업종 정보"
+  },
+  "行业权重必须为正且合计为": {
+    "en": "Industry weights must be positive and total ",
+    "ja": "業種の重みは正の値で、合計を次の値にしてください：",
+    "ko": "업종 가중치는 양수여야 하며 합계는 다음과 같아야 합니다: "
+  },
+  "行情参数超出允许范围": {
+    "en": "Market parameters are outside the allowed range",
+    "ja": "市場パラメーターが許容範囲外です",
+    "ko": "시장 매개변수가 허용 범위를 벗어났습니다"
+  },
+  "行情反应可能滞后，以上为来源传闻，不保证准确。": {
+    "en": "The market may react with a delay. These are source rumors and are not guaranteed to be accurate.",
+    "ja": "相場の反応は遅れることがあります。以上は情報源の噂であり、正確さを保証するものではありません。",
+    "ko": "시장의 반응은 늦을 수 있습니다. 위 내용은 출처에서 전해 온 소문이며 정확성을 보장하지 않습니다."
+  },
+  "行情配置为空": {
+    "en": "Market configuration is empty",
+    "ja": "市場設定が空です",
+    "ko": "시장 설정이 비어 있습니다"
+  },
+  "订单金额超出游戏资金范围。": {
+    "en": "Order value exceeds the game's money range.",
+    "ja": "注文金額がゲーム内資金の範囲を超えています。",
+    "ko": "주문 금액이 게임 자금 범위를 초과합니다."
+  },
+  "诊所护士": {
+    "en": "Clinic nurse",
+    "ja": "診療所の看護師",
+    "ko": "진료소 간호사"
+  },
+  "该情报不可购买。": {
+    "en": "This intelligence is unavailable for purchase.",
+    "ja": "この情報は購入できません。",
+    "ko": "이 정보는 구매할 수 없습니다."
+  },
+  "请先保存并重新读取存档，验证投资状态持久化。": {
+    "en": "Save and reload first to verify that your investment state persists.",
+    "ja": "投資状態の保存を検証するため、先にセーブして再読み込みしてください。",
+    "ko": "투자 상태의 저장 여부를 검증하려면 먼저 저장한 뒤 다시 불러와 주세요."
+  },
+  "购买内幕": {
+    "en": "Buy insider tip",
+    "ja": "内部情報を購入",
+    "ko": "내부 정보 구매"
+  },
+  "购买后查看线索": {
+    "en": "Purchase to view the tip",
+    "ja": "購入後に情報を表示",
+    "ko": "구매 후 정보 확인"
+  },
+  "资金或存档补偿失败，请停止交易并检查日志：": {
+    "en": "Balance or save compensation failed. Stop trading and check the logs: ",
+    "ja": "資金またはセーブの補償処理に失敗しました。取引を停止してログを確認してください：",
+    "ko": "자금 또는 저장 보상 처리에 실패했습니다. 거래를 중단하고 로그를 확인해 주세요: "
+  },
+  "资金补偿未完成": {
+    "en": "Balance compensation incomplete",
+    "ja": "資金の補償が未完了です",
+    "ko": "자금 보상 처리가 완료되지 않았습니다"
+  },
+  "资金补偿超出范围": {
+    "en": "Balance compensation exceeds allowed range",
+    "ja": "資金の補償が範囲を超えています",
+    "ko": "자금 보상 금액이 허용 범위를 초과합니다"
+  },
+  "走势可能走弱": {
+    "en": "may weaken",
+    "ja": "弱含む可能性がある",
+    "ko": "약세를 보일 수 있다"
+  },
+  "走势可能走强": {
+    "en": "may strengthen",
+    "ja": "強含む可能性がある",
+    "ko": "강세를 보일 수 있다"
+  },
+  "走弱": {
+    "en": "weaken",
+    "ja": "弱含む",
+    "ko": "약세"
+  },
+  "走强": {
+    "en": "strengthen",
+    "ja": "強含む",
+    "ko": "강세"
+  },
+  "运输、仓储与供应链": {
+    "en": "Transport, warehousing, and supply chains",
+    "ja": "輸送・倉庫・供給網",
+    "ko": "운송, 창고 및 공급망"
+  },
+  "这条情报已购买或不再适用于未来观察窗口。": {
+    "en": "This intelligence is already purchased or no longer valid for the future observation window.",
+    "ja": "この情報は購入済み、または今後の観察期間には適用できません。",
+    "ko": "이미 구매한 정보이거나 향후 관찰 기간에 더 이상 유효하지 않습니다."
+  },
+  "远星关键模块召回": {
+    "en": "Farstar critical module recall",
+    "ja": "遠星の基幹モジュール回収",
+    "ko": "원성 핵심 모듈 회수"
+  },
+  "远星控制模块取得突破": {
+    "en": "Farstar control module breakthrough",
+    "ja": "遠星の制御モジュールに技術革新",
+    "ko": "원성 제어 모듈 기술 혁신"
+  },
+  "远星科技": {
+    "en": "Farstar Technologies",
+    "ja": "遠星テクノロジー",
+    "ko": "원성 테크놀로지"
+  },
+  "远星科技公布控制模块技术突破，市场期待新模块拓展应用。霆光能源的供电控制设备和白塔医疗的电子诊疗设备都与这类模块有关，配套业务预期一同改善。": {
+    "en": "Farstar Technologies announced a control module breakthrough, raising hopes for wider applications. Thunderlight Energy power-control equipment and White Tower Medical electronic diagnostic equipment use these modules, improving related business expectations for both.",
+    "ja": "遠星テクノロジーが制御モジュールの技術的突破を発表し、新モジュールの用途拡大が期待される。霆光エナジーの電力制御設備と白塔メディカルの電子診療機器もこの種のモジュールに関連し、両社の関連事業の見通しも改善した。",
+    "ko": "원성 테크놀로지가 제어 모듈의 기술 혁신을 발표해 새 모듈의 활용 확대가 기대된다. 뇌광 에너지의 전력 제어 설비와 백탑 메디컬의 전자 진료 장비도 이 모듈과 관련되어 있어 두 회사의 관련 사업 전망도 개선되었다."
+  },
+  "远星科技宣布召回关键模块，维修与替换安排令交付预期承压。霆光能源和白塔医疗的相关配套设备也需要重新检查，市场因而下调这些业务的近期预期。": {
+    "en": "Farstar Technologies announced a recall of critical modules. Repairs and replacements are weighing on delivery expectations. Related equipment at Thunderlight Energy and White Tower Medical also needs reinspection, lowering the market's near-term expectations for those businesses.",
+    "ja": "遠星テクノロジーが基幹モジュールの回収を発表した。修理と交換の対応が納入見通しを圧迫している。霆光エナジーと白塔メディカルの関連設備も再点検が必要となり、市場はこれらの事業の短期見通しを引き下げている。",
+    "ko": "원성 테크놀로지가 핵심 모듈 회수를 발표했다. 수리와 교체로 납품 전망이 악화되고 있다. 뇌광 에너지와 백탑 메디컬의 관련 설비도 재점검이 필요해 시장은 해당 사업들의 단기 전망을 낮추었다."
+  },
+  "远星科技靠拆解旧终端和重新配制电子模块攒下第一批客户，后来才把业务伸向科研装置与设备控制系统。它为霆光能源的供电设备寻找控制部件，也向安盾防务提供装备所需的电子组件。看似不起眼的模块断货，往往会拖慢整台机器交付，仓库因此始终留着一排等待配件的空箱。": {
+    "en": "Farstar Technologies found its first customers by dismantling old terminals and reconfiguring electronic modules, then expanded into research apparatus and equipment control systems. It sources control components for Thunderlight Energy power equipment and supplies electronics for Aegis Defense gear. A missing, unassuming module can delay an entire machine, so a row of empty crates always waits in the warehouse for spare parts.",
+    "ja": "遠星テクノロジーは古い端末を分解し、電子モジュールを組み直すことで最初の顧客を得た。その後、研究装置や設備制御システムへ事業を広げた。霆光エナジーの電力設備向け制御部品を探し、イージス・ディフェンスの装備には電子部品を供給する。目立たないモジュール一つの欠品が機械全体の納入を遅らせるため、倉庫には部品を待つ空箱がいつも一列並んでいる。",
+    "ko": "원성 테크놀로지는 낡은 단말기를 분해하고 전자 모듈을 재구성하며 첫 고객을 모았다. 이후 연구 장치와 설비 제어 시스템으로 사업을 넓혔다. 뇌광 에너지의 전력 설비에 필요한 제어 부품을 구하고 이지스 디펜스의 장비용 전자 부품을 공급한다. 눈에 띄지 않는 모듈 하나가 없어도 기계 전체의 납품이 늦어지기에 창고에는 부품을 기다리는 빈 상자들이 늘 줄지어 있다."
+  },
+  "退休水商": {
+    "en": "Retired water merchant",
+    "ja": "引退した水商人",
+    "ko": "은퇴한 물 상인"
+  },
+  "通过情报商购买": {
+    "en": "Buy through an information broker",
+    "ja": "情報屋から購入",
+    "ko": "정보상을 통해 구매"
+  },
+  "防务物资流通可能收紧，供应渠道正在收缩": {
+    "en": "Defense supplies may become harder to obtain as supply channels shrink",
+    "ja": "防衛物資の流通が厳しくなり、供給経路が縮小する可能性がある",
+    "ko": "방위 물자 유통이 줄고 공급 경로가 축소될 수 있다"
+  },
+  "霆光燃料采购合同破裂": {
+    "en": "Thunderlight fuel procurement contract collapses",
+    "ja": "霆光の燃料調達契約が破談",
+    "ko": "뇌광 연료 조달 계약 결렬"
+  },
+  "霆光能源": {
+    "en": "Thunderlight Energy",
+    "ja": "霆光エナジー",
+    "ko": "뇌광 에너지"
+  },
+  "霆光能源的燃料采购合同破裂，采购与交付计划面临重新安排。星锻工业的生产供能预期承压，晨星物流原定的能源货运需求也可能减少。": {
+    "en": "Thunderlight Energy's fuel procurement contract collapsed, forcing a rethink of procurement and deliveries. Starforge Industries faces pressure on its production power supply outlook, while Morningstar Logistics may lose some scheduled energy cargo demand.",
+    "ja": "霆光エナジーの燃料調達契約が破談となり、調達と納入の計画を組み直す必要が生じた。星鍛インダストリーの生産用電力の見通しが圧迫され、晨星ロジスティクスの予定していたエネルギー輸送需要も減る可能性がある。",
+    "ko": "뇌광 에너지의 연료 조달 계약이 결렬되어 조달과 납품 계획을 다시 짜야 한다. 성단 인더스트리의 생산용 전력 공급 전망이 악화되고 샛별 로지스틱스의 예정된 에너지 운송 수요도 줄어들 수 있다."
+  },
+  "霆光能源获得储能电池大单，能源设备出货预期上升。远星科技提供控制模块，星锻工业参与机械与设备配套，订单扩大有望带动两家公司的相关业务。": {
+    "en": "Thunderlight Energy won a large energy-storage battery order, lifting expected energy equipment shipments. Farstar Technologies supplies control modules and Starforge Industries contributes machinery and equipment, so both may benefit from the expanded orders.",
+    "ja": "霆光エナジーが蓄電池の大型受注を獲得し、エネルギー設備の出荷期待が高まっている。遠星テクノロジーが制御モジュールを提供し、星鍛インダストリーが機械と設備を担当するため、受注拡大は両社の関連事業も後押しする見通しだ。",
+    "ko": "뇌광 에너지가 대규모 저장용 배터리 주문을 확보해 에너지 장비의 출하 기대가 높아졌다. 원성 테크놀로지가 제어 모듈을 공급하고 성단 인더스트리가 기계와 설비에 참여해 주문 확대가 두 회사의 관련 사업에도 도움이 될 전망이다."
+  },
+  "霆光能源起初只替修理铺补充电池，后来逐渐接手燃料、能源电池和供电设备的买卖。星锻工业的机械开工离不开稳定供能，远星科技的电子模块又影响着它的设备维护。业务看起来贯穿整个站区，仓库里却仍要逐件核算能源货物的进价、耗损与运输成本，一次缺货就可能打乱多家客户的排程。": {
+    "en": "Thunderlight Energy once did little more than restock batteries for repair shops, then gradually took on fuel, energy batteries, and power equipment trading. Starforge Industries machinery needs its steady power, while Farstar Technologies modules shape its equipment maintenance. Its business may span the whole station, but the warehouse still counts the purchase price, losses, and transport costs of every energy shipment. One shortage can disrupt several customers' schedules.",
+    "ja": "霆光エナジーは修理店に電池を補充する仕事から始まり、徐々に燃料、蓄電池、電力設備の売買を引き受けるようになった。星鍛インダストリーの機械稼働には安定供給が欠かせず、遠星テクノロジーの電子モジュールは設備の保守を左右する。事業は駅区全体に及ぶように見えても、倉庫では今も一品ずつ仕入れ値、損耗、輸送費を数えている。一度の欠品で、複数の顧客の予定が狂うこともある。",
+    "ko": "뇌광 에너지는 처음에는 수리점의 배터리를 보충하다가 점차 연료, 에너지 배터리, 전력 설비의 거래까지 맡게 되었다. 성단 인더스트리의 기계 가동에는 안정적인 전력이 필요하고 원성 테크놀로지의 전자 모듈은 설비 유지 보수를 좌우한다. 사업이 정거장 전체에 걸쳐 있어 보여도 창고에서는 여전히 에너지 물자 하나하나의 매입가, 손실, 운송비를 계산한다. 한 번의 품절로 여러 고객의 일정이 흐트러질 수 있다."
+  },
+  "霆光获得储能电池大单": {
+    "en": "Thunderlight wins large energy-storage battery order",
+    "ja": "霆光が蓄電池の大型受注を獲得",
+    "ko": "뇌광, 대규모 저장용 배터리 주문 수주"
+  },
+  "非法武器货物到港，防务市场出现波动": {
+    "en": "Illegal weapons cargo arrives, stirring the defense market",
+    "ja": "違法武器の貨物が到着し、防衛市場が変動",
+    "ko": "불법 무기 화물 입항으로 방위 시장 변동"
+  },
+  "顾客会话已封存；成交按原成交日汇总，在次日行情统一结算。": {
+    "en": "Customer session closed. Trades are aggregated by their original day and settled with the next day's market update.",
+    "ja": "顧客セッションを終了しました。取引は実際の取引日ごとに集計し、翌日の相場更新時にまとめて決済します。",
+    "ko": "손님 세션이 종료되었습니다. 거래는 실제 거래일별로 집계하여 다음 날 시세 갱신 때 일괄 정산합니다."
+  },
+  "预热": {
+    "en": "Preheat",
+    "ja": "予兆",
+    "ko": "사전 반응"
+  },
+  "额外情报商存档标识无效": {
+    "en": "Invalid saved additional broker ID",
+    "ja": "保存された追加情報屋の ID が無効です",
+    "ko": "저장된 추가 정보상 ID 가 잘못되었습니다"
+  },
+  "食品、农产品": {
+    "en": "Food and produce",
+    "ja": "食品・農産物",
+    "ko": "식품 및 농산물"
+  },
+  "食品、农产品与供应": {
+    "en": "Food, produce, and supply",
+    "ja": "食品・農産物・供給",
+    "ko": "식품, 농산물 및 공급"
+  },
+  "食品供应可能增加，相关商家的进货压力正在缓解": {
+    "en": "Food supply may increase, easing procurement pressure on related merchants",
+    "ja": "食品供給が増え、関連商店の仕入れ負担が和らぐ可能性がある",
+    "ko": "식품 공급이 늘어 관련 상인의 매입 부담이 완화될 수 있다"
+  },
+  "食品供应可能收紧，相关商家的进货压力正在增加": {
+    "en": "Food supply may tighten, increasing procurement pressure on related merchants",
+    "ja": "食品供給が減り、関連商店の仕入れ負担が増す可能性がある",
+    "ko": "식품 공급이 줄어 관련 상인의 매입 부담이 늘어날 수 있다"
+  },
+  "饮水、净化与循环": {
+    "en": "Drinking water, purification, and recycling",
+    "ja": "飲料水・浄化・再利用",
+    "ko": "식수, 정화 및 재활용"
+  },
+  "饮用水、水处理用品": {
+    "en": "Drinking water and treatment supplies",
+    "ja": "飲料水・水処理用品",
+    "ko": "식수 및 수처리 용품"
+  },
+  "首次接入基准": {
+    "en": "Initial tracking baseline",
+    "ja": "初回記録の基準",
+    "ko": "최초 기록 기준가"
+  }
+}
