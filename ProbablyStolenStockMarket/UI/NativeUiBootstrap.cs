@@ -2,12 +2,7 @@ using System;
 using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using System.Linq;
-using Il2Cpp;
-using Il2CppInterop.Runtime;
-using Il2CppInterop.Runtime.InteropTypes;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppTMPro;
-using MelonLoader;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,7 +12,7 @@ namespace ProbablyStolenStockMarket.UI;
 // 只复制游戏素材引用，新建纯 UI 对象，不克隆背包或交易对象及其业务监听器。
 internal sealed class NativeUiBootstrap : IDisposable
 {
-    private readonly MelonLogger.Instance? _logger;
+    private readonly ModLogger? _logger;
     private readonly List<(string Field, GameObject? Original, GameObject Assigned)> _assigned = new();
     private CustomUIManager? _manager;
     private GameObject? _templates;
@@ -29,7 +24,7 @@ internal sealed class NativeUiBootstrap : IDisposable
     private ImageSkin? _buttonSkin;
     private bool _disposed;
 
-    public NativeUiBootstrap(MelonLogger.Instance? logger = null) => _logger = logger;
+    public NativeUiBootstrap(ModLogger? logger = null) => _logger = logger;
 
     public CustomUIManager Resolve()
     {
@@ -42,7 +37,7 @@ internal sealed class NativeUiBootstrap : IDisposable
             { _manager = manager; EnsureEventSystem(); return manager; }
 
             stage = "loaded native prefab references";
-            var sources = Loaded<CustomUIManager>().Where(m => m != null && (manager == null || m.Pointer != manager.Pointer)).ToList();
+            var sources = Loaded<CustomUIManager>().Where(m => m != null && (manager == null || m != manager)).ToList();
             // 资源中的 manager 只作预制件引用来源，不克隆可能携带其他逻辑的 GameObject。
             if (manager == null)
             {
@@ -76,12 +71,11 @@ internal sealed class NativeUiBootstrap : IDisposable
             {
                 stage = "native manager Awake";
                 _ownedManager.SetActive(true);
-                if (CustomUIManager.Instance == null || CustomUIManager.Instance.Pointer != manager.Pointer)
+                if (CustomUIManager.Instance == null || CustomUIManager.Instance != manager)
                     throw new InvalidOperationException("原生 Awake 未登记所创建的管理器。");
             }
             stage = "native overlay canvas";
-            manager.EnsureOverlayCanvas();
-            if (manager.OverlayRoot() == null) throw new InvalidOperationException("原生 OverlayRoot 返回空。");
+            if (manager.GetLayerRoot(CustomUIManager.LAYER_OVERLAY) == null) throw new InvalidOperationException("原生 OverlayRoot 返回空。");
             stage = "input event system";
             EnsureEventSystem();
             Log("stage=contracts ready window(frame/content/title/close/drag), label(TMP), button(Image/Button/TMP), input(viewport/text/placeholder), scroll(viewport/content) 已逐项通过；实际交互仍需游戏验证。");
@@ -136,11 +130,12 @@ internal sealed class NativeUiBootstrap : IDisposable
     {
         // 背景只取原生窗口的背景节点，不能将商品图标或默认白块冒充窗口素材。
         var window = EmporiumEntry.Instance?.invWindow;
-        var image = window?.background?.image;
+        var image = WindowBackground(window);
         if (image?.sprite == null)
-            image = Loaded<TreeNodeRender>().Select(node => node.window?.background?.image).FirstOrDefault(i => i != null && i.sprite != null);
+            image = Loaded<TreeNodeRender>().Select(node => node.window).Where(candidate => candidate != null)
+                .Select(WindowBackground).FirstOrDefault(candidate => candidate != null);
         if (image?.sprite == null) throw new InvalidOperationException("尚未找到已加载原版窗口背景素材。");
-        _windowSkin = Skin(image, "PixelWindow.background");
+        _windowSkin = Skin(image, "PixelWindow handler/background_fill");
         var nativeButton = Loaded<Button>().Where(b => b != null && b.image != null && b.image.sprite != null && !b.gameObject.name.StartsWith("StockMarket.", StringComparison.Ordinal))
             .OrderByDescending(b => b.gameObject.activeInHierarchy).FirstOrDefault();
         _buttonSkin = nativeButton?.image?.sprite != null ? Skin(nativeButton.image, "native Button " + nativeButton.gameObject.name) : _windowSkin;
@@ -151,6 +146,15 @@ internal sealed class NativeUiBootstrap : IDisposable
         if (_font == null) throw new InvalidOperationException("尚未找到游戏已加载的 TMP 字体资源。");
         Log($"stage=borrow font source={text!.gameObject.name} font={_font.name} material={_fontMaterial?.name}");
     }
+    private static Image? WindowBackground(PixelWindow? window)
+    {
+        // 正式版背景字段为私有；从公开窗口节点中按原版背景精灵精确匹配。
+        var fill = RenderHandler.current?.fill;
+        var handler = window?.handler;
+        if (fill == null || handler == null) return null;
+        return handler.GetComponentsInChildren<Image>(true).FirstOrDefault(image => image != null && image.sprite == fill);
+    }
+
     private ImageSkin Skin(Image image, string source)
     {
         Log($"stage=borrow skin source={source}/{image.gameObject.name} sprite={image.sprite.name} texture={image.sprite.texture?.name} material={image.material?.name}");
@@ -159,7 +163,7 @@ internal sealed class NativeUiBootstrap : IDisposable
 
     private GameObject RectObject(string name, Transform? parent)
     {
-        var types = new Il2CppReferenceArray<Il2CppSystem.Type>(new[] { Il2CppType.Of<RectTransform>() });
+        var types = new[] { typeof(RectTransform) };
         var go = new GameObject("StockMarket." + name, types);
         if (parent != null) go.transform.SetParent(parent, false);
         return go;
@@ -170,17 +174,17 @@ internal sealed class NativeUiBootstrap : IDisposable
         // 父级 inactive，模板自身 activeSelf 为 true，原生 Instantiate 后才会可见。
         go.SetActive(true); return go;
     }
-    private static T Add<T>(GameObject go) where T : Component => go.AddComponent(Il2CppType.Of<T>()).Cast<T>();
-    private static T? Get<T>(GameObject? go) where T : Component => go?.GetComponent(Il2CppType.Of<T>())?.TryCast<T>();
-    private static T? Child<T>(GameObject? go) where T : Component => go?.GetComponentInChildren(Il2CppType.Of<T>(), true)?.TryCast<T>();
+    private static T Add<T>(GameObject go) where T : Component => go.AddComponent<T>();
+    private static T? Get<T>(GameObject? go) where T : Component => go?.GetComponent<T>();
+    private static T? Child<T>(GameObject? go) where T : Component => go?.GetComponentInChildren<T>(true);
     private static List<T> Loaded<T>() where T : UnityEngine.Object
     {
         var result = new List<T>();
-        foreach (var obj in Resources.FindObjectsOfTypeAll(Il2CppType.Of<T>()))
-            if (obj != null && obj.TryCast<T>() is { } found) result.Add(found);
+        foreach (var obj in Resources.FindObjectsOfTypeAll<T>())
+            if (obj != null) result.Add(obj);
         return result;
     }
-    private static RectTransform Rect(GameObject go) => go.transform.Cast<RectTransform>();
+    private static RectTransform Rect(GameObject go) => go.GetComponent<RectTransform>();
     private static void Stretch(RectTransform rect, float left = 0, float bottom = 0, float right = 0, float top = 0)
     {
         rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
@@ -294,17 +298,19 @@ internal sealed class NativeUiBootstrap : IDisposable
         if (EventSystem.current == null) throw new InvalidOperationException("自有 EventSystem 未激活。");
         Log("stage=input：原场景没有 EventSystem，已创建独立 EventSystem 与 StandaloneInputModule。");
     }
-    private void Log(string text) { if (_logger != null) _logger.Msg("[原生股市引导] " + text); else MelonLogger.Msg("[原生股市引导] " + text); }
+    private void Log(string text) { if (_logger != null) _logger.Msg("[原生股市引导] " + text); else UnityEngine.Debug.Log("[原生股市引导] " + text); }
     private void Cleanup()
     {
         if (_manager != null)
         {
             try
             {
-                bool shared = false;
-                if (_manager.windowOrder != null)
-                    foreach (var window in _manager.windowOrder)
-                        if (window != null && window.id != "ProbablyStolenStockMarket.stock_market.native" && window.IsAlive) shared = true;
+                // 正式版通过公开画布接口检查其他窗口，不访问管理器的私有窗口列表。
+                bool shared = CustomUIManager.GetAvailableLayers()
+                    .Select(layer => _manager.GetLayerRoot(layer))
+                    .Where(root => root != null)
+                    .SelectMany(root => root.GetComponentsInChildren<CustomUIWindowFrame>(true))
+                    .Any(frame => frame != null && !frame.gameObject.name.StartsWith("custom_window_ProbablyStolenStockMarket.", StringComparison.Ordinal));
                 if (shared)
                 {
                     Log("stage=dispose：管理器仍被其他窗口使用，保留正在共享的模板、管理器与事件系统，不销毁游戏素材。");
@@ -317,7 +323,7 @@ internal sealed class NativeUiBootstrap : IDisposable
         }
         if (_manager != null && _ownedManager == null)
             foreach (var entry in _assigned)
-                try { if (GetPrefab(_manager, entry.Field)?.Pointer == entry.Assigned.Pointer) SetPrefab(_manager, entry.Field, entry.Original); } catch { }
+                try { if (GetPrefab(_manager, entry.Field) == entry.Assigned) SetPrefab(_manager, entry.Field, entry.Original); } catch { }
         _assigned.Clear();
         if (_ownedManager != null) UnityEngine.Object.Destroy(_ownedManager);
         if (_templates != null) UnityEngine.Object.Destroy(_templates);

@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-using Il2Cpp;
-using Il2CppInterop.Runtime;
-using Il2CppTMPro;
-using MelonLoader;
+using TMPro;
 using ProbablyStolenStockMarket.Localization;
 using ProbablyStolenStockMarket.Market;
 
@@ -18,7 +15,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
     internal const string NpcId = "probably_stolen_stock.intel_broker";
     internal const string JianqingNpcId = "probably_stolen_stock.jianqing_broker";
     private readonly GameBridge _host;
-    private readonly MelonLogger.Instance _log;
+    private readonly ModLogger _log;
     private readonly JianqingVisual _visual;
     private readonly WenzhouVisual _wenzhouVisual;
     private readonly BrokerSession[] _sessions;
@@ -28,7 +25,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
     private string _lastFault = "";
     private static IntelBrokerAdapter? Current;
 
-    internal IntelBrokerAdapter(GameBridge host, MelonLogger.Instance log)
+    internal IntelBrokerAdapter(GameBridge host, ModLogger log)
     {
         _host = host; _log = log; _visual = new JianqingVisual(log); _wenzhouVisual = new WenzhouVisual(log);
         _sessions = new[] {
@@ -50,11 +47,12 @@ internal sealed class IntelBrokerAdapter : IDisposable
             Patch(typeof(StoreClientManager), "TrackClient", nameof(TrackPrefix), true);
             Patch(typeof(StoreClient), "OnIntroduced", nameof(IntroducedPrefix), true);
             Patch(typeof(StoreClient), "OnIntroduced", nameof(IntroducedPostfix), false);
-            Patch(typeof(NegociationUIManager), "InitUIWithItemInformationDealerMode", nameof(InformationUiPostfix), false);
-            Patch(typeof(NegociationUIManager), "RefreshUI", nameof(InformationUiPostfix), false);
+            Patch(typeof(NegociationUIManager), "BuildInfoDealer", nameof(InformationBuildPrefix), true);
+            Patch(typeof(NegociationUIManager), "RefreshNow", nameof(InformationUiPostfix), false);
             Patch(typeof(NegociationUIManager), "Update", nameof(InformationUiPostfix), false);
             Patch(typeof(NegociationUIManager), "OnOfferAcceptClick", nameof(PurchasePrefix), true);
-            Patch(typeof(NegociationUIManager), "OnAcceptMultipleButtonClick", nameof(OtherOfferPrefix), true);
+            Patch(typeof(NegociationUIManager), "OnBuyAllClick", nameof(OtherOfferPrefix), true);
+            Patch(typeof(NegociationUIManager), "OnSellAllClick", nameof(OtherOfferPrefix), true);
             Patch(typeof(NegociationUIManager), "OnWholesaleClick", nameof(OtherOfferPrefix), true);
             Patch(typeof(StoreClient), "IsClientBuyingThisItem", nameof(NoMerchandisePrefix), true);
             _log.Msg("[股市掮客探针] 已安装闻舟与剑清酱独立工厂、队尾来访和原版情报商购买钩子，等待游戏内验证。");
@@ -103,6 +101,16 @@ internal sealed class IntelBrokerAdapter : IDisposable
         try { adapter?.Session(client)?.Introduced(client, after); }
         catch (Exception ex) { adapter?.Report(ex); }
     }
+    private static bool InformationBuildPrefix(NegociationUIManager __instance, StoreClient __0, bool __1)
+    {
+        var adapter = Current;
+        var session = adapter?.Session(__0);
+        if (session == null) return true;
+        try { session.BuildInformationUi(__instance, __1); }
+        catch (Exception ex) { adapter?.Report(ex); }
+        // 自有顾客即使构建失败也不能退回原版情报扣款界面。
+        return false;
+    }
     private static void InformationUiPostfix(NegociationUIManager __instance)
     {
         var adapter = Current;
@@ -127,13 +135,13 @@ internal sealed class IntelBrokerAdapter : IDisposable
     private sealed class BrokerSession : IDisposable
     {
         private readonly GameBridge _host;
-        private readonly MelonLogger.Instance _log;
+        private readonly ModLogger _log;
         private readonly List<object> _factoryRoots = new();
         private readonly List<object> _visitRoots = new();
         private readonly List<StoreClient> _ownedClients = new();
         private readonly List<(Dialogue Dialog, string Canonical)> _localizedDialogues = new();
         private int _languageRevision = -1;
-        private Il2CppSystem.Func<StoreClient>? _factory;
+        private System.Func<StoreClient>? _factory;
         private StoreClientManager? _queue;
         private string _identity = "";
         private string _visitId = "";
@@ -147,7 +155,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
         private readonly string _brokerId, _npcId, _npcName;
         private readonly Func<string?> _resolveVisual;
         private bool IsJianqing => _brokerId == BrokerIds.Jianqing;
-        internal BrokerSession(GameBridge host, MelonLogger.Instance log, string brokerId, string npcId, string npcName, Func<string?> resolveVisual)
+        internal BrokerSession(GameBridge host, ModLogger log, string brokerId, string npcId, string npcName, Func<string?> resolveVisual)
         { _host = host; _log = log; _brokerId = brokerId; _npcId = npcId; _npcName = npcName; _resolveVisual = resolveVisual; }
 
         internal void Tick()
@@ -168,7 +176,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
             FlushArrivalPersistence();
             var manager = store.storeClientManager;
             // BrokerReady 和上方存档身份检查已确认当前存档，保留其队列引用以清理过期来访。
-            if (_queue != null && _queue.Pointer != manager.Pointer) RemoveQueued();
+            if (_queue != null && _queue != manager) RemoveQueued();
             _queue = manager;
             var oldVisit = engine.GetBrokerVisit(_brokerId);
             if (oldVisit is { HasArrived: true, Departed: false } && (!oldVisit.IsPhoneBooking || oldVisit.Purchased)
@@ -204,7 +212,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
             manager.AddClient(created);
             _queue = manager;
             bool inserted = false;
-            foreach (var client in manager.clientStack) if (client?.Pointer == created.Pointer) inserted = true;
+            foreach (var client in manager.clientStack) if (client == created) inserted = true;
             if (!inserted) throw new InvalidOperationException("原版队列没有读回新掮客，请稍后重试。");
             _log.Msg($"[股市掮客探针] 电话预约到期，队尾追加 broker={_brokerId} visit={visit.VisitId}，原队列={before}，现队列={manager.clientStack.Count}；未替换剧情顾客。");
             _lastFault = "";
@@ -214,7 +222,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
         {
             var registry = StoreClientListDict.storeClientDict;
             if (registry == null) throw new InvalidOperationException("原版顾客目录尚未初始化。");
-            if (_registered && registry.ContainsKey(_npcId) && registry[_npcId]?.Pointer == _factory?.Pointer) return;
+            if (_registered && registry.ContainsKey(_npcId) && registry[_npcId] == _factory) return;
             if (registry.ContainsKey(_npcId)) throw new InvalidOperationException("专属顾客标识已被其他工厂占用，未覆盖原值。");
             if (_factory == null)
             {
@@ -223,8 +231,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
                     try { return Create(); }
                     catch (Exception ex) { Report(ex); return null!; }
                 };
-                _factory = DelegateSupport.ConvertDelegate<Il2CppSystem.Func<StoreClient>>(managed)
-                    ?? throw new InvalidOperationException("顾客工厂委托转换失败。");
+                _factory = managed;
                 _factoryRoots.Add(managed); _factoryRoots.Add(_factory);
             }
             registry.Add(_npcId, _factory); _registered = true;
@@ -305,8 +312,8 @@ internal sealed class IntelBrokerAdapter : IDisposable
         {
             var dict = SpriteDict.Instance ?? throw new InvalidOperationException("原版人物图像目录尚未就绪。");
             var names = new List<string>();
-            if (dict.bmMaleEntries != null) foreach (var entry in dict.bmMaleEntries) if (entry != null && !string.IsNullOrWhiteSpace(entry.key) && entry.sprite != null) names.Add(entry.key);
-            if (dict.bmFemaleEntries != null) foreach (var entry in dict.bmFemaleEntries) if (entry != null && !string.IsNullOrWhiteSpace(entry.key) && entry.sprite != null) names.Add(entry.key);
+            if (NativeGameAccess.GetBrokerPortraits(dict) != null) foreach (var entry in NativeGameAccess.GetBrokerPortraits(dict)) if (entry != null && !string.IsNullOrWhiteSpace(entry.key) && entry.sprite != null) names.Add(entry.key);
+            if (NativeGameAccess.GetBrokerFemalePortraits(dict) != null) foreach (var entry in NativeGameAccess.GetBrokerFemalePortraits(dict)) if (entry != null && !string.IsNullOrWhiteSpace(entry.key) && entry.sprite != null) names.Add(entry.key);
             names = names.Distinct(StringComparer.Ordinal).OrderBy(x => x, StringComparer.Ordinal).ToList();
             if (names.Count == 0) throw new InvalidOperationException("没有可用的原版掮客人物素材，本次来访延后。");
             if (names.Contains(key, StringComparer.Ordinal)) return key;
@@ -317,7 +324,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
 
         private void Arrived(StoreClient client, string visitId, string identity)
         {
-            if (!Valid(identity, visitId) || !IsBroker(client) || _host.CurrentClient?.Pointer != client.Pointer) return;
+            if (!Valid(identity, visitId) || !IsBroker(client) || _host.CurrentClient != client) return;
             var engine = _host.Engine!;
             bool wasArrived = engine.GetBrokerVisit(_brokerId)?.HasArrived == true;
             bool changed = engine.MarkBrokerArrived(visitId, _brokerId);
@@ -337,6 +344,38 @@ internal sealed class IntelBrokerAdapter : IDisposable
             _pendingArrivalVisit = "";
         }
 
+        private string _informationUiKey = "";
+        private NegotiationTabletFrame? _informationFrame;
+
+        private string InformationBody(BrokerVisitView view) => PublicOffer(view)
+            + (_pendingArrivalVisit.Length > 0 ? "\n\n到访状态暂未保存，正在重试；保存成功后才能购买。"
+            : !_host.CanBuyBrokerIntel ? "\n\n" + _host.BrokerTradeStatus
+            : _host.Cash < view.Price ? "\n\n余额不足，暂时无法购买。" : "");
+
+        private bool CanPurchase(BrokerVisitView view) => !_purchasing && _pendingArrivalVisit.Length == 0
+            && _host.CanBuyBrokerIntel && !_host.BlocksGameInput && !view.Purchased && !view.Expired
+            && !view.Departed && _host.Cash >= view.Price && _host.CurrentClient?.isIntroduced == true;
+
+        internal void BuildInformationUi(NegociationUIManager ui, bool locked)
+        {
+            var view = _host.Engine?.GetBrokerVisit(_brokerId);
+            var frame = NativeGameAccess.GetNegotiationFrame(ui);
+            if (view == null || frame == null) return;
+            _informationFrame = frame;
+            _informationUiKey = Localizer.Revision + ":" + view.Price + ":" + view.Purchased + ":" + InformationBody(view);
+            TabletUI.ListRow(frame, frame.content, Localizer.Text(view.ProductKind), Localizer.Text($"{view.Price} 游戏币"), false,
+                () => Localizer.Text(InformationBody(view)), null);
+            // 正式版平板使用固定行高，按行分段以保留完整的公开报价说明。
+            foreach (var paragraph in Localizer.Text(InformationBody(view)).Split('\n'))
+                for (var start = 0; start < paragraph.Length; start += 32)
+                    TabletUI.TextRow(frame, frame.content, paragraph.Substring(start, Math.Min(32, paragraph.Length - start)), 16f, TabletStyle.INK);
+            TabletUI.FooterLine(frame, frame.footer, 17.5f, Localizer.Text("购买股市情报"), Localizer.Text($"{view.Price} 游戏币"));
+            var button = TabletUI.BigButton(frame, frame.buttonHost, 153f, 0f,
+                Localizer.Text(view.Purchased ? "已购买" : "购买股市情报"), ui.OnOfferAcceptClick);
+            button.SetInteractable(!locked && CanPurchase(view));
+            NativeGameAccess.SetNegotiationPrimary(ui, button);
+        }
+
         internal void UpdateUi(NegociationUIManager? source = null)
         {
             if (_disposed || !_host.BrokerReady || !IsBroker(_host.CurrentClient)) return;
@@ -344,16 +383,18 @@ internal sealed class IntelBrokerAdapter : IDisposable
             var ui = source ?? NegociationUIManager.Instance;
             if (ui == null || view == null || view.VisitId != _visitId || _identity != _host.BrokerSaveIdentity
                 || ui.uiObject == null || !ui.uiObject.activeInHierarchy) return;
-            // 原版周期刷新会在初始化之后重写标题，必须在原生刷新返回后统一应用专属文案。
-            SetText(ui.titleTMP, IsJianqing ? "剑清酱 · 股市内幕交易" : "股市内幕交易");
-            SetText(ui.itemName, view.ProductKind);
-            SetText(ui.bodyTMP, PublicOffer(view) + (_pendingArrivalVisit.Length > 0 ? "\n\n到访状态暂未保存，正在重试；保存成功后才能购买。" : !_host.CanBuyBrokerIntel ? "\n\n" + _host.BrokerTradeStatus : _host.Cash < view.Price ? "\n\n余额不足，暂时无法购买。" : ""));
-            SetText(ui.costTMP, $"{view.Price} 游戏币");
-            SetText(ui.acceptOfferButtonButtonTMP, view.Purchased ? "已购买" : "购买股市情报");
-            bool canPurchase = !_purchasing && _pendingArrivalVisit.Length == 0 && _host.CanBuyBrokerIntel && !_host.BlocksGameInput && !view.Purchased && !view.Expired && !view.Departed && _host.Cash >= view.Price;
-            if (ui.acceptOfferButtonButton != null && ui.acceptOfferButtonButton.interactable != canPurchase) ui.acceptOfferButtonButton.interactable = canPurchase;
-            if (ui.acceptMultipleButton != null && ui.acceptMultipleButton.gameObject.activeSelf) ui.acceptMultipleButton.gameObject.SetActive(false);
-            if (ui.wholesaleButton != null && ui.wholesaleButton.gameObject.activeSelf) ui.wholesaleButton.gameObject.SetActive(false);
+            var frame = NativeGameAccess.GetNegotiationFrame(ui);
+            if (frame == null) return;
+            SetText(frame.clientName, IsJianqing ? "剑清酱 · 股市内幕交易" : "闻舟 · 股市内幕交易");
+            SetText(frame.sectionHeader, "股市内幕交易");
+            var key = Localizer.Revision + ":" + view.Price + ":" + view.Purchased + ":" + InformationBody(view);
+            if (_informationFrame != frame || _informationUiKey != key)
+            {
+                _informationFrame = frame;
+                _informationUiKey = key;
+                NativeGameAccess.RebuildNegotiation(ui);
+            }
+            NativeGameAccess.GetNegotiationPrimary(ui)?.SetInteractable(CanPurchase(view));
         }
 
         private static void SetText(TextMeshProUGUI? label, string text)
@@ -425,7 +466,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
         }
 
         private bool Valid(string identity, string visitId) => !_disposed && _host.BrokerReady && identity == _host.BrokerSaveIdentity && _host.Engine?.GetBrokerVisit(_brokerId)?.VisitId == visitId;
-        private bool CurrentVisit(StoreClient client, string identity, string visitId, int epoch) => epoch == _epoch && Valid(identity, visitId) && _host.CurrentClient?.Pointer == client.Pointer;
+        private bool CurrentVisit(StoreClient client, string identity, string visitId, int epoch) => epoch == _epoch && Valid(identity, visitId) && _host.CurrentClient == client;
         internal bool IsBroker(StoreClient? client) => client != null && client.identifier == _npcId;
         private Dialogue Text(string value)
         {
@@ -444,10 +485,10 @@ internal sealed class IntelBrokerAdapter : IDisposable
                 client.displayName = Localizer.Text(_npcName + " · 行情掮客");
             UpdateUi();
         }
-        private Il2CppSystem.Action RootAction(Action managed)
+        private System.Action RootAction(Action managed)
         {
             Action guarded = () => { try { managed(); } catch (Exception ex) { Report(ex); } };
-            var native = DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(guarded) ?? throw new InvalidOperationException("原生情报回调转换失败。");
+            var native = guarded;
             _visitRoots.Add(managed); _visitRoots.Add(guarded); _visitRoots.Add(native); return native;
         }
 
@@ -478,7 +519,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
             try
             {
                 var registry = StoreClientListDict.storeClientDict;
-                if (_registered && registry != null && registry.ContainsKey(_npcId) && registry[_npcId]?.Pointer == _factory?.Pointer) registry.Remove(_npcId);
+                if (_registered && registry != null && registry.ContainsKey(_npcId) && registry[_npcId] == _factory) registry.Remove(_npcId);
             }
             catch (Exception ex) { _log.Warning("[股市掮客] 工厂清理失败：" + ex.Message); }
             _factoryRoots.Clear(); _factory = null; _registered = false;
@@ -496,7 +537,7 @@ internal sealed class IntelBrokerAdapter : IDisposable
             var visit = engine?.GetBrokerVisit(_brokerId);
             if (visit == null) return;
             if (!after) { Arrived(client, visit.VisitId, _host.BrokerSaveIdentity); return; }
-            if (client.isIntroduced && _host.CurrentClient?.Pointer == client.Pointer && engine != null
+            if (client.isIntroduced && _host.CurrentClient == client && engine != null
                 && engine.GetBrokerState(_brokerId)?.HasMetBroker != true && engine.MarkBrokerIntroduced(visit.VisitId, _brokerId))
             {
                 _host.PersistBrokerState();

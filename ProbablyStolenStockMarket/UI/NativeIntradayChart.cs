@@ -3,10 +3,7 @@ using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Il2CppInterop.Runtime;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppTMPro;
-using MelonLoader;
+using TMPro;
 using ProbablyStolenStockMarket.Market;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,7 +46,7 @@ public sealed class NativeIntradayChart : IDisposable
         _rect.offsetMin = Vector2.zero; _rect.offsetMax = Vector2.zero;
         try
         {
-            var background = _root.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+            var background = _root.AddComponent<Image>();
             background.color = StockUiTheme.ChartBackground;
             background.raycastTarget = false;
             _title = Text("Title", 13, TextAlignmentOptions.TopLeft, Ink);
@@ -131,7 +128,7 @@ public sealed class NativeIntradayChart : IDisposable
         catch (Exception ex)
         {
             _faulted = true;
-            MelonLogger.Warning("[原生分时图] 绘制失败，本窗口不再重试：" + Environment.NewLine + ex);
+            UnityEngine.Debug.LogWarning("[原生分时图] 绘制失败，本窗口不再重试：" + Environment.NewLine + ex);
             try { HidePlot(); _note.Text!.text = Localizer.Text("分时图暂不可用，请查看加载日志。"); } catch { }
         }
     }
@@ -232,7 +229,7 @@ public sealed class NativeIntradayChart : IDisposable
     private Node Block(string name, Color color)
     {
         var go = RectObject(name, _rect);
-        var image = go.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+        var image = go.AddComponent<Image>();
         image.color = color; image.raycastTarget = false; image.type = Image.Type.Simple;
         // 保持默认 UI Image 材质，不能借用字体 SDF 材质绘制色块。
         return new Node(go, RectOf(go), image, null);
@@ -241,7 +238,7 @@ public sealed class NativeIntradayChart : IDisposable
     private Node Text(string name, float size, TextAlignmentOptions alignment, Color color)
     {
         var go = RectObject(name, _rect);
-        var text = go.AddComponent(Il2CppType.Of<TextMeshProUGUI>()).Cast<TextMeshProUGUI>();
+        var text = go.AddComponent<TextMeshProUGUI>();
         text.font = _font; text.fontSize = size; text.color = color; text.alignment = alignment;
         text.raycastTarget = false; text.richText = false; text.enableWordWrapping = false;
         return new Node(go, RectOf(go), null, text);
@@ -249,12 +246,12 @@ public sealed class NativeIntradayChart : IDisposable
 
     private static GameObject RectObject(string name, Transform parent)
     {
-        var types = new Il2CppReferenceArray<Il2CppSystem.Type>(new[] { Il2CppType.Of<RectTransform>() });
+        var types = new[] { typeof(RectTransform) };
         var go = new GameObject("StockMarket.Intraday." + name, types);
         go.transform.SetParent(parent, false); return go;
     }
 
-    private static RectTransform RectOf(GameObject go) => go.GetComponent(Il2CppType.Of<RectTransform>()).Cast<RectTransform>();
+    private static RectTransform RectOf(GameObject go) => go.GetComponent<RectTransform>();
 
     private static void Place(Node node, float x, float y, float width, float height)
     {
@@ -299,7 +296,7 @@ public sealed class NativeIntradayChart : IDisposable
 
     public void SetHoverBounds(RectTransform windowRoot)
     {
-        if (_disposed || _hover?.WindowPointer == windowRoot.Pointer) return;
+        if (_disposed || _hover?.WindowId == windowRoot.GetInstanceID()) return;
         _hover?.Release(this); _hover = null;
         try { _hover = ChartHoverOverlay.Acquire(windowRoot, _font); }
         catch (Exception ex) { HoverWarning(ex); }
@@ -333,7 +330,7 @@ public sealed class NativeIntradayChart : IDisposable
     {
         if (_hoverWarned) return;
         _hoverWarned = true;
-        MelonLogger.Warning("[分时悬停] 本窗口悬停暂不可用：" + ex);
+        UnityEngine.Debug.LogWarning("[分时悬停] 本窗口悬停暂不可用：" + ex);
     }
 
     public void Dispose()
@@ -343,7 +340,7 @@ public sealed class NativeIntradayChart : IDisposable
         try { _hover?.Release(this); } catch (Exception ex) { HoverWarning(ex); }
         _hover = null;
         try { UnityEngine.Object.Destroy(_root); }
-        catch (Exception ex) { MelonLogger.Warning("[原生分时图] 清理对象失败：" + ex); }
+        catch (Exception ex) { UnityEngine.Debug.LogWarning("[原生分时图] 清理对象失败：" + ex); }
         // 字体为游戏已有资源，本图只释放自己的 UGUI 对象树。
     }
 

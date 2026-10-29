@@ -1,0 +1,34 @@
+<Project>
+  <Target Name="ValidateModManifest" BeforeTargets="BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Error Condition="!Exists('$(ModManifestPath)')" Text="缺少原生模组清单：$(ModManifestPath)" />
+    <XmlPeek XmlInputPath="$(ModManifestPath)" Query="/Manifest/ID/text()"><Output TaskParameter="Result" PropertyName="_ManifestModId" /></XmlPeek>
+    <XmlPeek XmlInputPath="$(ModManifestPath)" Query="/Manifest/Assemblies/Assembly/text()"><Output TaskParameter="Result" ItemName="_ManifestAssemblies" /></XmlPeek>
+    <XmlPeek XmlInputPath="$(ModManifestPath)" Query="/Manifest/Capabilities"><Output TaskParameter="Result" PropertyName="_ManifestCapabilities" /></XmlPeek>
+    <Error Condition="'$(_ManifestModId)' != 'probably_stolen_stock_market'" Text="清单 ID 必须为 probably_stolen_stock_market。" />
+    <Error Condition="'@(_ManifestAssemblies)' != 'ProbablyStolenStockMarket.dll'" Text="清单必须准确列出 ProbablyStolenStockMarket.dll。" />
+    <Error Condition="'$(_ManifestCapabilities)' == ''" Text="原生清单必须包含 Capabilities 元素。" />
+  </Target>
+  <Target Name="ValidateGameReferences" BeforeTargets="ResolveAssemblyReferences" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Error Condition="'$(ManagedDirectory)' == ''" Text="请在 Game.local.props 配置正式版 GameDirectory 或 ManagedDirectory。" />
+    <ItemGroup>
+      <_RequiredGameAssembly Include="$(ManagedDirectory)/Assembly-CSharp.dll;$(ManagedDirectory)/0Harmony.dll;$(ManagedDirectory)/Newtonsoft.Json.dll;$(ManagedDirectory)/UnityEngine.CoreModule.dll;$(ManagedDirectory)/UnityEngine.UI.dll;$(ManagedDirectory)/Unity.TextMeshPro.dll" />
+    </ItemGroup>
+    <Error Condition="!Exists('%(_RequiredGameAssembly.Identity)')" Text="缺少正式版 Mono 游戏引用：%(_RequiredGameAssembly.Identity)。请勿使用 Demo 的 IL2CPP 代理。" />
+  </Target>
+  <!-- 构建成功后将原生内容安装到独立目录；不操作 Demo 或原有存档。 -->
+  <Target Name="DeployNativeMod" AfterTargets="Build" DependsOnTargets="ValidateModManifest" Condition="'$(DeployOnBuild)' == 'true' and '$(DesignTimeBuild)' != 'true'">
+    <Error Condition="'$(AssemblyName)' == '' or '$(TargetPath)' == '' or !Exists('$(TargetPath)')" Text="找不到编译输出：$(TargetPath)。请先成功构建模组。" />
+    <Error Condition="'$(GameDirectory)' == '' or !Exists('$(GameDirectory)/Probably Stolen.exe')" Text="自动部署需要包含 Probably Stolen.exe 的正式版目录。" />
+    <Error Condition="!Exists('$(GameDirectory)/Probably Stolen_Data/Managed/Assembly-CSharp.dll')" Text="目标必须为提供 Managed 程序集的正式版 Mono 安装。" />
+    <PropertyGroup><ModDeployDirectory>$(GameDirectory)/Mods/$(AssemblyName)</ModDeployDirectory></PropertyGroup>
+    <ItemGroup>
+      <_ModAssets Include="$(ModAssetsDirectory)/**/*.png;$(ModAssetsDirectory)/**/*.jpg;$(ModAssetsDirectory)/**/*.jpeg;$(ModAssetsDirectory)/**/*.json;$(ModAssetsDirectory)/**/*.xml;$(ModAssetsDirectory)/**/*.csv;$(ModAssetsDirectory)/**/*.wav;$(ModAssetsDirectory)/**/*.ogg;$(ModAssetsDirectory)/**/*.mp3" Exclude="$(ModAssetsDirectory)/Textures/Items/health_pack.png" />
+    </ItemGroup>
+    <MakeDir Directories="$(ModDeployDirectory)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModDeployDirectory)" />
+    <Copy SourceFiles="$(ModManifestPath)" DestinationFiles="$(ModDeployDirectory)/manifest.xml" />
+    <Copy SourceFiles="@(_ModAssets)" DestinationFiles="@(_ModAssets->'$(ModDeployDirectory)/Assets/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(ModDeployDirectory)" Condition="'$(DeployDebugSymbols)' == 'true' and Exists('$(TargetDir)$(TargetName).pdb')" />
+    <Message Importance="high" Text="原生模组已部署到：$(ModDeployDirectory)。请在游戏模组菜单启用并重启。" />
+  </Target>
+</Project>

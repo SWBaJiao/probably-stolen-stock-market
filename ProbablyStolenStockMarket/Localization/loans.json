@@ -1,0 +1,1172 @@
+{
+  "周转贷款": {
+    "en": "Working Capital Loans",
+    "ja": "運転資金融資",
+    "ko": "운영 자금 대출"
+  },
+  "周转贷款专线": {
+    "en": "Working Capital Loan Line",
+    "ja": "運転資金融資専用電話",
+    "ko": "운영 자금 대출 전용 전화"
+  },
+  "借款、查询与还款": {
+    "en": "Borrow, check balance or repay",
+    "ja": "借入・残高照会・返済",
+    "ko": "대출 신청·조회·상환"
+  },
+  "沈衡": {
+    "en": "Shen Heng",
+    "ja": "沈衡",
+    "ko": "선헝"
+  },
+  "沈衡的贷款名片": {
+    "en": "Shen Heng's Loan Business Card",
+    "ja": "沈衡の融資名刺",
+    "ko": "선헝의 대출 명함"
+  },
+  "贷款专员": {
+    "en": "Loan Officer",
+    "ja": "融資担当者",
+    "ko": "대출 담당자"
+  },
+  "抵债停业": {
+    "en": "Closed for Debt",
+    "ja": "債務清算による閉店",
+    "ko": "채무 청산으로 폐업"
+  },
+  "你错过了贷款的最后还款期限。债权人带走了店铺里最后一批有价值的东西。卷帘门落下，你的生意也到此为止。": {
+    "en": "You missed the final repayment deadline. Your creditors took the last valuables from the shop. The shutter came down, bringing your business to an end.",
+    "ja": "最終返済期限を過ぎてしまった。債権者は店に残っていた最後の価値ある品々を持ち去った。シャッターが下り、あなたの商売もここで終わりを迎えた。",
+    "ko": "최종 상환 기한을 넘겼습니다. 채권자들은 가게에 남은 마지막 귀중품까지 가져갔습니다. 셔터가 내려가고, 당신의 장사도 여기서 끝났습니다."
+  },
+  "贷款类型无效。": {
+    "en": "Invalid loan type.",
+    "ja": "融資の種類が無効です。",
+    "ko": "유효하지 않은 대출 유형입니다."
+  },
+  "贷款业务已停用。": {
+    "en": "Loan services are disabled.",
+    "ja": "融資サービスは停止中です。",
+    "ko": "대출 서비스가 비활성화되어 있습니다."
+  },
+  "存档暂未就绪。": {
+    "en": "The save is not ready yet.",
+    "ja": "セーブデータの準備ができていません。",
+    "ko": "저장 데이터가 아직 준비되지 않았습니다."
+  },
+  "债务清算已经启动，无法办理贷款。": {
+    "en": "Debt liquidation has begun. New borrowing is unavailable.",
+    "ja": "債務清算が開始されたため、新たな借入はできません。",
+    "ko": "채무 청산이 시작되어 새 대출을 신청할 수 없습니다."
+  },
+  "请先接待贷款专员，获得联系方式。": {
+    "en": "Meet the loan officer first to receive his contact details.",
+    "ja": "まず融資担当者に会い、連絡先を受け取ってください。",
+    "ko": "먼저 대출 담당자를 만나 연락처를 받으세요."
+  },
+  "你当前还有一笔贷款未结清，暂时无法办理新的贷款。": {
+    "en": "You already have an outstanding loan. You cannot take out another until it is settled.",
+    "ja": "未返済の融資があるため、完済するまで新たな借入はできません。",
+    "ko": "아직 갚지 않은 대출이 있어 완납할 때까지 새 대출을 신청할 수 없습니다."
+  },
+  "请选择有可靠历史收盘价且数量有效的股票作为抵押物。": {
+    "en": "Select a valid number of shares with a reliable historical closing price as collateral.",
+    "ja": "信頼できる過去の終値がある株式を、有効な数量で担保に指定してください。",
+    "ko": "신뢰할 수 있는 과거 종가가 있는 주식을 유효한 수량만큼 담보로 선택하세요."
+  },
+  "贷款报价有效。": {
+    "en": "This loan quote is valid.",
+    "ja": "この融資見積もりは有効です。",
+    "ko": "유효한 대출 견적입니다."
+  },
+  "贷款报价为空。": {
+    "en": "No loan quote is available.",
+    "ja": "融資見積もりがありません。",
+    "ko": "대출 견적이 없습니다."
+  },
+  "贷款报价已变化，请重新确认合同。": {
+    "en": "The loan quote has changed. Please review the contract again.",
+    "ja": "融資見積もりが変更されました。契約をもう一度確認してください。",
+    "ko": "대출 견적이 변경되었습니다. 계약 내용을 다시 확인하세요."
+  },
+  "放款将超出游戏资金上限。": {
+    "en": "The disbursement would exceed the game's cash limit.",
+    "ja": "融資の入金により所持金の上限を超えてしまいます。",
+    "ko": "대출금을 받으면 게임의 보유 현금 한도를 초과합니다."
+  },
+  "当前没有未结清贷款。": {
+    "en": "You have no outstanding loan.",
+    "ja": "未返済の融資はありません。",
+    "ko": "미상환 대출이 없습니다."
+  },
+  "债务清算已经启动，已超过最后还款期限。": {
+    "en": "Debt liquidation has begun. The final repayment deadline has passed.",
+    "ja": "最終返済期限を過ぎたため、債務清算が開始されました。",
+    "ko": "최종 상환 기한이 지나 채무 청산이 시작되었습니다."
+  },
+  "贷款账单正在更新，请稍后再试。": {
+    "en": "Your loan statement is updating. Please try again shortly.",
+    "ja": "融資明細を更新中です。しばらくしてからお試しください。",
+    "ko": "대출 명세서를 갱신 중입니다. 잠시 후 다시 시도하세요."
+  },
+  "还款金额须大于零。": {
+    "en": "The repayment amount must be greater than zero.",
+    "ja": "返済額は 0 より大きい金額にしてください。",
+    "ko": "상환 금액은 0보다 커야 합니다."
+  },
+  "余额不足，未扣款，也不因此新增违约记录。": {
+    "en": "Insufficient cash. Nothing was deducted and no default was recorded.",
+    "ja": "所持金が不足しています。引き落としは行わず、延滞記録も追加されません。",
+    "ko": "잔액이 부족합니다. 금액이 차감되지 않았으며 연체 기록도 추가되지 않습니다."
+  },
+  "贷款已全部结清，抵押股份已解除锁定。": {
+    "en": "Your loan is fully repaid. All pledged shares have been released.",
+    "ja": "融資を完済しました。担保株式のロックを解除しました。",
+    "ko": "대출을 전액 상환했습니다. 담보 주식의 잠금이 해제되었습니다."
+  },
+  "贷款结算日期与当前存档不一致。": {
+    "en": "The loan settlement date does not match the current save.",
+    "ja": "融資の精算日が現在のセーブデータと一致しません。",
+    "ko": "대출 정산일이 현재 저장 데이터와 일치하지 않습니다."
+  },
+  "今日贷款账单已结算。": {
+    "en": "Today's loan statement has been settled.",
+    "ja": "本日の融資明細は精算済みです。",
+    "ko": "오늘의 대출 명세서 정산이 완료되었습니다."
+  },
+  "贷款已超过最后期限，本局进入债务清算。": {
+    "en": "The final repayment deadline has passed. This run is ending in debt liquidation.",
+    "ja": "最終返済期限を過ぎました。このプレイは債務清算で終了します。",
+    "ko": "최종 상환 기한이 지났습니다. 이번 플레이는 채무 청산으로 종료됩니다."
+  },
+  "请先关闭股市窗口，再办理贷款。": {
+    "en": "Close the stock market window before using loan services.",
+    "ja": "融資サービスを利用する前に株式市場ウィンドウを閉じてください。",
+    "ko": "주식 시장 창을 닫은 뒤 대출 서비스를 이용하세요."
+  },
+  "我叫沈衡，做资金周转。听说你最近有服务账单没能付清，所以过来看看。无抵押贷款额度较小、利息较高；股票抵押贷款额度较高、利息较低。期限由你选择，最长四周。": {
+    "en": "I'm Shen Heng. I help shopkeepers cover cash shortfalls. I heard you've had trouble paying a service bill, so I stopped by. Unsecured loans offer smaller amounts at higher rates; loans backed by shares offer more money at lower rates. You choose the term, up to four weeks.",
+    "ja": "沈衡と申します。資金繰りのお手伝いをしています。サービス料金を払えなかったと聞いて、様子を見に来ました。無担保融資は少額で金利が高め、株式担保融資は限度額が大きく金利が低めです。期間は最長四週間まで選べます。",
+    "ko": "저는 선헝입니다. 자금 융통을 도와드리고 있죠. 최근 서비스 요금을 내지 못하셨다고 해서 찾아왔습니다. 무담보 대출은 한도가 낮고 이자가 높으며, 주식 담보 대출은 한도가 높고 이자가 낮습니다. 기간은 최대 4주까지 선택할 수 있습니다."
+  },
+  "这是我的名片，电话 731207。现在可以办理，也可以以后打电话联系。同一时间只能有一笔贷款；到期后超过七天仍有欠款，店铺将被清算。借不借由你决定，联系方式先留给你。": {
+    "en": "Here's my card. My number is 731207. You can apply now or call me later. You may hold only one loan at a time. If any debt remains more than seven days after the due date, your shop will be liquidated. Whether to borrow is up to you. Keep the number either way.",
+    "ja": "こちらが名刺です。電話番号は 731207。今でも、後日お電話でもお申し込みいただけます。同時に借りられるのは一件だけです。返済期日から七日を超えて借金が残ると、店舗は清算されます。借りるかどうかはお任せします。まずは連絡先をどうぞ。",
+    "ko": "제 명함입니다. 번호는 731207입니다. 지금 신청하셔도 되고 나중에 전화하셔도 됩니다. 대출은 동시에 한 건만 보유할 수 있습니다. 만기 후 7일을 넘겨 빚이 남으면 가게가 청산됩니다. 빌릴지는 직접 결정하세요. 연락처는 받아 두시고요."
+  },
+  "电话 731207 可以查看账单、部分还款或全部结清。部分还款不会推迟期限；如果今天能处理，就打开账单看看。": {
+    "en": "Call 731207 to check your statement, make a partial repayment or settle in full. Partial repayments do not extend the deadline. If you can deal with it today, let's look at your statement.",
+    "ja": "731207 に電話すれば、明細の確認、一部返済、完済ができます。一部返済をしても期限は延びません。今日対応できるなら、明細を見てみましょう。",
+    "ko": "731207로 전화하면 명세서 조회, 일부 상환, 전액 상환이 가능합니다. 일부만 갚아도 기한은 연장되지 않습니다. 오늘 처리할 수 있다면 명세서를 확인해 보세요."
+  },
+  "名片上的号码是 731207。你可以现在查看贷款条件，也可以以后通过电话办理。": {
+    "en": "The number on my card is 731207. You can review the terms now or apply by phone later.",
+    "ja": "名刺の番号は 731207 です。今ここで条件を確認しても、後日電話で申し込んでも構いません。",
+    "ko": "명함의 번호는 731207입니다. 지금 대출 조건을 확인하거나 나중에 전화로 신청하셔도 됩니다."
+  },
+  "贷款和还款记录都可以通过电话 731207 查询。记住合同上的到期日。": {
+    "en": "Call 731207 to check your loan and repayment records. Remember the due date on your contract.",
+    "ja": "借入と返済の記録は 731207 で確認できます。契約書の返済期日を忘れないでください。",
+    "ko": "대출 및 상환 기록은 731207로 조회할 수 있습니다. 계약서의 만기일을 잊지 마세요."
+  },
+  "你的贷款已经结清，名片上的电话仍然有效。": {
+    "en": "Your loan is settled. The number on my card is still valid.",
+    "ja": "融資は完済済みです。名刺の電話番号は引き続きご利用いただけます。",
+    "ko": "대출은 모두 갚으셨습니다. 명함의 전화번호는 계속 사용할 수 있습니다."
+  },
+  "今天是最后还款日。今天结束后仍有欠款，清算程序就会启动。": {
+    "en": "Today is your final repayment day. If any debt remains at the end of today, liquidation will begin.",
+    "ja": "今日は最終返済日です。今日が終わっても借金が残っていれば、清算手続きが始まります。",
+    "ko": "오늘이 마지막 상환일입니다. 오늘이 끝날 때까지 빚이 남아 있으면 청산 절차가 시작됩니다."
+  },
+  "这是最后通牒，请在最终期限前结清欠款。": {
+    "en": "This is your final warning. Settle the debt before the deadline.",
+    "ja": "これが最後の通告です。最終期限までに借金を完済してください。",
+    "ko": "최후통첩입니다. 최종 기한 전에 빚을 모두 갚으세요."
+  },
+  "宽限期已经结束，我来提醒你处理这笔逾期贷款。": {
+    "en": "The grace period has ended. I'm here to remind you to deal with this overdue loan.",
+    "ja": "猶予期間は終わりました。延滞している融資の返済をお願いしに来ました。",
+    "ko": "유예 기간이 끝났습니다. 연체된 대출을 처리하시라고 알려드리러 왔습니다."
+  },
+  "联系电话：731207\n\n提供无抵押贷款与股票抵押贷款，同一时间只能持有一笔。贷款期限可选 1～28 个游戏日，最长四周，期限越长日利率越高。电话可办理贷款、查询账单、部分还款或提前结清。\n\n抵押股份在结清前不能卖出。到期后前两天为宽限期，第三天开始罚息或处置抵押物；部分还款不会推迟期限。到期后第八天仍有欠款，将执行店铺清算并结束本局。\n\n具体额度、利率和到期日以签约时的合同为准。请确认条款后再借款。": {
+    "en": "Contact: 731207\n\nUnsecured loans and share-backed loans are available. Only one loan may be held at a time. Choose a term of 1–28 in-game days, up to four weeks. Longer terms carry higher daily rates. Call to apply, check your statement, make a partial repayment or settle early.\n\nPledged shares cannot be sold until the loan is settled. The first two days after the due date are a grace period. Penalty interest or collateral liquidation begins on the third day. Partial repayments do not extend the deadline. Any debt remaining at the start of the eighth overdue day will trigger shop liquidation and end this run.\n\nYour signed contract determines the exact limit, rate and due date. Review the terms before borrowing.",
+    "ja": "連絡先：731207\n\n無担保融資と株式担保融資を取り扱っています。同時に借りられるのは一件のみです。期間はゲーム内の 1～28 日、最長四週間から選べます。期間が長いほど日利が高くなります。電話で申し込み、明細確認、一部返済、繰上返済ができます。\n\n担保株式は完済まで売却できません。返済期日後の最初の二日間は猶予期間で、三日目から延滞利息または担保処分が始まります。一部返済をしても期限は延びません。延滞八日目の開始時に借金が残っていれば、店舗を清算して今回のプレイを終了します。\n\n限度額、利率、返済期日は署名時の契約に従います。条件を確認してからお借り入れください。",
+    "ko": "연락처: 731207\n\n무담보 대출과 주식 담보 대출을 제공합니다. 대출은 동시에 한 건만 보유할 수 있습니다. 기간은 게임 내 1~28일, 최대 4주까지 선택할 수 있으며 기간이 길수록 일일 이율이 높아집니다. 전화로 대출 신청, 명세서 조회, 일부 상환, 조기 완납이 가능합니다.\n\n담보 주식은 완납 전까지 매도할 수 없습니다. 만기 후 첫 이틀은 유예 기간이며, 셋째 날부터 연체 이자가 붙거나 담보가 처분됩니다. 일부 상환으로 기한이 연장되지는 않습니다. 연체 8일째가 시작될 때 빚이 남아 있으면 가게를 청산하고 이번 플레이를 종료합니다.\n\n정확한 한도, 이율, 만기일은 체결한 계약에 따릅니다. 조건을 확인한 뒤 대출을 신청하세요."
+  },
+  "你还没有认识贷款专员，请等待他上门介绍。": {
+    "en": "You have not met the loan officer yet. Wait for his introductory visit.",
+    "ja": "まだ融資担当者と会っていません。担当者の訪問をお待ちください。",
+    "ko": "아직 대출 담당자를 만나지 않았습니다. 소개 방문을 기다리세요."
+  },
+  "你当前还有一笔贷款未结清，暂时无法办理新的贷款。可以查询账单或还款。": {
+    "en": "You have an outstanding loan and cannot take out another. You can still check your statement or repay.",
+    "ja": "未返済の融資があるため、新たな借入はできません。明細確認と返済は引き続きご利用いただけます。",
+    "ko": "미상환 대출이 있어 새 대출은 신청할 수 없습니다. 명세서 조회와 상환은 가능합니다."
+  },
+  "周转贷款专线：请选择贷款类型、金额和期限。": {
+    "en": "Working Capital Loan Line: choose a loan type, amount and term.",
+    "ja": "運転資金融資専用電話：融資の種類、金額、期間を選んでください。",
+    "ko": "운영 자금 대출 전용 전화: 대출 유형, 금액, 기간을 선택하세요."
+  },
+  "贷款服务暂不可用，请稍后重新拨号。": {
+    "en": "Loan services are temporarily unavailable. Please call again later.",
+    "ja": "融資サービスを一時的に利用できません。後ほどおかけ直しください。",
+    "ko": "현재 대출 서비스를 이용할 수 없습니다. 잠시 후 다시 전화하세요."
+  },
+  "无抵押贷款": {
+    "en": "Unsecured Loan",
+    "ja": "無担保融資",
+    "ko": "무담보 대출"
+  },
+  "抵押贷款": {
+    "en": "Secured Loan",
+    "ja": "担保融資",
+    "ko": "담보 대출"
+  },
+  "贷款本金": {
+    "en": "Loan Principal",
+    "ja": "借入元本",
+    "ko": "대출 원금"
+  },
+  "输入借款金额": {
+    "en": "Enter the loan amount",
+    "ja": "借入額を入力",
+    "ko": "대출 금액 입력"
+  },
+  "贷款期限：1～28 个游戏日，最多 4 周": {
+    "en": "Loan term: 1–28 in-game days, up to 4 weeks",
+    "ja": "融資期間：ゲーム内の 1～28 日、最長 4 週間",
+    "ko": "대출 기간: 게임 내 1~28일, 최대 4주"
+  },
+  "输入贷款天数": {
+    "en": "Enter the loan term in days",
+    "ja": "借入日数を入力",
+    "ko": "대출 일수 입력"
+  },
+  "选择抵押股份。只锁定所选数量，全部结清后解除抵押。没有可靠历史收盘价的股票暂不接受抵押。": {
+    "en": "Choose the shares to pledge. Only the selected quantity is locked, and it is released on full repayment. Shares without a reliable historical closing price cannot be pledged.",
+    "ja": "担保にする株式を選んでください。選んだ数量だけがロックされ、完済後に解除されます。信頼できる過去の終値がない株式は担保にできません。",
+    "ko": "담보로 제공할 주식을 선택하세요. 선택한 수량만 잠기며 전액 상환 후 해제됩니다. 신뢰할 수 있는 과거 종가가 없는 주식은 담보로 제공할 수 없습니다."
+  },
+  "抵押股数": {
+    "en": "Shares to pledge",
+    "ja": "担保株数",
+    "ko": "담보 주식 수량"
+  },
+  "查看合同并确认": {
+    "en": "Review Contract",
+    "ja": "契約を確認する",
+    "ko": "계약 검토"
+  },
+  "确认签约并放款": {
+    "en": "Sign Contract and Receive Funds",
+    "ja": "契約して融資を受ける",
+    "ko": "계약 체결 및 대출금 수령"
+  },
+  "返回修改合同": {
+    "en": "Back to Edit Terms",
+    "ja": "条件の編集に戻る",
+    "ko": "조건 수정으로 돌아가기"
+  },
+  "还款金额（先偿还罚息、再偿还利息和本金）": {
+    "en": "Repayment amount (penalties first, then interest and principal)",
+    "ja": "返済額（延滞利息、通常利息、元本の順で充当）",
+    "ko": "상환 금액(연체 이자, 일반 이자, 원금 순으로 상환)"
+  },
+  "输入还款金额": {
+    "en": "Enter the repayment amount",
+    "ja": "返済額を入力",
+    "ko": "상환 금액 입력"
+  },
+  "偿还指定金额": {
+    "en": "Repay Entered Amount",
+    "ja": "指定額を返済",
+    "ko": "입력한 금액 상환"
+  },
+  "全部结清并解除抵押": {
+    "en": "Settle in Full and Release Collateral",
+    "ja": "完済して担保を解除",
+    "ko": "전액 상환 및 담보 해제"
+  },
+  "贷款按剩余本金计算单利，放款当天不计息。期限越长，签约日利率越高；提前还款按实际计息天数和签约利率计算，无手续费。\n\n到期后有 2 天宽限期，第 3 天开始罚息或处置抵押股份。到期后第 7 天仍可营业还款，第 8 天开始时仍有欠款，将触发“抵债停业”失败结局。部分还款不会重置期限。\n\n同一时间只能持有一笔贷款，不接受展期或追加本金。结清后等待 3 天才能重新申请。": {
+    "en": "Loans accrue simple interest on the remaining principal, starting the day after disbursement. Longer terms carry higher fixed daily rates. Early repayment uses the actual interest-bearing days and the contracted rate, with no fee.\n\nThere is a 2-day grace period after the due date. Penalties or collateral liquidation begin on the third day. You may still trade and repay on the seventh overdue day. Any debt remaining at the start of the eighth day triggers the Closed for Debt ending. Partial repayments do not reset the deadline.\n\nOnly one loan may be held at a time. Extensions and additional advances are unavailable. Wait 3 days after settlement before applying again.",
+    "ja": "利息は残元本に対する単利で、融資当日は発生しません。期間が長いほど契約時の日利が高くなります。繰上返済は実際の利息発生日数と契約利率で計算し、手数料はかかりません。\n\n返済期日後には 2 日間の猶予があり、3 日目から延滞利息または担保株式の処分が始まります。延滞 7 日目も営業して返済できます。8 日目の開始時に借金が残っていれば「債務清算による閉店」の結末になります。一部返済をしても期限は変わりません。\n\n同時に借りられるのは一件のみです。期間延長や追加融資はできません。完済後、再申し込みまで 3 日間お待ちください。",
+    "ko": "대출 이자는 남은 원금에 대한 단리이며 대출 당일에는 발생하지 않습니다. 기간이 길수록 계약 일일 이율이 높습니다. 조기 상환 시 실제 이자 발생 일수와 계약 이율을 적용하며 수수료는 없습니다.\n\n만기 후 2일간 유예 기간이 있으며 셋째 날부터 연체 이자 또는 담보 주식 처분이 시작됩니다. 연체 7일째에도 영업하여 상환할 수 있습니다. 8일째가 시작될 때 빚이 남아 있으면 ‘채무 청산으로 폐업’ 결말이 발생합니다. 일부 상환으로 기한이 초기화되지는 않습니다.\n\n대출은 동시에 한 건만 보유할 수 있으며 기간 연장이나 추가 대출은 불가능합니다. 완납 후 3일이 지나야 다시 신청할 수 있습니다."
+  },
+  "结束通话": {
+    "en": "End Call",
+    "ja": "通話を終了",
+    "ko": "통화 종료"
+  },
+  "可用现金": {
+    "en": "Available cash",
+    "ja": "利用可能な所持金",
+    "ko": "사용 가능한 현금"
+  },
+  "持有 ": {
+    "en": "Owned ",
+    "ja": "保有 ",
+    "ko": "보유 "
+  },
+  " / 可用 ": {
+    "en": " / available ",
+    "ja": " / 利用可能 ",
+    "ko": " / 사용 가능 "
+  },
+  " / 抵押估值 ": {
+    "en": " / collateral value ",
+    "ja": " / 担保評価額 ",
+    "ko": " / 담보 평가액 "
+  },
+  "请核对合同，确认后资金将立即到账：": {
+    "en": "Review the contract. Funds will be credited as soon as you confirm:",
+    "ja": "契約内容をご確認ください。確定するとすぐに入金されます：",
+    "ko": "계약 내용을 확인하세요. 확정하는 즉시 대출금이 지급됩니다:"
+  },
+  "原始本金": {
+    "en": "Original principal",
+    "ja": "当初元本",
+    "ko": "최초 원금"
+  },
+  "剩余本金": {
+    "en": "Remaining principal",
+    "ja": "残元本",
+    "ko": "남은 원금"
+  },
+  "累计利息": {
+    "en": "Accrued interest",
+    "ja": "累計利息",
+    "ko": "누적 이자"
+  },
+  "累计罚息": {
+    "en": "Accrued penalties",
+    "ja": "累計延滞利息",
+    "ko": "누적 연체 이자"
+  },
+  "日利率": {
+    "en": "Daily rate",
+    "ja": "日利",
+    "ko": "일일 이율"
+  },
+  "当前结清金额": {
+    "en": "Amount to settle now",
+    "ja": "現在の完済額",
+    "ko": "현재 완납 금액"
+  },
+  "放款日": {
+    "en": "Disbursement day",
+    "ja": "融資日",
+    "ko": "대출 실행일"
+  },
+  "到期日": {
+    "en": "Due day",
+    "ja": "返済期日",
+    "ko": "만기일"
+  },
+  "最终清算日": {
+    "en": "Liquidation day",
+    "ja": "最終清算日",
+    "ko": "최종 청산일"
+  },
+  "已经逾期 ": {
+    "en": "Overdue by ",
+    "ja": "延滞日数：",
+    "ko": "연체 일수: "
+  },
+  " 天，部分还款不会延长清算期限。": {
+    "en": " days. Partial repayments do not extend the liquidation deadline.",
+    "ja": " 日。一部返済をしても清算期限は延びません。",
+    "ko": "일. 일부 상환으로 청산 기한이 연장되지는 않습니다."
+  },
+  "（已处置）": {
+    "en": "(liquidated)",
+    "ja": "（処分済み）",
+    "ko": "(처분 완료)"
+  },
+  "（已锁定）": {
+    "en": "(pledged)",
+    "ja": "（ロック中）",
+    "ko": "(담보 잠금)"
+  },
+  "请输入有效的正整数借款金额。": {
+    "en": "Enter a valid positive whole-number loan amount.",
+    "ja": "借入額を有効な正の整数で入力してください。",
+    "ko": "유효한 양의 정수로 대출 금액을 입력하세요."
+  },
+  "贷款期限必须为 1～28 天。": {
+    "en": "The loan term must be 1–28 days.",
+    "ja": "融資期間は 1～28 日にしてください。",
+    "ko": "대출 기간은 1~28일이어야 합니다."
+  },
+  "抵押数量必须为非负整数。": {
+    "en": "The number of pledged shares must be a nonnegative whole number.",
+    "ja": "担保株数は 0 以上の整数にしてください。",
+    "ko": "담보 수량은 0 이상의 정수여야 합니다."
+  },
+  "抵押贷款报价": {
+    "en": "Secured Loan Quote",
+    "ja": "担保融資の見積もり",
+    "ko": "담보 대출 견적"
+  },
+  "无抵押贷款报价": {
+    "en": "Unsecured Loan Quote",
+    "ja": "無担保融資の見積もり",
+    "ko": "무담보 대출 견적"
+  },
+  "服务费用基准": {
+    "en": "Service cost baseline",
+    "ja": "サービス費用基準",
+    "ko": "서비스 요금 기준"
+  },
+  "最高可借": {
+    "en": "Maximum principal",
+    "ja": "借入上限",
+    "ko": "최대 대출 가능액"
+  },
+  "所选股票估值 ": {
+    "en": "Selected shares' value ",
+    "ja": "選択した株式の評価額 ",
+    "ko": "선택한 주식의 평가액 "
+  },
+  "，抵押率最高 50%。": {
+    "en": "; maximum loan-to-value ratio: 50%.",
+    "ja": "、担保掛目の上限は 50% です。",
+    "ko": ", 최대 담보 인정 비율은 50%입니다."
+  },
+  "到账本金": {
+    "en": "Principal received",
+    "ja": "入金元本",
+    "ko": "지급 원금"
+  },
+  " · 期限 ": {
+    "en": " · Term ",
+    "ja": " · 期間 ",
+    "ko": " · 기간 "
+  },
+  "预计利息": {
+    "en": "Estimated interest",
+    "ja": "予想利息",
+    "ko": "예상 이자"
+  },
+  "到期应还": {
+    "en": "Amount due at maturity",
+    "ja": "期日の返済額",
+    "ko": "만기 상환액"
+  },
+  "贷款报价不可用。": {
+    "en": "No loan quote is currently available.",
+    "ja": "融資見積もりを利用できません。",
+    "ko": "현재 대출 견적을 확인할 수 없습니다."
+  },
+  "合同尚未签署，请点击“确认签约并放款”。": {
+    "en": "The contract is not signed yet. Select “Sign Contract and Receive Funds” to proceed.",
+    "ja": "契約はまだ成立していません。「契約して融資を受ける」を押してください。",
+    "ko": "아직 계약이 체결되지 않았습니다. ‘계약 체결 및 대출금 수령’을 선택하세요."
+  },
+  "合同确认已失效，请重新查看报价。": {
+    "en": "This confirmation has expired. Review a new quote.",
+    "ja": "契約の確認が失効しました。見積もりを再確認してください。",
+    "ko": "계약 확인이 만료되었습니다. 견적을 다시 확인하세요."
+  },
+  "贷款报价已经变化，请重新核对合同。": {
+    "en": "The loan quote has changed. Review the contract again.",
+    "ja": "融資見積もりが変わりました。契約内容を再確認してください。",
+    "ko": "대출 견적이 변경되었습니다. 계약 내용을 다시 검토하세요."
+  },
+  "请输入有效的正整数还款金额。": {
+    "en": "Enter a valid positive whole-number repayment amount.",
+    "ja": "返済額を有効な正の整数で入力してください。",
+    "ko": "유효한 양의 정수로 상환 금액을 입력하세요."
+  },
+  "操作未完成，请重新查询贷款状态。": {
+    "en": "The operation did not complete. Check your loan status again.",
+    "ja": "操作が完了していません。融資状況を再確認してください。",
+    "ko": "작업이 완료되지 않았습니다. 대출 상태를 다시 조회하세요."
+  },
+  "贷款业务将在第 ": {
+    "en": "Loan services resume on day ",
+    "ja": "融資サービスの再開日：",
+    "ko": "대출 서비스 재개일: "
+  },
+  " 日恢复。": {
+    "en": ".",
+    "ja": " 日。",
+    "ko": "일."
+  },
+  "贷款期限须为 1～": {
+    "en": "The loan term must be 1–",
+    "ja": "融資期間は 1～",
+    "ko": "대출 기간은 1~"
+  },
+  " 个游戏日。": {
+    "en": " in-game days.",
+    "ja": " ゲーム日です。",
+    "ko": "게임 일수여야 합니다."
+  },
+  "本次可借本金为 1～": {
+    "en": "You may borrow 1–",
+    "ja": "今回の借入可能額は 1～",
+    "ko": "이번 대출 가능 원금은 1~"
+  },
+  " 游戏币。": {
+    "en": " coins.",
+    "ja": " コインです。",
+    "ko": "코인입니다."
+  },
+  "贷款已到账 ": {
+    "en": "Loan funds received: ",
+    "ja": "融資入金額：",
+    "ko": "대출금 수령: "
+  },
+  "， 第 ": {
+    "en": ", day ",
+    "ja": "、第 ",
+    "ko": ", 제 "
+  },
+  "，第 ": {
+    "en": "; due on day ",
+    "ja": "、返済期日は第 ",
+    "ko": ", 만기일: 제 "
+  },
+  " 日到期。": {
+    "en": ".",
+    "ja": " 日です。",
+    "ko": "일."
+  },
+  "还款成功，剩余欠款 ": {
+    "en": "Repayment received. Remaining debt: ",
+    "ja": "返済を受け付けました。残債：",
+    "ko": "상환이 완료되었습니다. 남은 채무: "
+  },
+  "目前全部结清需要 ": {
+    "en": "Full settlement now requires ",
+    "ja": "現在の完済に必要な額は ",
+    "ko": "현재 완납에 필요한 금액은 "
+  },
+  "。最后还款日是第 ": {
+    "en": ". The final repayment day is day ",
+    "ja": "。最終返済日は第 ",
+    "ko": ". 마지막 상환일은 제 "
+  },
+  " 天": {
+    "en": " days",
+    "ja": " 日",
+    "ko": "일"
+  },
+  "每日服务付款失败，贷款专员将在第 ": {
+    "en": "A daily service payment failed. The loan officer will visit from day ",
+    "ja": "サービス料金の支払いに失敗しました。融資担当者の訪問開始日：",
+    "ko": "일일 서비스 요금 결제에 실패했습니다. 대출 담당자 방문 시작일: "
+  },
+  " 日起到访。": {
+    "en": " onward.",
+    "ja": " 日。",
+    "ko": "일."
+  },
+  "办理无抵押贷款，本金 ": {
+    "en": "Unsecured loan taken; principal ",
+    "ja": "無担保融資を契約。元本 ",
+    "ko": "무담보 대출 체결. 원금 "
+  },
+  "办理抵押贷款，本金 ": {
+    "en": "Secured loan taken; principal ",
+    "ja": "担保融資を契約。元本 ",
+    "ko": "담보 대출 체결. 원금 "
+  },
+  "，期限 ": {
+    "en": "; term ",
+    "ja": "、期間 ",
+    "ko": ", 기간 "
+  },
+  "，日利率 ": {
+    "en": "; daily rate ",
+    "ja": "、日利 ",
+    "ko": ", 일일 이율 "
+  },
+  "主动偿还贷款 ": {
+    "en": "Manual loan repayment: ",
+    "ja": "融資の手動返済：",
+    "ko": "직접 대출 상환: "
+  },
+  "每日服务扣费后自动结清贷款 ": {
+    "en": "Loan automatically settled after daily service charges: ",
+    "ja": "日次サービス料金の引き落とし後に融資を自動完済：",
+    "ko": "일일 서비스 요금 차감 후 대출 자동 완납: "
+  },
+  "贷款已超过宽限期，记录一次违约。": {
+    "en": "The loan has passed its grace period. One default has been recorded.",
+    "ja": "融資の猶予期間を過ぎたため、延滞を一件記録しました。",
+    "ko": "대출 유예 기간이 지나 연체 기록이 1건 추가되었습니다."
+  },
+  "抵押股票已处置，所得 ": {
+    "en": "Pledged shares liquidated; proceeds ",
+    "ja": "担保株式を処分。売却収入 ",
+    "ko": "담보 주식 처분 완료. 수익 "
+  },
+  "，用于偿债 ": {
+    "en": "; applied to debt ",
+    "ja": "、返済充当額 ",
+    "ko": ", 채무 상환액 "
+  },
+  "，返还 ": {
+    "en": "; returned ",
+    "ja": "、返還額 ",
+    "ko": ", 반환액 "
+  },
+  "贷款超过最后还款期限，债务清算待执行。": {
+    "en": "The final repayment deadline has passed. Debt liquidation is pending.",
+    "ja": "最終返済期限を過ぎました。債務清算の実行待ちです。",
+    "ko": "최종 상환 기한이 지났습니다. 채무 청산 실행을 기다리고 있습니다."
+  },
+  "抵押处置 ": {
+    "en": "Collateral liquidation: ",
+    "ja": "担保処分：",
+    "ko": "담보 처분: "
+  },
+  " 股，净所得 ": {
+    "en": " shares; net proceeds ",
+    "ja": " 株、純収入 ",
+    "ko": "주, 순수익 "
+  },
+  "贷款已结清，第 ": {
+    "en": "Loan settled. New applications open on day ",
+    "ja": "融資を完済しました。再申し込み可能日：",
+    "ko": "대출을 완납했습니다. 재신청 가능일: "
+  },
+  " 日起可以再次申请。": {
+    "en": ".",
+    "ja": " 日。",
+    "ko": "일."
+  },
+  "请先处理当前电话预约确认。": {
+    "en": "Resolve the current phone booking confirmation first.",
+    "ja": "現在の電話予約の確認を先に完了してください。",
+    "ko": "현재 전화 예약 확인을 먼저 처리하세요."
+  },
+  "今日贷款账单已结算或清算正在执行。": {
+    "en": "Today's loan statement is settled, or debt liquidation is in progress.",
+    "ja": "本日の融資明細は精算済み、または債務清算を実行中です。",
+    "ko": "오늘의 대출 명세서 정산이 완료되었거나 채무 청산이 진행 중입니다."
+  },
+  "最后还款日是第 ": {
+    "en": "The final repayment day is day ",
+    "ja": "最終返済日は第 ",
+    "ko": "마지막 상환일은 제 "
+  },
+  "所有可开通付费服务均超过余额，贷款专员将在第 ": {
+    "en": "All available paid services cost more than your cash balance. The loan officer will visit from day ",
+    "ja": "利用可能なすべての有料サービスが所持金を超えています。融資担当者の訪問開始日：",
+    "ko": "이용 가능한 모든 유료 서비스의 요금이 보유 현금을 초과합니다. 대출 담당자 방문 시작일: "
+  },
+  "贷款将在明天到期，请准备还款。": {
+    "en": "Your loan is due tomorrow. Please prepare to repay.",
+    "ja": "融資は明日が返済期日です。返済のご準備をお願いします。",
+    "ko": "내일이 대출 만기일입니다. 상환을 준비하세요."
+  },
+  "今天是最后还款日，明天仍有欠款将触发抵债停业结局。": {
+    "en": "Today is your final repayment day. Any debt remaining tomorrow will trigger the Closed for Debt ending.",
+    "ja": "今日は最終返済日です。明日も借金が残っていれば「債務清算による閉店」の結末になります。",
+    "ko": "오늘이 마지막 상환일입니다. 내일도 빚이 남아 있으면 ‘채무 청산으로 폐업’ 결말이 발생합니다."
+  },
+  "贷款已经逾期，这是最后通牒，请在最终期限前结清。": {
+    "en": "Your loan is overdue. This is your final warning: settle it before the final deadline.",
+    "ja": "融資が延滞しています。これが最後の通告です。最終期限までに完済してください。",
+    "ko": "대출이 연체되었습니다. 최후통첩입니다. 최종 기한 전에 전액 상환하세요."
+  },
+  "查看贷款账单": {
+    "en": "View Loan Statement",
+    "ja": "融資明細を見る",
+    "ko": "대출 명세서 보기"
+  },
+  "稍后处理": {
+    "en": "Handle Later",
+    "ja": "後で対応する",
+    "ko": "나중에 처리"
+  },
+  "最后还款日": {
+    "en": "Final repayment day",
+    "ja": "最終返済日",
+    "ko": "마지막 상환일"
+  },
+  "电话 731207 可查询或还款。": {
+    "en": "Call 731207 to check your loan or make a repayment.",
+    "ja": "731207 に電話すると、明細確認や返済ができます。",
+    "ko": "731207로 전화하면 대출 조회와 상환이 가능합니다."
+  },
+  "罚息：每日剩余本金的 ": {
+    "en": "Penalty interest: ",
+    "ja": "延滞利息：毎日の残元本の ",
+    "ko": "연체 이자: 매일 남은 원금의 "
+  },
+  "，累计不超过原始本金的 ": {
+    "en": " of remaining principal per day, capped at ",
+    "ja": "、累計上限は当初元本の ",
+    "ko": ", 누적 상한은 최초 원금의 "
+  },
+  "，罚息不计复利。": {
+    "en": " of original principal. Penalties do not compound.",
+    "ja": "です。延滞利息に複利は適用されません。",
+    "ko": "입니다. 연체 이자는 복리로 계산하지 않습니다."
+  },
+  "抵押清算：每笔股票处置按成交额的 ": {
+    "en": "Collateral liquidation: each disposal order is charged ",
+    "ja": "担保清算：各株式処分の手数料は取引額の ",
+    "ko": "담보 청산: 주식 처분 주문마다 거래 금액의 "
+  },
+  " 收取手续费，最低 ": {
+    "en": " of the trade value, with a minimum of ",
+    "ja": "、最低手数料は ",
+    "ko": "의 수수료가 부과되며, 최소 "
+  },
+  " 游戏币。多余资金返还，不足部分继续欠款，原清算期限不变。": {
+    "en": " coins. Excess funds are returned; any shortfall remains due under the original liquidation deadline.",
+    "ja": " コインです。余剰金は返還し、不足額は残債として元の清算期限を引き継ぎます。",
+    "ko": "코인입니다. 초과 금액은 반환되며 부족한 금액은 원래 청산 기한이 적용되는 채무로 남습니다."
+  },
+  "我叫沈衡，做资金周转。听说你最近连一项付费服务都负担不起，所以过来看看。无抵押贷款额度较小、利息较高；股票抵押贷款额度较高、利息较低。期限由你选择，最长四周。": {
+    "en": "I'm Shen Heng. I help shopkeepers cover cash shortfalls. I heard you can't afford even a single paid service right now, so I stopped by. Unsecured loans offer smaller amounts at higher rates; loans backed by shares offer more money at lower rates. You choose the term, up to four weeks.",
+    "ja": "沈衡と申します。資金繰りのお手伝いをしています。最近は有料サービスを一つも利用できないほどお困りだと聞いて、様子を見に来ました。無担保融資は少額で金利が高め、株式担保融資は限度額が大きく金利が低めです。期間は最長四週間まで選べます。",
+    "ko": "저는 선헝입니다. 자금 융통을 도와드리고 있죠. 최근에는 유료 서비스 하나조차 감당하기 어려우시다고 해서 찾아왔습니다. 무담보 대출은 한도가 낮고 이자가 높으며, 주식 담보 대출은 한도가 높고 이자가 낮습니다. 기간은 최대 4주까지 선택할 수 있습니다."
+  },
+  "贷款按剩余本金计算单利，放款当天不计息。期限越长，签约日利率越高；提前还款按实际计息天数和签约利率计算，无手续费。\n\n到期后有 2 天宽限期，第 3 天开始罚息或处置抵押股份。到期后第 7 天仍可营业还款，第 8 天开始时仍有欠款，将触发“抵债停业”失败结局。部分还款不会重置期限。\n\n默认逾期罚息为每日剩余本金的 0.5%，累计罚息不超过原始本金的 10%，罚息不再产生利息。抵押股份按处置时市价出售，扣除正常交易手续费后偿债，多余资金返还；不足部分继续作为欠款，原清算期限不变。具体罚息与处置手续费以签约合同为准。\n\n同一时间只能持有一笔贷款，不接受展期或追加本金。结清后等待 3 天才能重新申请。": {
+    "en": "Loans accrue simple interest on the remaining principal, starting the day after disbursement. Longer terms carry higher fixed daily rates. Early repayment uses the actual interest-bearing days and the contracted rate, with no fee.\n\nThere is a 2-day grace period after the due date. Penalties or collateral liquidation begin on the third day. You may still trade and repay on the seventh overdue day. Any debt remaining at the start of the eighth day triggers the Closed for Debt ending. Partial repayments do not reset the deadline.\n\nBy default, overdue penalties accrue at 0.5% of remaining principal per day, capped at 10% of original principal, without compounding. Pledged shares are sold at the market price at liquidation. Normal trading fees are deducted before proceeds are applied to the debt. Any surplus is returned; any shortfall remains due under the original liquidation deadline. The signed contract determines the exact penalty rates and disposal fees.\n\nOnly one loan may be held at a time. Extensions and additional advances are unavailable. Wait 3 days after settlement before applying again.",
+    "ja": "利息は残元本に対する単利で、融資当日は発生しません。期間が長いほど契約時の日利が高くなります。繰上返済は実際の利息発生日数と契約利率で計算し、手数料はかかりません。\n\n返済期日後には 2 日間の猶予があり、3 日目から延滞利息または担保株式の処分が始まります。延滞 7 日目も営業して返済できます。8 日目の開始時に借金が残っていれば「債務清算による閉店」の結末になります。一部返済をしても期限は変わりません。\n\n標準の延滞利息は毎日の残元本の 0.5% で、累計上限は当初元本の 10% です。延滞利息に複利は適用されません。担保株式は処分時の市場価格で売却し、通常の取引手数料を差し引いて返済に充当します。余剰金は返還し、不足額は残債として元の清算期限を引き継ぎます。正確な延滞利息と処分手数料は契約内容に従います。\n\n同時に借りられるのは一件のみです。期間延長や追加融資はできません。完済後、再申し込みまで 3 日間お待ちください。",
+    "ko": "대출 이자는 남은 원금에 대한 단리이며 대출 당일에는 발생하지 않습니다. 기간이 길수록 계약 일일 이율이 높습니다. 조기 상환 시 실제 이자 발생 일수와 계약 이율을 적용하며 수수료는 없습니다.\n\n만기 후 2일간 유예 기간이 있으며 셋째 날부터 연체 이자 또는 담보 주식 처분이 시작됩니다. 연체 7일째에도 영업하여 상환할 수 있습니다. 8일째가 시작될 때 빚이 남아 있으면 ‘채무 청산으로 폐업’ 결말이 발생합니다. 일부 상환으로 기한이 초기화되지는 않습니다.\n\n기본 연체 이자는 매일 남은 원금의 0.5%이며, 누적 연체 이자는 최초 원금의 10%를 넘지 않습니다. 연체 이자에는 복리가 적용되지 않습니다. 담보 주식은 처분 시점의 시장가로 매도하고 일반 거래 수수료를 차감한 뒤 채무를 상환합니다. 초과 금액은 반환되며 부족액은 원래 청산 기한이 적용되는 채무로 남습니다. 정확한 연체 이율과 처분 수수료는 체결한 계약에 따릅니다.\n\n대출은 동시에 한 건만 보유할 수 있으며 기간 연장이나 추가 대출은 불가능합니다. 완납 후 3일이 지나야 다시 신청할 수 있습니다."
+  },
+  "负债店主": {
+    "en": "Indebted Shopkeeper",
+    "ja": "借金を抱えた店主",
+    "ko": "빚을 진 상점 주인"
+  },
+  "你曾想靠炒股赚一笔，却在行情暴跌中亏掉积蓄，还背上了 5000 元债务。如今手头只剩 1500 元，你决定重新经营店铺，在 28 个营业日内还清欠款。跳过部分基础教程，直接开始经营。": {
+    "en": "You once hoped to make a fortune trading stocks, but a market crash wiped out your savings and left you 5000 in debt. With only 1500 left, you return to running a shop and must repay the debt within 28 business days. Skip part of the basic tutorial and start running the shop right away.",
+    "ja": "株でひと儲けしようとしたものの、相場の暴落で貯金を失い、5000 の借金まで背負ってしまった。手元に残ったのは 1500 だけ。あなたは再び店を営み、28 営業日以内に借金を返すことを決意した。基礎チュートリアルの一部を省略し、すぐに経営を始める。",
+    "ko": "주식으로 한몫 벌려 했지만 시장 폭락으로 저축을 모두 잃고 5000 의 빚까지 지게 되었습니다. 이제 수중에는 1500 만 남았습니다. 다시 가게를 운영하며 28 영업일 안에 빚을 갚기로 했습니다. 기본 튜토리얼 일부를 건너뛰고 바로 운영을 시작합니다."
+  },
+  "初始现金 1500 元": {
+    "en": "Starting cash: 1500",
+    "ja": "初期資金 1500",
+    "ko": "시작 현금 1500"
+  },
+  "固定旧债 5000 元，无利息或罚息": {
+    "en": "Fixed old debt: 5000, with no interest or penalties",
+    "ja": "固定の借金 5000、利息・延滞利息なし",
+    "ko": "고정된 기존 채무 5000, 이자 및 연체 이자 없음"
+  },
+  "28 个营业日内还清，无逾期宽限": {
+    "en": "Repay within 28 business days; no grace period",
+    "ja": "28 営業日以内に完済、延滞猶予なし",
+    "ko": "28 영업일 이내 완납, 연체 유예 없음"
+  },
+  "跳过部分基础教程": {
+    "en": "Skip some basic tutorials",
+    "ja": "基本チュートリアルを一部省略",
+    "ko": "일부 기초 튜토리얼 건너뛰기"
+  },
+  "挑战开局": {
+    "en": "Challenge Start",
+    "ja": "チャレンジ開始設定",
+    "ko": "도전 시작 설정"
+  },
+  "到期日结先支付普通服务费用，再用现金自动结清剩余旧债；不足则抵债停业。": {
+    "en": "On the final night, ordinary service costs are paid first. Any remaining old debt is then settled automatically from cash. Insufficient cash triggers Closed for Debt.",
+    "ja": "期限日の夜は通常のサービス料金を先に支払い、その後、残った借金を現金で自動完済します。資金不足の場合は債務清算による閉店となります。",
+    "ko": "만기일 정산에서는 일반 서비스 비용을 먼저 지불한 후 현금으로 남은 기존 채무를 자동 완납합니다. 현금이 부족하면 채무 청산으로 폐업합니다."
+  },
+  "开局现金为 1500 元，固定旧债为 5000 元，不再额外发放本金。\n\n从首个营业日起共有 28 个游戏日可还款。零利息、零罚息，无宽限期。可随时部分还款或提前结清，部分还款不延长期限。\n\n最后营业日的经营费用结算后，现金足够时自动结清；否则进入“抵债停业”结局。欠款结清前不能申请新贷款。": {
+    "en": "You start with 1500 in cash and a fixed old debt of 5000. No additional principal is disbursed.\n\nYou have 28 game days to repay, starting on your first business day. There is no interest, penalty or grace period. Partial and early repayments are available at any time, but partial repayments do not extend the deadline.\n\nAfter operating costs are settled on the final business day, sufficient cash automatically pays off the debt. Otherwise, the Closed for Debt ending is triggered. You cannot apply for another loan until this debt is settled.",
+    "ja": "初期資金は 1500、固定の借金は 5000 です。追加の元本は振り込まれません。\n\n最初の営業日から 28 ゲーム日以内に返済してください。利息・延滞利息・猶予期間はありません。いつでも一部返済や繰上完済ができますが、一部返済でも期限は延びません。\n\n最終営業日の経費精算後、現金が足りれば自動完済します。不足していれば「債務清算による閉店」の結末になります。完済するまで新規融資には申し込めません。",
+    "ko": "시작 현금은 1500이며 고정된 기존 채무는 5000입니다. 추가 원금은 지급되지 않습니다.\n\n첫 영업일부터 28 게임일 안에 상환해야 합니다. 이자, 연체 이자, 유예 기간은 없습니다. 언제든 일부 상환이나 조기 완납이 가능하지만 일부 상환으로 기한이 연장되지는 않습니다.\n\n마지막 영업일의 운영 비용 정산 후 현금이 충분하면 자동 완납합니다. 그렇지 않으면 ‘채무 청산으로 폐업’ 결말이 발생합니다. 완납하기 전에는 새 대출을 신청할 수 없습니다."
+  },
+  "请在最后营业日结束前准备足够现金结清旧债，当前不能申请新贷款。": {
+    "en": "Have enough cash to settle the old debt by the end of the final business day. New loans are currently unavailable.",
+    "ja": "最終営業日の終了までに完済できる現金を用意してください。現在、新規融資には申し込めません。",
+    "ko": "마지막 영업일이 끝나기 전까지 기존 채무를 완납할 현금을 마련하세요. 현재 새 대출은 신청할 수 없습니다."
+  },
+  "还款金额（直接抵扣固定欠款）": {
+    "en": "Repayment amount (deducted directly from the fixed debt)",
+    "ja": "返済額（固定の借金から直接差し引き）",
+    "ko": "상환 금액 (고정 채무에서 직접 차감)"
+  },
+  "全部结清": {
+    "en": "Settle in Full",
+    "ja": "全額返済",
+    "ko": "전액 상환"
+  },
+  "开局债务": {
+    "en": "Starting Debt",
+    "ja": "開始時の借金",
+    "ko": "시작 채무"
+  },
+  "原始欠款 ": {
+    "en": "Original debt: ",
+    "ja": "当初の借金：",
+    "ko": "최초 채무: "
+  },
+  "剩余欠款 ": {
+    "en": "Remaining debt: ",
+    "ja": "残債：",
+    "ko": "남은 채무: "
+  },
+  "最后还款日：第 ": {
+    "en": "Final repayment: end of business on day ",
+    "ja": "最終返済期限：第 ",
+    "ko": "최종 상환 기한: 제 "
+  },
+  " 日营业结束": {
+    "en": " (end of business)",
+    "ja": " 日の営業終了時",
+    "ko": " 일 영업 종료 시"
+  },
+  "距最后还款日还有 ": {
+    "en": "Days until the final repayment day: ",
+    "ja": "最終返済日まであと ",
+    "ko": "최종 상환일까지 남은 기간: "
+  },
+  " 天（含今天仍可继续营业）。": {
+    "en": " days (you may also trade today).",
+    "ja": " 日（今日も引き続き営業できます）。",
+    "ko": " 일 (오늘도 계속 영업할 수 있습니다)."
+  },
+  "今天营业结束后必须结清。": {
+    "en": "The debt must be settled at the end of business today.",
+    "ja": "今日の営業終了時に完済が必要です。",
+    "ko": "오늘 영업 종료 시 반드시 완납해야 합니다."
+  },
+  "零利息、零罚息，无宽限期。": {
+    "en": "No interest, penalties or grace period.",
+    "ja": "利息・延滞利息・猶予期間はありません。",
+    "ko": "이자, 연체 이자, 유예 기간은 없습니다."
+  },
+  "负债店主：炒股亏损后，你只剩 1500 元现金，并背上了固定旧债 5000 元。你有完整 28 个游戏日还清欠款，零利息、零罚息，无宽限期。": {
+    "en": "Indebted Shopkeeper: After losing money on stocks, you have only 1500 in cash and a fixed existing debt of 5000. You have 28 full game days to repay it, with no interest, penalty interest, or grace period.",
+    "ja": "借金持ちの店主：株で損をしたあなたには現金 1500 だけが残り、固定額の既存債務 5000 を背負っています。返済期限は丸 28 ゲーム日です。利息・延滞利息はなく、猶予期間もありません。",
+    "ko": "빚진 상점 주인: 주식 투자 손실 후 현금 1500 만 남았고 고정된 기존 채무 5000 을 지게 되었습니다. 온전한 28 게임일 안에 갚아야 하며 이자, 연체 이자, 유예 기간은 없습니다."
+  },
+  "还款提醒": {
+    "en": "Repayment Reminder",
+    "ja": "返済のお知らせ",
+    "ko": "상환 알림"
+  },
+  "今天是最后还款日。经营费用结算后，现金足够时自动结清；否则进入“抵债停业”结局。": {
+    "en": "Today is the final repayment day. After operating costs are settled, sufficient cash automatically pays off the debt. Otherwise, the Closed for Debt ending is triggered.",
+    "ja": "今日は最終返済日です。経費精算後、現金が足りれば自動完済します。不足していれば「債務清算による閉店」の結末になります。",
+    "ko": "오늘이 최종 상환일입니다. 운영 비용 정산 후 현금이 충분하면 자동 완납합니다. 그렇지 않으면 ‘채무 청산으로 폐업’ 결말이 발생합니다."
+  },
+  "可随时部分还款或提前结清，部分还款不延长期限。": {
+    "en": "Partial and early repayments are available at any time. Partial repayments do not extend the deadline.",
+    "ja": "いつでも一部返済や繰上完済ができます。一部返済でも期限は延びません。",
+    "ko": "언제든 일부 상환이나 조기 완납이 가능합니다. 일부 상환으로 기한이 연장되지는 않습니다."
+  },
+  "今天是旧债的最后还款日。结束营业后仍可在夜间还款；日结先扣普通服务费用，再自动偿还剩余旧债，现金不足将抵债停业。": {
+    "en": "Today is the final repayment day for your old debt. You can still repay during the evening after closing. Nightly settlement pays ordinary service costs first, then automatically settles the remaining old debt. Insufficient cash will trigger Closed for Debt.",
+    "ja": "今日は古い借金の最終返済日です。営業終了後も夜の間は返済できます。日次精算では通常のサービス料金を先に支払い、その後、残った借金を自動返済します。現金が足りなければ債務清算による閉店となります。",
+    "ko": "오늘이 기존 채무의 최종 상환일입니다. 영업 종료 후에도 밤 동안 상환할 수 있습니다. 일일 정산에서 일반 서비스 비용을 먼저 지불한 뒤 남은 기존 채무를 자동 상환합니다. 현금이 부족하면 채무 청산으로 폐업합니다."
+  },
+  "继续结束营业": {
+    "en": "Continue Closing",
+    "ja": "営業終了を続行",
+    "ko": "영업 종료 계속"
+  },
+  "返回经营": {
+    "en": "Return to Business",
+    "ja": "営業に戻る",
+    "ko": "영업으로 돌아가기"
+  },
+  "剩余旧债 ": {
+    "en": "Remaining old debt: ",
+    "ja": "古い借金の残額：",
+    "ko": "남은 기존 채무: "
+  },
+  "旧债已清，负债店主挑战完成，可以继续正常经营。": {
+    "en": "Your old debt is paid off. The Indebted Shopkeeper challenge is complete. You can continue running your business.",
+    "ja": "古い借金を完済しました。「借金を抱えた店主」チャレンジ達成です。このまま通常の営業を続けられます。",
+    "ko": "기존 채무를 모두 갚았습니다. 빚을 진 상점 주인 도전을 완료했습니다. 계속 정상적으로 영업할 수 있습니다."
+  },
+  "继续经营": {
+    "en": "Continue Trading",
+    "ja": "営業を続ける",
+    "ko": "영업 계속"
+  },
+  "贷款到账": {
+    "en": "Loan Disbursed",
+    "ja": "融資入金",
+    "ko": "대출금 입금"
+  },
+  "旧债登记": {
+    "en": "Old Debt Registered",
+    "ja": "既存債務の登録",
+    "ko": "기존 채무 등록"
+  },
+  "贷款到期": {
+    "en": "Loan Due",
+    "ja": "融資返済期日",
+    "ko": "대출 만기"
+  },
+  "旧债最后还款日": {
+    "en": "Final Old Debt Repayment Day",
+    "ja": "既存債務の最終返済日",
+    "ko": "기존 채무 최종 상환일"
+  },
+  "贷款最后还款日": {
+    "en": "Final Loan Repayment Day",
+    "ja": "融資の最終返済日",
+    "ko": "대출 최종 상환일"
+  },
+  "贷款合同": {
+    "en": "Loan Agreement",
+    "ja": "融資契約書",
+    "ko": "대출 계약서"
+  },
+  "旧债确认书": {
+    "en": "Old Debt Acknowledgment",
+    "ja": "既存債務確認書",
+    "ko": "기존 채무 확인서"
+  },
+  "合同存档": {
+    "en": "Contract Archive",
+    "ja": "契約書保管",
+    "ko": "계약서 보관"
+  },
+  "打开贷款合同": {
+    "en": "Open Loan Agreement",
+    "ja": "融資契約書を開く",
+    "ko": "대출 계약서 열기"
+  },
+  "返回贷款业务": {
+    "en": "Return to Loan Services",
+    "ja": "融資サービスに戻る",
+    "ko": "대출 업무로 돌아가기"
+  },
+  "签约条款": {
+    "en": "Agreed Terms",
+    "ja": "契約条項",
+    "ko": "계약 조건"
+  },
+  "即时账单": {
+    "en": "Current Statement",
+    "ja": "現在の明細",
+    "ko": "현재 명세서"
+  },
+  "贷款专员 · 沈衡": {
+    "en": "Loan Officer · Shen Heng",
+    "ja": "融資担当者 · 沈衡",
+    "ko": "대출 담당자 · 선헝"
+  },
+  "借款人签名": {
+    "en": "Borrower Signature",
+    "ja": "借主署名",
+    "ko": "차용인 서명"
+  },
+  "签约当日留存": {
+    "en": "Recorded at Signing",
+    "ja": "契約時の記録",
+    "ko": "계약 당시 기록"
+  },
+  "已结清": {
+    "en": "Settled",
+    "ja": "完済",
+    "ko": "완납"
+  },
+  "履约中": {
+    "en": "Active",
+    "ja": "返済中",
+    "ko": "상환 중"
+  },
+  "合同编号": {
+    "en": "Contract No.",
+    "ja": "契約番号",
+    "ko": "계약 번호"
+  },
+  "店主": {
+    "en": "Shopkeeper",
+    "ja": "店主",
+    "ko": "상점 주인"
+  },
+  "本合同随存档保存，可通过贷款专线或日历重新查阅。": {
+    "en": "This agreement is kept with your save. Reopen it through the loan line or calendar.",
+    "ja": "この契約書はセーブデータに保存され、融資専用電話またはカレンダーから再確認できます。",
+    "ko": "이 계약서는 저장 데이터에 보관되며 대출 전용 전화나 달력에서 다시 확인할 수 있습니다."
+  },
+  "出借人：沈衡 · 周转贷款专员": {
+    "en": "Lender: Shen Heng · Working Capital Loan Officer",
+    "ja": "貸主：沈衡 · 運転資金融資担当者",
+    "ko": "대여인: 선헝 · 운영 자금 대출 담당자"
+  },
+  "合同编号：{0}": {
+    "en": "Contract No.: {0}",
+    "ja": "契約番号：{0}",
+    "ko": "계약 번호: {0}"
+  },
+  "借款人：{0}": {
+    "en": "Borrower: {0}",
+    "ja": "借主：{0}",
+    "ko": "차용인: {0}"
+  },
+  "一、旧债确认": {
+    "en": "1. Acknowledgment of Existing Debt",
+    "ja": "一、既存債務の確認",
+    "ko": "1. 기존 채무 확인"
+  },
+  "本凭证确认既有欠款 {0} 游戏币，不再次发放本金。": {
+    "en": "This document acknowledges an existing debt of {0} game currency. No additional principal is disbursed.",
+    "ja": "本書は既存債務 {0} ゲーム通貨を確認するものであり、元金を再度交付するものではありません。",
+    "ko": "이 증서는 기존 채무 {0} 게임 화폐를 확인하며 원금을 추가 지급하지 않습니다."
+  },
+  "自第 {0} 日起，共 {1} 个营业日可还款；最后还款日为第 {2} 日营业结束。": {
+    "en": "From Day {0}, repayment is allowed for {1} business days; the final deadline is the close of business on Day {2}.",
+    "ja": "第 {0} 日から計 {1} 営業日の間に返済でき、最終期限は第 {2} 日の営業終了時です。",
+    "ko": "{0} 일차부터 총 {1} 영업일 동안 상환할 수 있으며 최종 기한은 {2} 일차 영업 종료 시점입니다."
+  },
+  "二、清偿约定": {
+    "en": "2. Repayment Terms",
+    "ja": "二、清算の取り決め",
+    "ko": "2. 상환 약정"
+  },
+  "零利息、零罚息，无宽限期。可随时部分还款或提前结清，部分还款不延长期限。": {
+    "en": "No interest, no penalty interest, and no grace period. Partial or full early repayment is allowed at any time. Partial repayment does not extend the deadline.",
+    "ja": "利息・延滞利息はなく、猶予期間もありません。いつでも一部返済または繰上完済ができます。一部返済によって期限は延長されません。",
+    "ko": "이자와 연체 이자가 없으며 유예 기간도 없습니다. 언제든 일부 상환하거나 조기 완납할 수 있지만 일부 상환으로 기한이 연장되지는 않습니다."
+  },
+  "最后营业日经营费用结算后，现金足够时自动结清；仍有欠款则触发“抵债停业”结局。": {
+    "en": "After operating costs are settled on the final business day, sufficient cash automatically pays off the debt. Any remaining debt triggers the Closed for Debt ending.",
+    "ja": "最終営業日の経費精算後、現金が足りれば自動完済します。債務が残る場合は「債務清算による閉店」の結末となります。",
+    "ko": "마지막 영업일의 운영 비용 정산 후 현금이 충분하면 자동 완납합니다. 채무가 남으면 채무 청산으로 폐업 결말이 발생합니다."
+  },
+  "一、放款与期限": {
+    "en": "1. Disbursement and Term",
+    "ja": "一、融資実行と期限",
+    "ko": "1. 대출금 지급 및 기간"
+  },
+  "贷款类型：股票抵押贷款": {
+    "en": "Loan type: Share-secured loan",
+    "ja": "融資種類：株式担保融資",
+    "ko": "대출 유형: 주식 담보 대출"
+  },
+  "贷款类型：无抵押贷款": {
+    "en": "Loan type: Unsecured loan",
+    "ja": "融資種類：無担保融資",
+    "ko": "대출 유형: 무담보 대출"
+  },
+  "签约并放款：第 {0} 日；到账本金：{1} 游戏币。": {
+    "en": "Signed and disbursed on Day {0}; principal received: {1} game currency.",
+    "ja": "契約・入金日：第 {0} 日。入金元金：{1} ゲーム通貨。",
+    "ko": "계약 및 지급일: {0} 일차. 입금 원금: {1} 게임 화폐."
+  },
+  "贷款期限：{0} 天；到期日：第 {1} 日；最后还款日：第 {2} 日。": {
+    "en": "Loan term: {0} days; due on Day {1}; final repayment day: Day {2}.",
+    "ja": "融資期間：{0} 日。返済期日：第 {1} 日。最終返済日：第 {2} 日。",
+    "ko": "대출 기간: {0} 일. 만기일: {1} 일차. 최종 상환일: {2} 일차."
+  },
+  "二、利息与还款": {
+    "en": "2. Interest and Repayment",
+    "ja": "二、利息と返済",
+    "ko": "2. 이자 및 상환"
+  },
+  "签约日利率：{0}。放款当天不计息，之后按剩余本金逐日计算单利，直至结清。": {
+    "en": "Agreed daily interest rate: {0}. No interest is charged on the disbursement day. Thereafter, simple interest accrues daily on the remaining principal until settlement.",
+    "ja": "契約時の日利率：{0}。融資当日は利息が発生せず、翌日から完済まで残元金に対して日ごとに単利で計算します。",
+    "ko": "계약 일 이자율: {0}. 지급 당일에는 이자가 발생하지 않으며 이후 완납까지 남은 원금에 매일 단리로 이자가 발생합니다."
+  },
+  "按原本金持有至到期，预计利息 {0}，到期预计应还 {1} 游戏币。": {
+    "en": "If the original principal remains outstanding until maturity, estimated interest is {0} and estimated repayment at maturity is {1} game currency.",
+    "ja": "元金を期日まで全額借り続ける場合、見込利息は {0}、期日の見込返済額は {1} ゲーム通貨です。",
+    "ko": "원금을 만기까지 유지하면 예상 이자는 {0}, 만기 예상 상환액은 {1} 게임 화폐입니다."
+  },
+  "提前还款仅按实际计息天数收息，无提前还款手续费。还款先抵扣罚息，再抵扣利息和本金；部分还款不延长期限。": {
+    "en": "Early repayment is charged interest only for the actual accrued days, with no early repayment fee. Payments cover penalty interest first, then interest and principal. Partial repayment does not extend the deadline.",
+    "ja": "繰上返済では実際の利息発生日数分のみを精算し、繰上返済手数料はかかりません。返済金は延滞利息、通常利息、元金の順に充当されます。一部返済で期限は延長されません。",
+    "ko": "조기 상환 시 실제 이자 발생 일수만 계산하며 별도 수수료는 없습니다. 상환금은 연체 이자, 이자, 원금 순으로 충당되며 일부 상환으로 기한이 연장되지 않습니다."
+  },
+  "到期后的次日，经营费用结算后现金足够时尝试自动结清；现金不足仍须主动还款。": {
+    "en": "On the day after maturity, automatic settlement is attempted if sufficient cash remains after operating costs. If cash is insufficient, you must repay manually.",
+    "ja": "返済期日の翌日、経費精算後に現金が足りれば自動完済を試みます。不足する場合は手動で返済する必要があります。",
+    "ko": "만기 다음 날 운영 비용 정산 후 현금이 충분하면 자동 완납을 시도합니다. 현금이 부족하면 직접 상환해야 합니다."
+  },
+  "三、逾期约定": {
+    "en": "3. Overdue Terms",
+    "ja": "三、延滞時の取り決め",
+    "ko": "3. 연체 약정"
+  },
+  "到期后宽限 {0} 天；第 {1} 天起每日按剩余本金的 {2} 收取罚息，累计不超过原始本金的 {3}。罚息不计复利。": {
+    "en": "The grace period is {0} days after maturity. From overdue day {1}, daily penalty interest is {2} of the remaining principal, capped at {3} of the original principal in total. Penalty interest does not compound.",
+    "ja": "返済期日後の猶予期間は {0} 日です。延滞 {1} 日目から毎日、残元金の {2} を延滞利息として徴収し、累計上限は当初元金の {3} とします。延滞利息に複利は適用しません。",
+    "ko": "만기 후 유예 기간은 {0} 일입니다. 연체 {1} 일차부터 남은 원금의 {2} 를 매일 연체 이자로 부과하며 총액은 최초 원금의 {3} 를 넘지 않습니다. 연체 이자는 복리로 계산하지 않습니다."
+  },
+  "第 {0} 日开始时仍有欠款，将触发“抵债停业”结局。": {
+    "en": "If any debt remains at the start of Day {0}, the Closed for Debt ending is triggered.",
+    "ja": "第 {0} 日の開始時に債務が残っている場合、「債務清算による閉店」の結末となります。",
+    "ko": "{0} 일차 시작 시 채무가 남아 있으면 채무 청산으로 폐업 결말이 발생합니다."
+  },
+  "四、抵押股份": {
+    "en": "4. Pledged Shares",
+    "ja": "四、担保株式",
+    "ko": "4. 담보 주식"
+  },
+  "{0}：{1} 股。": {
+    "en": "{0}: {1} shares.",
+    "ja": "{0}：{1} 株。",
+    "ko": "{0}: {1} 주."
+  },
+  "抵押股份在全部结清前锁定，不能卖出；宽限期结束后按处置时市价出售偿债。": {
+    "en": "Pledged shares are locked and cannot be sold until full settlement. After the grace period, they are sold at the market price at disposal to repay the debt.",
+    "ja": "担保株式は完済までロックされ、売却できません。猶予期間終了後、処分時の市場価格で売却して返済に充当します。",
+    "ko": "담보 주식은 완납 전까지 잠겨 매도할 수 없습니다. 유예 기간이 끝나면 처분 당시 시장가로 매각하여 채무를 상환합니다."
+  },
+  "每笔处置手续费为成交额的 {0}，最低 {1} 游戏币；多余资金返还，不足部分继续欠款，原期限不变。": {
+    "en": "Each disposal costs {0} of the transaction value, with a minimum fee of {1} game currency. Surplus funds are returned; any shortfall remains owed under the original deadline.",
+    "ja": "各処分の手数料は約定額の {0}、最低 {1} ゲーム通貨です。余剰金は返還し、不足分は元の期限のまま債務として残ります。",
+    "ko": "건별 처분 수수료는 거래액의 {0}, 최소 {1} 게임 화폐입니다. 남는 금액은 반환하며 부족분은 원래 기한 그대로 채무로 남습니다."
+  },
+  "同一时间只持有一笔贷款，不接受展期或追加本金。": {
+    "en": "Only one loan may be held at a time. Term extensions and additional principal are not available.",
+    "ja": "同時に保有できる融資は一件のみで、期間延長や元金追加はできません。",
+    "ko": "동시에 한 건의 대출만 보유할 수 있으며 기간 연장이나 원금 추가는 불가합니다."
+  },
+  "结清后等待 {0} 天，可重新申请贷款。": {
+    "en": "You may apply for another loan {0} days after settlement.",
+    "ja": "完済から {0} 日後に再申請できます。",
+    "ko": "완납 후 {0} 일이 지나면 다시 대출을 신청할 수 있습니다."
+  },
+  "本凭证随存档保留。签约条款以本凭证为准，当前欠款另见账单。": {
+    "en": "This document is retained with your save. It records the agreed terms; see the statement for the current debt.",
+    "ja": "本書はセーブデータとともに保管されます。契約条項は本書に記載された内容に従い、現在の債務額は別途明細をご確認ください。",
+    "ko": "이 증서는 저장 데이터와 함께 보관됩니다. 계약 조건은 이 증서에 따르며 현재 채무는 명세서를 확인하세요."
+  },
+  "已于第 {0} 日结清，当前欠款为 0 游戏币。": {
+    "en": "Settled on Day {0}. Current debt: 0 game currency.",
+    "ja": "第 {0} 日に完済済みです。現在の債務額は 0 ゲーム通貨です。",
+    "ko": "{0} 일차에 완납했습니다. 현재 채무는 0 게임 화폐입니다."
+  },
+  "第 {0} 日账单 · 当前结清金额 {1} 游戏币。": {
+    "en": "Day {0} statement · Current settlement amount: {1} game currency.",
+    "ja": "第 {0} 日の明細 · 現在の完済額：{1} ゲーム通貨。",
+    "ko": "{0} 일차 명세서 · 현재 완납 금액: {1} 게임 화폐."
+  },
+  "剩余本金 {0}；累计利息 {1}；累计罚息 {2}。": {
+    "en": "Remaining principal: {0}; accrued interest: {1}; accrued penalty interest: {2}.",
+    "ja": "残元金：{0}。累積利息：{1}。累積延滞利息：{2}。",
+    "ko": "남은 원금: {0}. 누적 이자: {1}. 누적 연체 이자: {2}."
+  },
+  "抵押股份已处置。": {
+    "en": "Pledged shares have been disposed of.",
+    "ja": "担保株式は処分済みです。",
+    "ko": "담보 주식이 처분되었습니다."
+  },
+  "抵押股份仍处于锁定状态。": {
+    "en": "Pledged shares remain locked.",
+    "ja": "担保株式は引き続きロックされています。",
+    "ko": "담보 주식은 계속 잠겨 있습니다."
+  },
+  "已逾期 {0} 天，部分还款不延长期限。": {
+    "en": "Overdue by {0} days. Partial repayment does not extend the deadline.",
+    "ja": "{0} 日延滞中です。一部返済によって期限は延長されません。",
+    "ko": "{0} 일 연체 중입니다. 일부 상환으로 기한이 연장되지 않습니다."
+  },
+  "查询或还款请拨打 731207。": {
+    "en": "Call 731207 to check your balance or repay.",
+    "ja": "残高照会・返済は 731207 にお電話ください。",
+    "ko": "조회 또는 상환은 731207 로 전화하세요."
+  }
+}

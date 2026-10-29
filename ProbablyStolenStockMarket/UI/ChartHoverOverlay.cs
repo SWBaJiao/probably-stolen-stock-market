@@ -1,9 +1,7 @@
 using System;
 using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
-using Il2CppInterop.Runtime;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppTMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +10,7 @@ namespace ProbablyStolenStockMarket.UI;
 // 同一原生窗口的两张图共用一个提示框，按拥有者令牌隐藏，避免另一张图误清当前提示。
 internal sealed class ChartHoverOverlay
 {
-    private static readonly Dictionary<IntPtr, ChartHoverOverlay> Shared = new();
+    private static readonly Dictionary<int, ChartHoverOverlay> Shared = new();
     private readonly RectTransform _window;
     private readonly GameObject _box, _guide;
     private readonly RectTransform _boxRect, _guideRect;
@@ -24,14 +22,14 @@ internal sealed class ChartHoverOverlay
     private float _measuredWidth = -1, _measuredHeight;
     private string _measuredText = "";
 
-    public IntPtr WindowPointer => _window.Pointer;
+    public int WindowId => _window.GetInstanceID();
 
     public static ChartHoverOverlay Acquire(RectTransform window, TMP_FontAsset font)
     {
-        if (Shared.TryGetValue(window.Pointer, out var existing) && !existing._disposed)
+        if (Shared.TryGetValue(window.GetInstanceID(), out var existing) && !existing._disposed)
         { existing._references++; return existing; }
         var created = new ChartHoverOverlay(window, font) { _references = 1 };
-        Shared[window.Pointer] = created;
+        Shared[window.GetInstanceID()] = created;
         return created;
     }
 
@@ -42,18 +40,18 @@ internal sealed class ChartHoverOverlay
         _boxRect = RectOf(_box);
         try
         {
-            var layout = _box.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
+            var layout = _box.AddComponent<LayoutElement>();
             layout.ignoreLayout = true;
-            var background = _box.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+            var background = _box.AddComponent<Image>();
             background.color = StockUiTheme.TooltipBackground; background.raycastTarget = false;
-            var outline = _box.AddComponent(Il2CppType.Of<Outline>()).Cast<Outline>();
+            var outline = _box.AddComponent<Outline>();
             outline.effectColor = StockUiTheme.Accent;
             outline.effectDistance = new Vector2(1, -1);
             outline.useGraphicAlpha = false;
-            var group = _box.AddComponent(Il2CppType.Of<CanvasGroup>()).Cast<CanvasGroup>();
+            var group = _box.AddComponent<CanvasGroup>();
             group.blocksRaycasts = false; group.interactable = false;
             var textObject = CreateRect("Text", _boxRect);
-            _label = textObject.AddComponent(Il2CppType.Of<TextMeshProUGUI>()).Cast<TextMeshProUGUI>();
+            _label = textObject.AddComponent<TextMeshProUGUI>();
             _label.font = font; _label.fontSize = 14; _label.color = StockUiTheme.Text;
             _label.richText = false; _label.raycastTarget = false; _label.enableWordWrapping = true;
             _label.alignment = TextAlignmentOptions.TopLeft;
@@ -63,9 +61,9 @@ internal sealed class ChartHoverOverlay
             textRect.offsetMin = new Vector2(9, 7); textRect.offsetMax = new Vector2(-9, -7);
             _guide = CreateRect("Guide", window);
             _guideRect = RectOf(_guide);
-            var image = _guide.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+            var image = _guide.AddComponent<Image>();
             image.color = StockUiTheme.Accent; image.raycastTarget = false;
-            var guideLayout = _guide.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
+            var guideLayout = _guide.AddComponent<LayoutElement>();
             guideLayout.ignoreLayout = true;
             _box.SetActive(false); _guide.SetActive(false);
         }
@@ -136,7 +134,7 @@ internal sealed class ChartHoverOverlay
         }
         var fitted = ChartHoverMath.FitTooltip(new HoverPoint(anchor.x, anchor.y), preferredWidth, Math.Max(40, _measuredHeight), visibleBounds);
         Place(_boxRect, (float)(fitted.X - rect.xMin), (float)(fitted.Y - rect.yMin), (float)fitted.Width, (float)fitted.Height);
-        if (_guideRect.parent?.Pointer != chart.Pointer) _guideRect.SetParent(chart, false);
+        if (_guideRect.parent != chart) _guideRect.SetParent(chart, false);
         Place(_guideRect, guideX - .5f, (float)plot.Y, 1, (float)plot.Height);
         _guideRect.SetAsLastSibling();
         _boxRect.SetAsLastSibling();
@@ -151,7 +149,7 @@ internal sealed class ChartHoverOverlay
         _owner = null;
         _box.SetActive(false); _guide.SetActive(false);
         // 图表可能先于另一个持有者销毁，隐藏时把共享引导线归还窗口，不能留在将销毁的图下。
-        if (_guideRect.parent?.Pointer != _window.Pointer) _guideRect.SetParent(_window, false);
+        if (_guideRect.parent != _window) _guideRect.SetParent(_window, false);
     }
 
     public void Release(object owner)
@@ -160,7 +158,7 @@ internal sealed class ChartHoverOverlay
         try { Hide(owner); } catch { }
         if (--_references > 0) return;
         _disposed = true;
-        Shared.Remove(_window.Pointer);
+        Shared.Remove(_window.GetInstanceID());
         // 引导线可能已挂到图表下，必须先于该图销毁；从不释放游戏字体和材质。
         try { UnityEngine.Object.Destroy(_guide); } catch { }
         try { UnityEngine.Object.Destroy(_box); } catch { }
@@ -169,7 +167,7 @@ internal sealed class ChartHoverOverlay
     private bool VisibleWindowBounds(Camera? camera, out HoverRect result)
     {
         var window = _window.rect;
-        var canvas = _window.gameObject.GetComponentInParent(Il2CppType.Of<Canvas>(), true)?.TryCast<Canvas>();
+        var canvas = _window.gameObject.GetComponentInParent<Canvas>(true);
         var screen = canvas?.rootCanvas?.pixelRect ?? new Rect(0, 0, Screen.width, Screen.height);
         result = default;
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(_window, new Vector2(screen.xMin, screen.yMin), camera, out var low)
@@ -181,7 +179,7 @@ internal sealed class ChartHoverOverlay
     private static bool TryCamera(RectTransform rect, out Camera? camera)
     {
         camera = null;
-        var canvas = rect.gameObject.GetComponentInParent(Il2CppType.Of<Canvas>(), true)?.TryCast<Canvas>();
+        var canvas = rect.gameObject.GetComponentInParent<Canvas>(true);
         if (canvas == null || !canvas.enabled) return false;
         canvas = canvas.rootCanvas ?? canvas;
         if (canvas.renderMode == RenderMode.ScreenSpaceOverlay) return true;
@@ -192,12 +190,12 @@ internal sealed class ChartHoverOverlay
 
     private static GameObject CreateRect(string name, Transform parent)
     {
-        var types = new Il2CppReferenceArray<Il2CppSystem.Type>(new[] { Il2CppType.Of<RectTransform>() });
+        var types = new[] { typeof(RectTransform) };
         var go = new GameObject("StockMarket.ChartHover." + name, types);
         go.transform.SetParent(parent, false); return go;
     }
-    private static T? Get<T>(GameObject go) where T : Component => go.GetComponent(Il2CppType.Of<T>())?.TryCast<T>();
-    private static RectTransform RectOf(GameObject go) => go.GetComponent(Il2CppType.Of<RectTransform>()).Cast<RectTransform>();
+    private static T? Get<T>(GameObject go) where T : Component => go.GetComponent<T>();
+    private static RectTransform RectOf(GameObject go) => go.GetComponent<RectTransform>();
     private static void Place(RectTransform rect, float x, float y, float width, float height)
     {
         rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.zero; rect.pivot = Vector2.zero;

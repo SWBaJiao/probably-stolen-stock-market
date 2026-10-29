@@ -2,9 +2,7 @@ using System;
 using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using System.Linq;
-using Il2Cpp;
-using Il2CppInterop.Runtime;
-using Il2CppTMPro;
+using TMPro;
 using ProbablyStolenStockMarket.Market;
 using UnityEngine;
 using UnityEngine.Events;
@@ -24,7 +22,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
     private readonly Dictionary<string, string> _texts = new(StringComparer.Ordinal);
     private CustomUIWindow? _window;
     private CustomUIBuilder? _builder;
-    private Il2CppSystem.Action? _nativeClosed;
+    private Action? _nativeClosed;
     private MarketEngine? _engine;
     private string _companyId = "";
     private float _width;
@@ -50,17 +48,15 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
     private void Build()
     {
         var manager = CustomUIManager.Instance;
-        manager.EnsureOverlayCanvas();
-        var overlay = manager.OverlayRoot();
+        var overlay = manager.GetLayerRoot(CustomUIManager.LAYER_OVERLAY);
         var bounds = overlay != null ? overlay.rect : new Rect(0, 0, Screen.width, Screen.height);
         _width = Math.Min(780, Math.Max(320, bounds.width - 48));
         var height = Math.Min(650, Math.Max(280, bounds.height - 48));
         _builder = CustomUIManager.Window(WindowId, Localizer.Text("公司介绍与公开消息"), CustomUIManager.LAYER_OVERLAY);
-        _window = _builder.window;
+        _window = _builder.Handle;
         // Escape 统一由主窗口分发，避免同一次按键关闭两个窗口。
         _builder.SetSize(_width, height).Center().SetDraggable(true).SetCloseOnEscape(false);
-        _nativeClosed = DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(_managedClosed)
-            ?? throw new InvalidOperationException("公司窗口关闭回调转换失败。");
+        _nativeClosed = _managedClosed;
         _window.onClose = _nativeClosed;
         StyleFrame();
         _builder.BeginRow(6);
@@ -68,7 +64,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
         Button("下一家公司", () => Move(1), 120);
         _builder.End();
         _builder.BeginScroll(Math.Max(100, height - 170));
-        NativeStockMarketPanel.Container(_builder.CurrentParent, -1);
+        NativeStockMarketPanel.Container(_builder.CurrentContainer, -1);
         Label("name", 28, true);
         Label("story", 80);
         Label("news.title", 28, true);
@@ -85,7 +81,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
     {
         _builder!.AddLabel("", "details." + id);
         var element = _builder.Last;
-        NativeStockMarketPanel.Container(element.root.transform.Cast<RectTransform>(), -1, height);
+        NativeStockMarketPanel.Container(element.root.GetComponent<RectTransform>(), -1, height);
         if (element.text != null)
         {
             NativeUiBootstrap.ApplyCurrentFont(element.text);
@@ -102,13 +98,13 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
     {
         _builder!.AddButton(Localizer.Text(text), null, null);
         var element = _builder.Last;
-        NativeStockMarketPanel.Container(element.root.transform.Cast<RectTransform>(), width, 36);
+        NativeStockMarketPanel.Container(element.root.GetComponent<RectTransform>(), width, 36);
         if (element.text != null) { NativeUiBootstrap.ApplyCurrentFont(element.text); element.text.color = StockUiTheme.Text; element.text.fontSize = 16; element.text.richText = false; }
         var button = element.button ?? throw new InvalidOperationException("公司窗口按钮缺少 Button。");
         button.targetGraphic = NativeStockMarketPanel.Surface(element.root, "CompanyButton", Color.white, 2, 2, 2, 2);
         NativeStockMarketPanel.SetButtonColors(button, false);
         Action managed = () => { if (!_disposed) action(); };
-        var native = DelegateSupport.ConvertDelegate<UnityAction>(managed) ?? throw new InvalidOperationException("公司窗口按钮回调转换失败。");
+        var native = new UnityAction(managed.Invoke);
         button.onClick.AddListener(native);
         _listeners.Add((button, native, managed));
     }
@@ -120,7 +116,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
         if (background != null) background.color = Color.white;
         NativeStockMarketPanel.Surface(window.root, "CompanyBackground", StockUiTheme.Background, 4, 4, 4, 4);
         var bar = NativeStockMarketPanel.Surface(window.root, "CompanyTitleBar", StockUiTheme.TitleBackground, 5, 5, 5, 5);
-        var rect = bar.transform.Cast<RectTransform>();
+        var rect = bar.GetComponent<RectTransform>();
         rect.anchorMin = new Vector2(0, 1); rect.anchorMax = Vector2.one;
         rect.offsetMin = new Vector2(5, -46); rect.offsetMax = new Vector2(-5, -5);
         bar.transform.SetSiblingIndex(1);
@@ -130,7 +126,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
             var close = window.frame.closeButton;
             close.targetGraphic = NativeStockMarketPanel.Surface(close.gameObject, "CompanyClose", Color.white, 2, 2, 2, 2);
             NativeStockMarketPanel.SetButtonColors(close, false);
-            foreach (var label in close.gameObject.GetComponentsInChildren(Il2CppType.Of<TextMeshProUGUI>(), true)) label.Cast<TextMeshProUGUI>().color = StockUiTheme.Text;
+            foreach (var label in close.gameObject.GetComponentsInChildren<TextMeshProUGUI>(true)) label.color = StockUiTheme.Text;
         }
     }
 
@@ -158,7 +154,7 @@ internal sealed class NativeCompanyDetailsWindow : IDisposable
         var changed = !_texts.TryGetValue(id, out var old) || old != value;
         if (changed) { element.SetText(value); _texts[id] = value; }
         if (element.text == null) return;
-        var actual = element.root.transform.Cast<RectTransform>().rect.width;
+        var actual = element.root.GetComponent<RectTransform>().rect.width;
         var preferred = element.text.GetPreferredValues(value, Math.Max(160, actual > 20 ? actual - 12 : _width - 100), float.PositiveInfinity);
         var layout = element.root.GetComponent<LayoutElement>();
         if (layout != null) { layout.minHeight = 28; layout.preferredHeight = Math.Max(28, preferred.y + 12); }

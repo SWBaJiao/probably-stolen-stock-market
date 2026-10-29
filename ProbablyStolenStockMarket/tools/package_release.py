@@ -10,6 +10,7 @@ import struct
 import subprocess
 import sys
 import zipfile
+from xml.etree import ElementTree as ET
 from pathlib import Path, PurePosixPath
 
 
@@ -23,7 +24,7 @@ def digest(data: bytes) -> str:
 
 
 def assembly_mod_version(data: bytes) -> str:
-    """直接读取程序集 ModInfo.Version 常量，不加载游戏或 MelonLoader 依赖。"""
+    """直接读取程序集 ModInfo.Version 常量，不加载游戏依赖。"""
     def number(offset: int, size: int) -> int:
         formats = {1: "<B", 2: "<H", 4: "<I", 8: "<Q"}
         return struct.unpack_from(formats[size], data, offset)[0]
@@ -145,34 +146,51 @@ def assembly_mod_version(data: bytes) -> str:
     raise ValueError("Release DLL 缺少 ModInfo.Version 常量，请重新编译。")
 
 
-def tracked_assets() -> dict[str, bytes]:
+def release_assets() -> dict[str, bytes]:
+    # 同时收录已跟踪和未忽略的新资源，避免新玩法图片漏包；生成提示和源素材不发布。
     result = subprocess.run(
-        ["git", "ls-files", "-z", "--", f"{NAME}/Assets/"],
-        cwd=ROOT,
-        capture_output=True,
-        check=True,
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z", "--", f"{NAME}/Assets/"],
+        cwd=ROOT, capture_output=True, check=True,
     )
     files: dict[str, bytes] = {}
+    allowed_suffixes = {".png", ".jpg", ".jpeg", ".wav", ".ogg", ".mp3", ".json", ".csv", ".xml"}
     for raw in result.stdout.split(b"\0"):
         if not raw:
             continue
         relative = PurePosixPath(raw.decode("utf-8"))
-        if relative.name in {"health_pack.png", ".DS_Store", ".gitkeep"}:
+        if relative.name == "health_pack.png" or relative.suffix.lower() not in allowed_suffixes:
             continue
         if relative.is_absolute() or ".." in relative.parts:
             raise ValueError(f"不安全的资源路径：{relative}")
         source = ROOT.joinpath(*relative.parts)
         if source.is_symlink() or not source.is_file():
-            raise ValueError(f"版本控制中的资源缺失或不是普通文件：{relative}")
+            raise ValueError(f"资源缺失或不是普通文件：{relative}")
         asset_relative = relative.relative_to(PurePosixPath(NAME) / "Assets")
-        target = f"UserData/{NAME}/Assets/{asset_relative}"
-        files[target] = source.read_bytes()
-    required = f"UserData/{NAME}/Assets/market-config.default.json"
-    if required not in files:
-        raise ValueError("没有找到版本控制中的默认配置，拒绝生成不完整的发布包。")
-    if not any(path.endswith(".png") for path in files):
-        raise ValueError("没有找到版本控制中的人物或道具图片。")
+        files[f"Mods/{NAME}/Assets/{asset_relative}"] = source.read_bytes()
+    required = (
+        "market-config.default.json", "Textures/Items/stock_market_terminal.png",
+        "Textures/UI/loan_contract_paper.png", "Textures/UI/loan_contract_seal.png",
+        "Textures/Items/loan_business_card.png", "Textures/Items/intel_business_card.png", "Textures/Characters/wenzhou.png",
+        "Textures/Characters/jianqing.png", "Textures/Characters/shenheng.png",
+    )
+    for name in required:
+        if f"Mods/{NAME}/Assets/{name}" not in files:
+            raise ValueError(f"缺少必要资源，拒绝生成不完整的发布包：{name}")
     return files
+
+
+def release_manifest(version: str) -> bytes:
+    path = PROJECT / "manifest.xml"
+    data = path.read_bytes()
+    root = ET.fromstring(data)
+    if root.tag != "Manifest" or root.findtext("ID") != "probably_stolen_stock_market":
+        raise ValueError("manifest.xml 的根元素或模组 ID 无效。")
+    if root.findtext("ModVersion") != version:
+        raise ValueError("manifest.xml 的 ModVersion 与源码版本不一致。")
+    assemblies = [element.text for element in root.findall("Assemblies/Assembly")]
+    if assemblies != [f"{NAME}.dll"] or root.find("Capabilities") is None:
+        raise ValueError("manifest.xml 必须只列出本模组 DLL，并包含 Capabilities 元素。")
+    return data
 
 
 def verify_archive(path: Path, expected: dict[str, bytes]) -> None:
@@ -209,7 +227,7 @@ def main() -> int:
         raise ValueError(f"版本格式不正确：{version}")
     if version != match.group(1):
         raise ValueError(f"发布版本 {version} 与 ModInfo.cs 的 {match.group(1)} 不一致，请先修改源码并重新编译。")
-    dll = PROJECT / "bin" / "Release" / "net6.0" / f"{NAME}.dll"
+    dll = PROJECT / "bin" / "Release" / "netstandard2.1" / f"{NAME}.dll"
     if not dll.is_file():
         raise FileNotFoundError(
             f"缺少 Release DLL：{dll}\n请先执行：dotnet build {NAME}/{NAME}.csproj -c Release"
@@ -222,8 +240,9 @@ def main() -> int:
     if not instructions.is_file():
         raise FileNotFoundError(f"缺少安装说明：{instructions}")
 
-    files = tracked_assets()
-    files[f"Mods/{NAME}.dll"] = dll_data
+    files = release_assets()
+    files[f"Mods/{NAME}/{NAME}.dll"] = dll_data
+    files[f"Mods/{NAME}/manifest.xml"] = release_manifest(version)
     files["安装说明.md"] = instructions.read_bytes()
     manifest = "".join(f"{digest(data)}  {name}\n" for name, data in sorted(files.items()))
     files["SHA256SUMS"] = manifest.encode("utf-8")
@@ -257,6 +276,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (OSError, ValueError, struct.error, subprocess.CalledProcessError, zipfile.BadZipFile) as error:
+    except (OSError, ValueError, struct.error, ET.ParseError, subprocess.CalledProcessError, zipfile.BadZipFile) as error:
         print(f"打包失败：{error}", file=sys.stderr)
         raise SystemExit(1)

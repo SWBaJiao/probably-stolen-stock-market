@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""使用临时占位文件验证 MelonLoader 模板的真实部署目标。"""
+"""在临时目录验证正式版原生模组部署，不编译 C# 或写入真实游戏。"""
 
 import shutil
 import subprocess
@@ -8,7 +8,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 
-TEMPLATE = Path(__file__).resolve().parents[1]
+PROJECT = Path(__file__).resolve().parents[1]
 
 
 def run(dotnet, project, *arguments, error=None):
@@ -27,58 +27,69 @@ def verify():
     dotnet = shutil.which("dotnet")
     if dotnet is None:
         raise SystemExit("请先安装 .NET SDK，并确保 dotnet 位于 PATH 中。")
-    with tempfile.TemporaryDirectory(prefix="melon-deployment-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="native-mod-deployment-") as temporary:
         root = Path(temporary)
         game = root / "Steam/drive_c/Program Files (x86)/Probably Stolen"
-        runtime = game / "MelonLoader/net6"
-        runtime.mkdir(parents=True)
-        (runtime / "MelonLoader.dll").write_bytes(b"loader fixture; not a real assembly")
+        managed = game / "Probably Stolen_Data/Managed"
+        managed.mkdir(parents=True)
+        (game / "Probably Stolen.exe").write_bytes(b"game fixture")
+        # 占位程序集只用于部署与引用存在性检查，不会载入。
+        for name in ("Assembly-CSharp.dll", "0Harmony.dll", "UnityEngine.dll", "UnityEngine.CoreModule.dll", "UnityEngine.UI.dll", "Unity.TextMeshPro.dll", "Newtonsoft.Json.dll"):
+            (managed / name).write_bytes(b"managed assembly fixture")
         output = root / "output"
         output.mkdir()
-        dll = output / "FixtureMelon.dll"
+        dll = output / "ProbablyStolenStockMarket.dll"
         dll.write_bytes(b"mod fixture; not a real assembly")
-        pdb = output / "FixtureMelon.pdb"
+        pdb = dll.with_suffix(".pdb")
         pdb.write_bytes(b"symbols fixture")
         assets = root / "Assets"
-        sprite = assets / "Textures/Items/health_pack.png"
+        sprite = assets / "Textures/Items/stock_market_terminal.png"
         sprite.parent.mkdir(parents=True)
         sprite.write_bytes(b"sprite fixture")
         (assets / ".DS_Store").write_bytes(b"ignored")
         (assets / ".gitkeep").write_bytes(b"")
+        manifest = root / "manifest.xml"
+        shutil.copyfile(PROJECT / "manifest.xml", manifest)
 
-        # 空 Build 目标只用于验证 AfterTargets，不执行 C# 编译。
+        # 空 Build 目标只验证 AfterTargets 及失败保护，不执行编译。
         project = root / "DeploymentFixture.proj"
         xml = ET.Element("Project", DefaultTargets="Build")
         group = ET.SubElement(xml, "PropertyGroup")
         ET.SubElement(group, "GameDirectory").text = str(game)
-        ET.SubElement(xml, "Import", Project=str(TEMPLATE / "build/MelonDevelopment.props"))
+        ET.SubElement(xml, "Import", Project=str(PROJECT / "build/NativeDevelopment.props"))
         properties = ET.SubElement(xml, "PropertyGroup")
         for name, value in {
-            "AssemblyName": "FixtureMelon", "TargetName": "FixtureMelon", "TargetFileName": dll.name,
-            "TargetPath": dll, "TargetDir": str(output) + "/", "ModAssetsDirectory": assets,
+            "AssemblyName": "ProbablyStolenStockMarket", "TargetName": "ProbablyStolenStockMarket",
+            "TargetFileName": dll.name, "TargetPath": dll, "TargetDir": str(output) + "/",
+            "ModAssetsDirectory": assets, "ModManifestPath": manifest,
         }.items():
             ET.SubElement(properties, name).text = str(value)
         ET.SubElement(xml, "Target", Name="ResolveAssemblyReferences")
         build = ET.SubElement(xml, "Target", Name="Build")
         ET.SubElement(build, "Error", Condition="'$(FixtureBuildFails)' == 'true'", Text="fixture-build-failed")
-        ET.SubElement(xml, "Import", Project=str(TEMPLATE / "build/MelonDevelopment.targets"))
+        ET.SubElement(xml, "Import", Project=str(PROJECT / "build/NativeDevelopment.targets"))
         ET.ElementTree(xml).write(project, encoding="utf-8", xml_declaration=True)
 
-        installed = game / "Mods"
-        installed_asset = game / "UserData/FixtureMelon/Assets/Textures/Items/health_pack.png"
+        installed = game / "Mods/ProbablyStolenStockMarket"
+        installed_asset = installed / "Assets/Textures/Items/stock_market_terminal.png"
+        config = game / "UserData/ProbablyStolenStockMarket/market-config.json"
+        config.parent.mkdir(parents=True)
+        config.write_bytes(b"legacy config preserved exactly")
         run(dotnet, project)
         assert (installed / dll.name).read_bytes() == dll.read_bytes()
+        assert (installed / "manifest.xml").read_bytes() == manifest.read_bytes()
         assert installed_asset.read_bytes() == sprite.read_bytes()
-        assert not (installed / "FixtureMelon").exists()
-        assert not (installed / "manifest.xml").exists()
+        assert not (game / "Mods" / dll.name).exists()
         assert not (installed / pdb.name).exists()
-        assert not (game / "UserData/FixtureMelon/Assets/.DS_Store").exists()
-        assert not (game / "UserData/FixtureMelon/Assets/.gitkeep").exists()
+        assert not (installed / "Assets/.DS_Store").exists()
+        assert not (installed / "Assets/.gitkeep").exists()
+        assert not (installed / "0Harmony.dll").exists()
+        assert config.read_bytes() == b"legacy config preserved exactly"
         dll.write_bytes(b"updated mod fixture with a different length")
         run(dotnet, project, "-p:DeployDebugSymbols=true")
         assert (installed / dll.name).read_bytes() == dll.read_bytes()
         assert (installed / pdb.name).read_bytes() == pdb.read_bytes()
-        print("通过：DLL 直接复制到 Mods，资源进入 UserData，文件更新及 PDB 开关有效。")
+        print("通过：清单、DLL 和资源部署到原生子目录，文件更新及 PDB 开关有效，旧配置保留。")
 
         for name, option, expected in (
             ("disabled", "-p:DeployOnBuild=false", None),
@@ -89,68 +100,19 @@ def verify():
             destination.mkdir()
             run(dotnet, project, option, f"-p:GameDirectory={destination}", error=expected)
             assert not (destination / "Mods").exists()
-            assert not (destination / "UserData").exists()
-        print("通过：禁用部署、设计时构建和失败构建不会复制文件。")
+        print("通过：禁用部署、设计时构建和失败构建不复制文件。")
 
-        # 正式名称升级必须保留旧文件的可恢复备份，且不能改动现有配置。
-        upgrade = root / "upgrade"
-        (upgrade / "MelonLoader/net6").mkdir(parents=True)
-        (upgrade / "MelonLoader/net6/MelonLoader.dll").write_bytes(b"loader")
-        legacy_dll = upgrade / "Mods/MelonModTemplate.dll"
-        legacy_dll.parent.mkdir()
-        legacy_dll.write_bytes(b"legacy assembly")
-        legacy_pdb = legacy_dll.with_suffix(".pdb")
-        legacy_pdb.write_bytes(b"legacy symbols")
-        config = upgrade / "UserData/ProbablyStolenStockMarket/market-config.json"
-        config.parent.mkdir(parents=True)
-        config.write_bytes(b"custom config preserved exactly")
-        renamed_dll = output / "ProbablyStolenStockMarket.dll"
-        renamed_dll.write_bytes(dll.read_bytes())
-        rename_args = (f"-p:GameDirectory={upgrade}", "-p:AssemblyName=ProbablyStolenStockMarket",
-                       "-p:TargetName=ProbablyStolenStockMarket", f"-p:TargetFileName={renamed_dll.name}",
-                       f"-p:TargetPath={renamed_dll}")
-        for option, expected in (("-p:DeployOnBuild=false", None),
-                                 ("-p:DesignTimeBuild=true", None),
-                                 ("-p:FixtureBuildFails=true", "fixture-build-failed")):
-            run(dotnet, project, *rename_args, option, error=expected)
-            assert legacy_dll.read_bytes() == b"legacy assembly"
-            assert legacy_pdb.read_bytes() == b"legacy symbols"
-            assert not (config.parent / "LegacyBackup").exists()
-        blocked_assets = config.parent / "Assets"
-        blocked_assets.write_bytes(b"blocked asset directory")
-        run(dotnet, project, *rename_args, error="MSB")
-        assert legacy_dll.read_bytes() == b"legacy assembly"
-        assert legacy_pdb.read_bytes() == b"legacy symbols"
-        assert not (upgrade / "Mods" / renamed_dll.name).exists()
-        blocked_assets.unlink()
-        run(dotnet, project, *rename_args)
-        assert not legacy_dll.exists() and not legacy_pdb.exists()
-        backups = config.parent / "LegacyBackup"
-        assert next(backups.rglob("*.dll.disabled")).read_bytes() == b"legacy assembly"
-        assert next(backups.rglob("*.pdb.disabled")).read_bytes() == b"legacy symbols"
-        assert config.read_bytes() == b"custom config preserved exactly"
-        assert (upgrade / "Mods" / renamed_dll.name).read_bytes() == renamed_dll.read_bytes()
-        print("通过：正式名称部署后备份旧 DLL/PDB，保留配置；禁用或失败时不迁移。")
-
-        run(dotnet, project, f"-p:GameDirectory={root / 'missing-game'}", error="自动部署需要存在的")
-        no_loader = root / "no-loader"
-        no_loader.mkdir()
-        run(dotnet, project, f"-p:GameDirectory={no_loader}", error="目标游戏尚未安装")
-        run(dotnet, project, f"-p:TargetPath={root / 'missing.dll'}", error="找不到编译输出")
-        run(dotnet, project, "-t:ValidateMelonReferences", f"-p:MelonLoaderAssembly={root / 'missing-loader.dll'}",
-            error="找不到 MelonLoader.dll")
-        run(dotnet, project, "-t:ValidateGameInterop", "-p:UseGameInterop=true", error="找不到游戏代理")
-
-        interop = game / "MelonLoader/Il2CppAssemblies"
-        interop.mkdir()
-        (interop / "Il2CppAssembly-CSharp.dll").write_bytes(b"game proxy fixture")
-        run(dotnet, project, "-t:ValidateGameInterop", "-p:UseGameInterop=true", error="缺少 IL2CPP 互操作引用")
-        (interop / "Il2Cppmscorlib.dll").write_bytes(b"system proxy fixture")
-        for name in ("Il2CppInterop.Common.dll", "Il2CppInterop.Runtime.dll"):
-            (runtime / name).write_bytes(b"interop runtime fixture")
-        run(dotnet, project, "-t:ValidateMelonReferences")
-        run(dotnet, project, "-t:ValidateGameInterop", "-p:UseGameInterop=true")
-        print("通过：缺失加载器、输出和代理时明确报错，代理引用检查正常。")
+        run(dotnet, project, f"-p:GameDirectory={root / 'missing-game'}", error="自动部署需要包含")
+        run(dotnet, project, f"-p:TargetPath={root / 'missing.dll'}", error="找不到")
+        run(dotnet, project, "-t:ValidateGameReferences", f"-p:ManagedDirectory={root / 'missing-managed'}", error="缺少")
+        run(dotnet, project, "-t:ValidateGameReferences")
+        run(dotnet, project, "-t:ValidateModManifest", f"-p:ModManifestPath={root / 'missing-manifest.xml'}", error="缺少原生模组清单")
+        incomplete = root / "incomplete.xml"
+        manifest_root = ET.fromstring(manifest.read_bytes())
+        manifest_root.remove(manifest_root.find("Assemblies"))
+        ET.ElementTree(manifest_root).write(incomplete, encoding="utf-8", xml_declaration=True)
+        run(dotnet, project, "-t:ValidateModManifest", f"-p:ModManifestPath={incomplete}", error="清单必须准确列出")
+        print("通过：缺失游戏引用、编译输出和原生清单时明确报错。")
     print("验证完成；未编译 C#、未安装加载器、未写入真实游戏目录。")
 
 

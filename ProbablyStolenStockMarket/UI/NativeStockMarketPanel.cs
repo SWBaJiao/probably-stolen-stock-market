@@ -4,11 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Il2Cpp;
-using Il2CppInterop.Runtime;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppTMPro;
-using MelonLoader;
+using TMPro;
 using ProbablyStolenStockMarket.Contracts;
 using ProbablyStolenStockMarket.Market;
 using UnityEngine;
@@ -42,7 +38,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private readonly List<GameObject> _pages = new();
     private readonly HashSet<string> _warned = new(StringComparer.Ordinal);
     private readonly Action _managedClosed;
-    private Il2CppSystem.Action? _nativeClosed;
+    private Action? _nativeClosed;
     private CustomUIWindow? _window;
     private CustomUIBuilder? _builder;
     private MarketEngine? _boundEngine;
@@ -150,16 +146,14 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (manager.windowPrefab == null || manager.labelPrefab == null || manager.buttonPrefab == null || manager.inputFieldPrefab == null || manager.scrollViewPrefab == null)
             throw new InvalidOperationException("游戏的原生自定义窗口、文本、按钮、输入或滚动预制件尚未配置。");
         var engine = _host.Engine ?? throw new InvalidOperationException("没有活动存档。");
-        manager.EnsureOverlayCanvas();
-        var canvas = manager.OverlayRoot();
+        var canvas = manager.GetLayerRoot(CustomUIManager.LAYER_OVERLAY);
         var bounds = canvas != null ? canvas.rect : new Rect(0, 0, Screen.width, Screen.height);
         _width = Math.Min(1040f, Math.Max(420f, bounds.width - 32f));
         _height = Math.Min(750f, Math.Max(350f, bounds.height - 32f));
         _builder = CustomUIManager.Window(WindowId, Localizer.Text("远星证券 · 股市投资"), CustomUIManager.LAYER_OVERLAY);
-        _window = _builder.window;
+        _window = _builder.Handle;
         _builder.SetSize(_width, _height).Center().SetDraggable(true).SetCloseOnEscape(true);
-        _nativeClosed = DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(_managedClosed)
-            ?? throw new InvalidOperationException("原生窗口关闭回调转换失败。");
+        _nativeClosed = _managedClosed;
         _window.onClose = _nativeClosed;
         StyleWindow();
         Label("summary", "", 32, true);
@@ -190,13 +184,13 @@ public sealed class NativeStockMarketPanel : IDisposable
             _builder.End();
             _builder.BeginColumn(8);
         }
-        if (!scrollMarket) FillHeight(_builder.CurrentParent);
+        if (!scrollMarket) FillHeight(_builder.CurrentContainer);
         _builder.BeginColumn(4);
-        Container(_builder.CurrentParent, wide ? 218 : -1, wide ? -1 : 112);
-        if (wide && !scrollMarket) FillHeight(_builder.CurrentParent);
+        Container(_builder.CurrentContainer, wide ? 218 : -1, wide ? -1 : 112);
+        if (wide && !scrollMarket) FillHeight(_builder.CurrentContainer);
         Label("market.guide", "公司行情 · 点击切换", 28, true);
         _builder.BeginScroll(wide ? 260 : 76);
-        Container(_builder.CurrentParent, -1);
+        Container(_builder.CurrentContainer, -1);
         ConfigureCompanyScroll(wide && !scrollMarket, wide ? 260 : 76);
         var companyRowHeight = Localizer.Language == ModLanguage.Chinese ? 38 : 52;
         if (!wide) _builder.BeginGrid(2, (_width - 84) / 2, companyRowHeight, 4);
@@ -208,12 +202,12 @@ public sealed class NativeStockMarketPanel : IDisposable
         _builder.End();
 
         _builder.BeginColumn(5);
-        Container(_builder.CurrentParent, -1);
-        if (!scrollMarket) FillHeight(_builder.CurrentParent);
+        Container(_builder.CurrentContainer, -1);
+        if (!scrollMarket) FillHeight(_builder.CurrentContainer);
         _builder.BeginRow(5);
         // 名称和介绍入口紧邻，行情数字使用本行余下空间，不再占用图表高度。
         var companyName = Label("company.title", "", 30, true);
-        Container(companyName.root.transform.Cast<RectTransform>(), Localizer.Language == ModLanguage.Chinese ? 88 : 195, 30);
+        Container(companyName.root.GetComponent<RectTransform>(), Localizer.Language == ModLanguage.Chinese ? 88 : 195, 30);
         if (companyName.text != null) companyName.text.enableWordWrapping = false;
         Button("company.introduction", "介绍", "details", 48, 28);
         var companyQuote = Label("company.quote", "", 30, true);
@@ -229,7 +223,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         Button("chart.30", "近 30 日", "chart:30", -1, 28);
         _builder.End();
         _builder.BeginColumn(0);
-        var chartRoot = _builder.CurrentParent;
+        var chartRoot = _builder.CurrentContainer;
         Container(chartRoot, -1);
         if (scrollMarket) Container(chartRoot, -1, 250);
         else
@@ -242,7 +236,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (chartLayout != null) chartLayout.enabled = false;
         var font = _window.frame.titleText.font;
         _chart = new NativeCandlestickChart(chartRoot, font);
-        var hoverBounds = _window.root.transform.Cast<RectTransform>();
+        var hoverBounds = _window.root.GetComponent<RectTransform>();
         _chart.SetHoverBounds(hoverBounds);
         _chart.SetPublicEventSummary(day => _host.Engine is { } active
             ? string.Join("；", active.GetPublicStockNews(_companyId).Where(n => n.PublicDay == day).Take(3).Select(n => n.Title.Length > 28 ? n.Title.Substring(0, 28) + "…" : n.Title))
@@ -311,23 +305,23 @@ public sealed class NativeStockMarketPanel : IDisposable
         _window = _builder.Show();
         _languageRevision = Localizer.Revision;
         _builder = null;
-        MelonLogger.Msg("[原生股市] 已使用游戏 CustomUI 窗体、按钮、TMP 字体和滚动预制件创建独立投资窗口。");
+        UnityEngine.Debug.Log("[原生股市] 已使用游戏 CustomUI 窗体、按钮、TMP 字体和滚动预制件创建独立投资窗口。");
     }
 
     private void BeginPage()
     {
         _builder!.BeginColumn(4);
-        var page = _builder.CurrentParent;
+        var page = _builder.CurrentContainer;
         _pages.Add(page.gameObject);
         Container(page, -1);
         FillHeight(page);
         _builder.BeginScroll(Math.Max(100, _height - 248));
-        Container(_builder.CurrentParent, -1);
+        Container(_builder.CurrentContainer, -1);
         // 页面吃掉标题与页脚以外的剩余高度；缩小窗口时只缩滚动区域。
-        for (Transform? ancestor = _builder.CurrentParent; ancestor != null && ancestor.Pointer != page.Pointer; ancestor = ancestor.parent)
+        for (Transform? ancestor = _builder.CurrentContainer; ancestor != null && ancestor != page; ancestor = ancestor.parent)
             if (Get<ScrollRect>(ancestor.gameObject) is { } scroll)
             {
-                FillHeight(scroll.transform.Cast<RectTransform>());
+                FillHeight(scroll.GetComponent<RectTransform>());
                 Surface(scroll.gameObject, "ScrollFill", StockUiTheme.Background, 2, 2, 2, 2);
                 break;
             }
@@ -336,7 +330,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private void BeginFixedPage()
     {
         _builder!.BeginColumn(0);
-        var page = _builder.CurrentParent;
+        var page = _builder.CurrentContainer;
         _pages.Add(page.gameObject);
         Container(page, -1);
         FillHeight(page);
@@ -344,10 +338,10 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     private void ConfigureCompanyScroll(bool fill, float height)
     {
-        for (Transform? ancestor = _builder!.CurrentParent; ancestor != null; ancestor = ancestor.parent)
+        for (Transform? ancestor = _builder!.CurrentContainer; ancestor != null; ancestor = ancestor.parent)
             if (Get<ScrollRect>(ancestor.gameObject) is { } scroll)
             {
-                var root = scroll.transform.Cast<RectTransform>();
+                var root = scroll.GetComponent<RectTransform>();
                 // 显式覆盖预制件遗留的最小高度，窄屏选择器才能真正保持紧凑。
                 if (fill) FillHeight(root);
                 else
@@ -403,7 +397,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private CustomUIElement Remember(string id, CustomUIElement element, float height, float width = -1)
     {
         _elements.Add(id, element);
-        Container(element.root.transform.Cast<RectTransform>(), width, height);
+        Container(element.root.GetComponent<RectTransform>(), width, height);
         return element;
     }
 
@@ -415,7 +409,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (background != null) background.color = Color.white;
         Surface(_window.root, "OpaqueBackground", StockUiTheme.Background, 4, 4, 4, 4);
         var titleBar = Surface(_window.root, "TitleBar", StockUiTheme.TitleBackground, 5, 5, 5, 5);
-        var titleRect = titleBar.transform.Cast<RectTransform>();
+        var titleRect = titleBar.GetComponent<RectTransform>();
         titleRect.anchorMin = new Vector2(0, 1); titleRect.anchorMax = Vector2.one;
         titleRect.offsetMin = new Vector2(5, -46); titleRect.offsetMax = new Vector2(-5, -5);
         titleBar.transform.SetSiblingIndex(1);
@@ -424,8 +418,8 @@ public sealed class NativeStockMarketPanel : IDisposable
             var close = _window.frame.closeButton;
             close.targetGraphic = Surface(close.gameObject, "CloseFill", Color.white, 2, 2, 2, 2);
             SetButtonColors(close, false);
-            foreach (var label in close.gameObject.GetComponentsInChildren(Il2CppType.Of<TextMeshProUGUI>(), true))
-                label.Cast<TextMeshProUGUI>().color = TextColor;
+            foreach (var label in close.gameObject.GetComponentsInChildren<TextMeshProUGUI>(true))
+                label.color = TextColor;
         }
         if (_window.frame?.titleText != null)
         {
@@ -634,7 +628,7 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     private void SubmitOrder()
     {
-        MelonLogger.Msg($"[原生股市委托] 点击{(_buy ? "买入" : "卖出")} company={_companyId} quantity={_quantity} canTrade={_host.CanTrade}");
+        UnityEngine.Debug.Log($"[原生股市委托] 点击{(_buy ? "买入" : "卖出")} company={_companyId} quantity={_quantity} canTrade={_host.CanTrade}");
         if (!IsCurrentContext()) { Hide(); return; }
         var engine = _host.Engine;
         if (engine == null || !_host.CanTrade) { _feedback = _host.Status; return; }
@@ -662,7 +656,7 @@ public sealed class NativeStockMarketPanel : IDisposable
             EventSystem.current?.SetSelectedGameObject(null);
             _window.closeOnEscape = false;
             _restoreEscapeAfterRelease = false;
-            var group = Get<CanvasGroup>(_window.root) ?? _window.root.AddComponent(Il2CppType.Of<CanvasGroup>()).Cast<CanvasGroup>();
+            var group = Get<CanvasGroup>(_window.root) ?? _window.root.AddComponent<CanvasGroup>();
             _parentWasInteractable = group.interactable;
             _parentBlockedRaycasts = group.blocksRaycasts;
             _parentInputGroup = group;
@@ -723,7 +717,7 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (changed) { element.SetText(value); _textCache[id] = value; }
         if (_minimumHeights.TryGetValue(id, out var minimum) && element.text != null)
         {
-            var actualWidth = element.root.transform.Cast<RectTransform>().rect.width;
+            var actualWidth = element.root.GetComponent<RectTransform>().rect.width;
             var available = Math.Max(100, actualWidth > 20 ? actualWidth - 12 : _width - 90);
             if (changed || !_measuredWidths.TryGetValue(id, out var lastWidth) || Math.Abs(lastWidth - available) > 1)
             {
@@ -742,7 +736,7 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     internal static void Container(RectTransform root, float width, float height = -1)
     {
-        var layout = Get<LayoutElement>(root.gameObject) ?? root.gameObject.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
+        var layout = Get<LayoutElement>(root.gameObject) ?? root.gameObject.AddComponent<LayoutElement>();
         // 清除模板遗留的固定宽度；负值表示填充所在列。
         layout.minWidth = width < 0 ? 0 : width;
         layout.preferredWidth = width < 0 ? 0 : width;
@@ -750,11 +744,11 @@ public sealed class NativeStockMarketPanel : IDisposable
         if (height >= 0) { layout.minHeight = height; layout.preferredHeight = height; layout.flexibleHeight = 0; }
     }
 
-    private static T? Get<T>(GameObject root) where T : Component => root.GetComponent(Il2CppType.Of<T>())?.TryCast<T>();
+    private static T? Get<T>(GameObject root) where T : Component => root.GetComponent<T>();
 
     private static void FillHeight(RectTransform root)
     {
-        var layout = Get<LayoutElement>(root.gameObject) ?? root.gameObject.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
+        var layout = Get<LayoutElement>(root.gameObject) ?? root.gameObject.AddComponent<LayoutElement>();
         layout.minHeight = 0; layout.preferredHeight = 0; layout.flexibleHeight = 1;
         var fitter = Get<ContentSizeFitter>(root.gameObject);
         if (fitter != null) fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
@@ -762,20 +756,20 @@ public sealed class NativeStockMarketPanel : IDisposable
 
     internal static void NormalizeLayout(RectTransform root)
     {
-        foreach (var component in root.gameObject.GetComponentsInChildren(Il2CppType.Of<VerticalLayoutGroup>(), true))
+        foreach (var component in root.gameObject.GetComponentsInChildren<VerticalLayoutGroup>(true))
         {
-            var group = component.Cast<VerticalLayoutGroup>();
+            var group = component;
             group.childControlWidth = true; group.childForceExpandWidth = true;
             group.childControlHeight = true; group.childForceExpandHeight = false;
         }
-        foreach (var component in root.gameObject.GetComponentsInChildren(Il2CppType.Of<HorizontalLayoutGroup>(), true))
+        foreach (var component in root.gameObject.GetComponentsInChildren<HorizontalLayoutGroup>(true))
         {
-            var group = component.Cast<HorizontalLayoutGroup>();
+            var group = component;
             group.childControlWidth = true; group.childForceExpandWidth = false;
             group.childControlHeight = true; group.childForceExpandHeight = false;
         }
-        foreach (var component in root.gameObject.GetComponentsInChildren(Il2CppType.Of<ContentSizeFitter>(), true))
-            component.Cast<ContentSizeFitter>().horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        foreach (var component in root.gameObject.GetComponentsInChildren<ContentSizeFitter>(true))
+            component.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
     }
 
     private void Enabled(string id, bool enabled)
@@ -807,13 +801,13 @@ public sealed class NativeStockMarketPanel : IDisposable
     {
         button.transition = Selectable.Transition.ColorTint;
         var colors = button.colors;
-        // 当前 IL2CPP 代理裁剪了部分 ColorBlock setter，使用已还原的结构字段。
-        colors.m_NormalColor = selected ? StockUiTheme.Selected : StockUiTheme.Button;
-        colors.m_HighlightedColor = selected ? StockUiTheme.SelectedHover : StockUiTheme.Hover;
-        colors.m_SelectedColor = colors.m_HighlightedColor;
-        colors.m_PressedColor = StockUiTheme.Pressed;
-        colors.m_DisabledColor = StockUiTheme.Disabled;
-        colors.m_ColorMultiplier = 1; colors.m_FadeDuration = .1f;
+        // 正式版直接使用 Unity 的公开颜色属性。
+        colors.normalColor = selected ? StockUiTheme.Selected : StockUiTheme.Button;
+        colors.highlightedColor = selected ? StockUiTheme.SelectedHover : StockUiTheme.Hover;
+        colors.selectedColor = colors.highlightedColor;
+        colors.pressedColor = StockUiTheme.Pressed;
+        colors.disabledColor = StockUiTheme.Disabled;
+        colors.colorMultiplier = 1; colors.fadeDuration = .1f;
         button.colors = colors;
     }
 
@@ -823,29 +817,29 @@ public sealed class NativeStockMarketPanel : IDisposable
         var input = element.input;
         input.targetGraphic = Surface(element.root, "InputFill", Color.white, 2, 2, 2, 2);
         SetButtonColors(input, false);
-        var colors = input.colors; colors.m_NormalColor = StockUiTheme.Surface; input.colors = colors;
+        var colors = input.colors; colors.normalColor = StockUiTheme.Surface; input.colors = colors;
         input.customCaretColor = true; input.caretColor = AccentColor;
         input.selectionColor = new Color(.35f, .65f, .85f, .55f);
         if (input.textComponent != null) { NativeUiBootstrap.ApplyCurrentFont(input.textComponent); input.textComponent.color = TextColor; input.textComponent.fontSize = 17; }
         if (input.placeholder != null)
         {
             input.placeholder.color = MutedColor;
-            var placeholderText = input.placeholder.TryCast<TMP_Text>();
+            var placeholderText = (input.placeholder as TMP_Text);
             if (placeholderText != null) NativeUiBootstrap.ApplyCurrentFont(placeholderText);
         }
     }
 
     internal static Image Surface(GameObject parent, string name, Color color, float left, float top, float right, float bottom)
     {
-        var types = new Il2CppReferenceArray<Il2CppSystem.Type>(new[] { Il2CppType.Of<RectTransform>() });
+        var types = new[] { typeof(RectTransform) };
         var go = new GameObject("StockMarket." + name, types);
         go.transform.SetParent(parent.transform, false); go.transform.SetAsFirstSibling();
-        var rect = go.transform.Cast<RectTransform>();
+        var rect = go.GetComponent<RectTransform>();
         rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
         rect.offsetMin = new Vector2(left, bottom); rect.offsetMax = new Vector2(-right, -top);
-        var layout = go.AddComponent(Il2CppType.Of<LayoutElement>()).Cast<LayoutElement>();
+        var layout = go.AddComponent<LayoutElement>();
         layout.ignoreLayout = true;
-        var image = go.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+        var image = go.AddComponent<Image>();
         image.color = color; image.raycastTarget = false;
         return image;
     }
@@ -910,7 +904,7 @@ public sealed class NativeStockMarketPanel : IDisposable
     private void Warn(string stage, string text, Exception? exception = null)
     {
         if (!_warned.Add(stage)) return;
-        MelonLogger.Warning("[原生股市] " + stage + ": " + text + (exception == null ? "" : Environment.NewLine + exception));
+        UnityEngine.Debug.LogWarning("[原生股市] " + stage + ": " + text + (exception == null ? "" : Environment.NewLine + exception));
     }
 
     private static decimal PreviousClose(MarketEngine engine, CompanyState stock) => stock.Candles.LastOrDefault(p => p.Day < engine.State.LastDay)?.Close ?? stock.History.LastOrDefault(p => p.Day < engine.State.LastDay)?.Price ?? engine.Config.InitialPrice;

@@ -1,5 +1,5 @@
 using ProbablyStolenStockMarket.Market;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Text.Json.Nodes;
 
 static class StockScenarioTests
@@ -10,7 +10,7 @@ static class StockScenarioTests
         public int Cash { get; private set; } = 1000;
         public void ChangeCash(int delta) => Cash += delta;
     }
-    static string Snapshot(object value) => JsonSerializer.Serialize(value, MarketEngine.JsonOptions);
+    static string Snapshot(object value) => JsonConvert.SerializeObject(value, MarketEngine.JsonOptions);
     static MarketEngine Clone(MarketEngine engine)
     {
         var config = MarketConfig.Deserialize(engine.Config.Serialize());

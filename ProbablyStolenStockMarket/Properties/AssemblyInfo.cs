@@ -1,5 +1,9 @@
-using MelonLoader;
+using System.Reflection;
 using ProbablyStolenStockMarket;
 
-[assembly: MelonInfo(typeof(ModEntry), ModInfo.Name, ModInfo.Version, ModInfo.Author)]
-[assembly: MelonGame(ModInfo.GameDeveloper, ModInfo.GameName)]
+[assembly: AssemblyTitle(ModInfo.Name)]
+[assembly: AssemblyDescription("Probably Stolen 正式版股市与贷款原生模组")]
+[assembly: AssemblyCompany(ModInfo.Author)]
+[assembly: AssemblyProduct(ModInfo.Name)]
+[assembly: AssemblyVersion(ModInfo.Version)]
+[assembly: AssemblyFileVersion(ModInfo.Version)]

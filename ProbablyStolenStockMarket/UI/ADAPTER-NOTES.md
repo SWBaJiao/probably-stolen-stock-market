@@ -1,5 +1,7 @@
 # 0.1.1 IMGUI 代理适配历史记录
 
+0.15.0 已迁移到正式版 Mono 原生 Mod API，当前 UI 使用普通 Unity/TMPro 托管类型。以下仅为早期 Demo 的历史记录，IL2CPP 裁剪限制和代理调用链不适用于当前迁移目标。
+
 0.2.0 已移除此面板实现，当前使用游戏原生控件与素材，见 [原生界面说明](NATIVE-NOTES.md)。以下仅保留旧调用链的诊断依据。
 
 本记录依据本机 `MelonLoader/Il2CppAssemblies` 中 Unity 2021.3.45f2 的生成代理静态反编译。已绑定原生方法表示调用链中存在 `il2cpp_runtime_invoke` 或 `ResolveICall`，不代表已在游戏中实际验收。

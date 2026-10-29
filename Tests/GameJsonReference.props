@@ -1,0 +1,18 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)../ProbablyStolenStockMarket/Game.local.props"
+          Condition="Exists('$(MSBuildThisFileDirectory)../ProbablyStolenStockMarket/Game.local.props')" />
+  <PropertyGroup>
+    <ManagedDirectory Condition="'$(ManagedDirectory)' == '' and '$(GameDirectory)' != ''">$(GameDirectory)/Probably Stolen_Data/Managed</ManagedDirectory>
+    <NewtonsoftJsonPath Condition="'$(NewtonsoftJsonPath)' == ''">$(ManagedDirectory)/Newtonsoft.Json.dll</NewtonsoftJsonPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(NewtonsoftJsonPath)</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="ValidateTestJsonReference" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(NewtonsoftJsonPath)')"
+           Text="测试需要正式版自带的 Newtonsoft.Json.dll，请配置 Game.local.props、GameDirectory 或 NewtonsoftJsonPath。" />
+  </Target>
+</Project>

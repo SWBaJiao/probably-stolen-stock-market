@@ -13,7 +13,7 @@ public static class GameLanguageAdapter
     /// <summary>在游戏主线程调用；异步语言初始化完成后才读取结果。</summary>
     public static void Update()
     {
-        var now = Environment.TickCount64;
+        var now = NativeGameAccess.Milliseconds;
         if (now < _nextPoll) return;
         _nextPoll = now + PollIntervalMilliseconds;
 
@@ -24,7 +24,7 @@ public static class GameLanguageAdapter
             if (!operation.IsDone) return;
             var locale = operation.Result;
             if (locale == null) return;
-            Localizer.Language = Localizer.ResolveLanguage(locale.Identifier?.Code);
+            Localizer.Language = Localizer.ResolveLanguage(locale.Identifier.Code);
         }
         catch
         {

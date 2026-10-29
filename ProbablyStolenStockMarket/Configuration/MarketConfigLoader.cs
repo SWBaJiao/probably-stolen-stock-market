@@ -1,50 +1,34 @@
-using System;
 using System.IO;
-using MelonLoader;
-using MelonLoader.Utils;
 using ProbablyStolenStockMarket.Market;
 
 namespace ProbablyStolenStockMarket.Configuration;
 
 public static class MarketConfigLoader
 {
-    public static string ConfigPath => Path.Combine(ModPaths.DataDirectory, "market-config.json");
+    private const string ConfigFile = "market-config.json";
+    public static string ConfigPath => Path.Combine(ModPaths.DataDirectory, ConfigFile);
 
-    public static MarketConfig Load(MelonLogger.Instance logger)
+    public static MarketConfig Load(ModLogger logger)
     {
-        var path = ConfigPath;
-        var legacy = Path.Combine(ModPaths.LegacyDataDirectory, "market-config.json");
-        if (!File.Exists(path) && File.Exists(legacy))
+        var custom = ModHelper.ReadModDataFileText(ModInfo.Id, ConfigFile);
+        if (custom != null)
         {
-            // 先严格验证旧配置，再原样复制；旧文件保留，新文件存在时始终优先使用。
-            var text = File.ReadAllText(legacy);
-            MarketConfig.Deserialize(text);
-            Directory.CreateDirectory(ModPaths.DataDirectory);
-            File.Copy(legacy, path, overwrite: false);
-            logger.Msg("已将旧版股市配置迁移到：" + path);
+            // 配置错误时保留原文并停止初始化，避免悄悄替换经济规则。
+            var config = MarketConfig.Deserialize(custom);
+            logger.Msg("股市配置已加载：" + ConfigPath);
+            LogStockConfiguration(config, logger);
+            return config;
         }
-        if (File.Exists(path))
-        {
-            // 用户配置出错时保留原文件并停止初始化，避免悄悄替换经济规则。
-            var custom = MarketConfig.Deserialize(File.ReadAllText(path));
-            logger.Msg("股市配置已加载：" + path);
-            LogStockConfiguration(custom, logger);
-            return custom;
-        }
-
-        var bundled = ModPaths.AssetPath("market-config.default.json");
-        var config = File.Exists(bundled)
-            ? MarketConfig.Deserialize(File.ReadAllText(bundled))
-            : MarketConfig.CreateDefault();
-        config.Validate();
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        File.WriteAllText(path, config.Serialize());
-        logger.Msg("首次创建股市配置：" + path);
-        LogStockConfiguration(config, logger);
-        return config;
+        var bundled = ModPaths.ReadAssetText("market-config.default.json");
+        var defaults = MarketConfig.Deserialize(bundled);
+        defaults.Validate();
+        ModHelper.WriteModDataFileText(ModInfo.Id, ConfigFile, defaults.Serialize());
+        logger.Msg("首次创建股市配置：" + ConfigPath);
+        LogStockConfiguration(defaults, logger);
+        return defaults;
     }
 
-    private static void LogStockConfiguration(MarketConfig config, MelonLogger.Instance logger)
+    private static void LogStockConfiguration(MarketConfig config, ModLogger logger)
     {
         logger.Msg($"[股市事件配置] 专用事件{(config.EnableStockEvents ? "启用" : "停用")}；模板 {config.StockEventTemplates.Count} 个；提前排程 {config.StockScheduleDays} 日；间隔 {config.StockEventIntervalMinDays}～{config.StockEventIntervalMaxDays} 日；同公司每日主冲击净限幅 {config.EventShockDailyLimit:P0}。");
     }

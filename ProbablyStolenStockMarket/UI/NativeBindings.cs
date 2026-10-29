@@ -1,13 +1,11 @@
 using System;
-using Il2Cpp;
-using Il2CppInterop.Runtime;
-using Il2CppTMPro;
+using TMPro;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace ProbablyStolenStockMarket.UI;
 
-// 保留托管入口和原生委托，关闭窗口时移除完全相同的监听器。
+// 保存同一个 Unity 委托，关闭窗口时解绑对应的监听器。
 internal sealed class NativeButtonBinding : IDisposable
 {
     private readonly Button _button;
@@ -23,7 +21,7 @@ internal sealed class NativeButtonBinding : IDisposable
         _owner = owner;
         _command = command;
         _managed = Invoke;
-        _native = DelegateSupport.ConvertDelegate<UnityAction>(_managed) ?? throw new InvalidOperationException("原生按钮委托转换失败。");
+        _native = Invoke;
         _button.onClick.AddListener(_native);
     }
 
@@ -51,7 +49,7 @@ internal sealed class NativeQuantityBinding : IDisposable
         _input = element.input ?? throw new InvalidOperationException("原生输入框预制件缺少 TMP_InputField 组件。");
         _owner = owner;
         _managed = OnChanged;
-        _native = DelegateSupport.ConvertDelegate<UnityAction<string>>(_managed) ?? throw new InvalidOperationException("原生输入委托转换失败。");
+        _native = OnChanged;
         _input.characterLimit = 9;
         _input.contentType = TMP_InputField.ContentType.IntegerNumber;
         _input.onValueChanged.AddListener(_native);

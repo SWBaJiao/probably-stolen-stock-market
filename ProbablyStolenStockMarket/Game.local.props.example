@@ -1,14 +1,9 @@
 <Project>
   <PropertyGroup>
-    <!-- 使用执行 dotnet 的系统路径，CrossOver 中的 Windows 游戏填写 macOS 磁盘路径。 -->
+    <!-- 指向包含 Probably Stolen.exe 的正式版目录；CrossOver 使用 macOS 磁盘路径。 -->
     <GameDirectory></GameDirectory>
     <DeployOnBuild>true</DeployOnBuild>
     <DeployDebugSymbols>false</DeployDebugSymbols>
-    <!-- 股市功能需要当前游戏版本生成的 IL2CPP 代理程序集。 -->
-    <UseGameInterop>true</UseGameInterop>
-    <!-- 可以按实际安装布局覆盖以下路径。 -->
-    <!-- <MelonLoaderAssembly>/你的目录/MelonLoader.dll</MelonLoaderAssembly> -->
-    <!-- <MelonRuntimeDirectory>/你的目录/MelonLoader/net6</MelonRuntimeDirectory> -->
-    <!-- <Il2CppAssembliesDirectory>/你的目录/MelonLoader/Il2CppAssemblies</Il2CppAssembliesDirectory> -->
+    <!-- 特殊安装布局可单独指定 ManagedDirectory。 -->
   </PropertyGroup>
 </Project>

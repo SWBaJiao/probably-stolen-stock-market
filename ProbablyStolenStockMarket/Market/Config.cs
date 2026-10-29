@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ProbablyStolenStockMarket.Market;
 
@@ -105,13 +106,13 @@ public sealed partial class MarketConfig
         return c;
     }
 
-    public string Serialize() => JsonSerializer.Serialize(this, MarketEngine.JsonOptions);
+    public string Serialize() => JsonConvert.SerializeObject(this, MarketEngine.JsonOptions);
     public static MarketConfig Deserialize(string json)
     {
-        var c = JsonSerializer.Deserialize<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空");
-        using var document = JsonDocument.Parse(json);
+        var c = JsonConvert.DeserializeObject<MarketConfig>(json, MarketEngine.JsonOptions) ?? throw new ArgumentException("行情配置为空");
+        var document = JObject.Parse(json);
         // 旧自定义公司与行业列表只获得完整可用的新模板，不补改用户的业务定义。
-        if (!document.RootElement.TryGetProperty(nameof(StockEventTemplates), out _) && c.Companies != null && c.Sectors != null)
+        if (document.Property(nameof(StockEventTemplates), StringComparison.Ordinal) == null && c.Companies != null && c.Sectors != null)
         {
             c.StockEventTemplates = c.StockEventTemplates.Where(t => t.Impacts.Keys.All(id => c.Companies.Any(x => x?.Id == id)) && t.Sectors.All(id => c.Sectors.Any(x => x?.Id == id))).ToList();
             if (c.StockEventTemplates.Count == 0) c.EnableStockEvents = false;
@@ -150,6 +151,8 @@ public sealed partial class MarketConfig
 
     public void Validate()
     {
+        if (Loans == null) throw new ArgumentException("贷款配置为空");
+        Loans.Validate();
         ValidateStockConfiguration();
         if (TradeDailyLimit < 0 || TradeDailyLimit > .2m) throw new ArgumentException("每日成交影响幅度无效");
         if (EventShockWindowDays < 1 || EventShockWindowDays > 3650 || EventPreheatChance < 0 || EventPreheatChance > 1 || EventPreheatScale < 0 || EventPreheatScale > 1 || EventPreheatLimit < 0 || EventPreheatLimit > .1m) throw new ArgumentException("事件冲击窗口与预热参数无效");

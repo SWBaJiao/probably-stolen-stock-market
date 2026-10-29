@@ -1,147 +1,162 @@
 using System;
-using HarmonyLib;
-using MelonLoader;
 using ProbablyStolenStockMarket.Configuration;
 using ProbablyStolenStockMarket.Features;
 using ProbablyStolenStockMarket.Game;
 using ProbablyStolenStockMarket.UI;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace ProbablyStolenStockMarket;
 
-public sealed class ModEntry : MelonMod
+public sealed class ModEntry : IMod
 {
+    private readonly ModLogger _logger = new();
     private SceneHooks? _sceneHooks;
     private GameBridge? _market;
     private NativeStockMarketPanel? _panel;
     private HarmonyLib.Harmony? _marketHarmony;
-    private bool _subscribed;
+    private ModRuntime? _runtime;
+    private bool _enabled;
     private DateTime _lastError;
 
-    public override void OnInitializeMelon()
+    public void Init(ModManifest manifest)
     {
-        if (_subscribed)
-            return;
+        if (manifest == null || !string.Equals(manifest.ID, ModInfo.Id, StringComparison.Ordinal))
+            throw new InvalidOperationException("manifest.xml 中的 ID 必须与股市模组 ID 一致。");
+        _logger.Msg($"{manifest.Name} {manifest.ModVersion} 原生模组已注册。");
+    }
 
-        _sceneHooks ??= new SceneHooks(LoggerInstance);
-        SubscribeHooks();
-        LoggerInstance.Msg($"{ModInfo.Name} {ModInfo.Version} 已初始化，ID：{ModInfo.Id}");
+    public void OnEnable()
+    {
+        if (_enabled) return;
+        _enabled = true;
+        SceneManager.sceneLoaded += HandleSceneLoaded;
+        SceneManager.sceneUnloaded += HandleSceneUnloaded;
         try
         {
-            var config = MarketConfigLoader.Load(LoggerInstance);
-            _marketHarmony = new HarmonyLib.Harmony(ModInfo.Id);
-            _market = new GameBridge(LoggerInstance, config);
+            var root = new GameObject(ModInfo.Id + ".runtime");
+            UnityEngine.Object.DontDestroyOnLoad(root);
+            _runtime = root.AddComponent<ModRuntime>();
+            _runtime.Owner = this;
+        }
+        catch { OnDisable(); throw; }
+    }
+
+    internal void StartRuntime()
+    {
+        if (!_enabled) return;
+        try
+        {
+            // 加载器会在 OnEnable 返回后登记模组目录；下一帧再读取资源和配置。
+            _sceneHooks = new SceneHooks(_logger);
+            var config = MarketConfigLoader.Load(_logger);
+            _marketHarmony = new HarmonyLib.Harmony("mod." + ModInfo.Id + ".runtime");
+            _market = new GameBridge(_logger, config);
             _panel = new NativeStockMarketPanel(_market);
             _market.IsPanelVisible = () => _panel?.IsVisible == true;
             _market.OpenPanelRequested += HandleOpenPanel;
+            _market.ClosePanelRequested += HandleClosePanel;
             _market.Initialize(_marketHarmony);
-            LoggerInstance.Msg("股市功能已初始化；进入存档后请检查 [股市交易] 与 [股市探针]，交易权限按本机配置生效。");
+            HandleSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+            _logger.Msg("股市和贷款已接入正式版原生加载器；投资记录随原版存档保存。");
         }
         catch (Exception ex)
         {
-            LoggerInstance.Error("股市初始化失败，已撤销本模组钩子：" + ex);
+            _logger.Error("股市初始化失败，已撤销本模组钩子：" + ex);
             DisposeMarket();
+            var loaded = ModLoader.Mods.Find(m => m.Manifest.ID == ModInfo.Id);
+            if (loaded != null) loaded.LoadError = "股市初始化失败：" + ex.Message;
         }
     }
 
-    public override void OnDeinitializeMelon()
+    public void OnDisable()
     {
-        if (!_subscribed)
-            return;
-
-        UnsubscribeHooks();
+        _enabled = false;
+        SceneManager.sceneLoaded -= HandleSceneLoaded;
+        SceneManager.sceneUnloaded -= HandleSceneUnloaded;
+        if (_runtime != null)
+        {
+            _runtime.Owner = null;
+            UnityEngine.Object.Destroy(_runtime.gameObject);
+            _runtime = null;
+        }
         DisposeMarket();
         _sceneHooks?.LogSummary();
         _sceneHooks = null;
-        LoggerInstance.Msg("模组已关闭，场景钩子已解绑。");
     }
 
-    public override void OnUpdate()
+    internal void Tick()
     {
+        if (!_enabled) return;
         try { GameLanguageAdapter.Update(); _market?.Tick(); _panel?.Tick(); }
         catch (Exception ex) { LogRuntimeError(ex); }
     }
 
-    public override void OnGUI()
+    internal void DrawInput()
     {
+        if (!_enabled) return;
         try
         {
-            var input = UnityEngine.Event.current;
-            if (_market != null && input != null && input.type == UnityEngine.EventType.KeyDown
-                && input.keyCode == UnityEngine.KeyCode.F8 && input.control)
+            var input = Event.current;
+            if (_market != null && input != null && input.type == EventType.KeyDown
+                && input.keyCode == KeyCode.F8 && input.control)
             {
                 // 仅补领道具，保留通过背包双击打开股市的主要交互。
-                LoggerInstance.Msg("[股市道具] 手动补领：" + _market.RecoverTerminal());
+                _logger.Msg("[股市道具] 手动补领：" + _market.RecoverTerminal());
                 input.Use();
             }
         }
-        catch (Exception ex)
-        {
-            _panel?.Hide();
-            LogRuntimeError(ex);
-        }
+        catch (Exception ex) { _panel?.Hide(); LogRuntimeError(ex); }
     }
 
     private void HandleOpenPanel() => _panel?.Show();
+    private void HandleClosePanel() => _panel?.Hide();
 
     private void DisposeMarket()
     {
         if (_market != null) _market.OpenPanelRequested -= HandleOpenPanel;
-        _panel?.Dispose();
-        _panel = null;
-        _market?.Dispose();
-        _market = null;
-        // 只清理本模组拥有的补丁，不影响其他 MelonLoader 模组。
-        _marketHarmony?.UnpatchSelf();
-        _marketHarmony = null;
+        if (_market != null) _market.ClosePanelRequested -= HandleClosePanel;
+        try { _panel?.Dispose(); }
+        finally
+        {
+            _panel = null;
+            try { _market?.Dispose(); }
+            finally
+            {
+                _market = null;
+                // 只撤销本模组手工安装的补丁，加载器管理自己的自动补丁。
+                if (_marketHarmony != null) _marketHarmony.UnpatchAll(_marketHarmony.Id);
+                _marketHarmony = null;
+            }
+        }
     }
 
     private void LogRuntimeError(Exception ex)
     {
         if ((DateTime.UtcNow - _lastError).TotalSeconds < 10) return;
         _lastError = DateTime.UtcNow;
-        LoggerInstance.Error("股市运行异常：" + ex);
+        _logger.Error("股市运行异常：" + ex);
     }
 
-    private void SubscribeHooks()
+    private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (_subscribed)
-            return;
-
-        // 只订阅具名处理函数，不再覆写同名场景回调，避免重复执行功能。
-        MelonEvents.OnSceneWasInitialized.Subscribe(HandleSceneInitialized);
-        try
-        {
-            MelonEvents.OnSceneWasUnloaded.Subscribe(HandleSceneUnloaded);
-            _subscribed = true;
-        }
-        catch
-        {
-            // 第二个订阅失败时撤销第一个，避免留下部分注册的钩子。
-            MelonEvents.OnSceneWasInitialized.Unsubscribe(HandleSceneInitialized);
-            throw;
-        }
-    }
-
-    private void UnsubscribeHooks()
-    {
-        if (!_subscribed)
-            return;
-
-        MelonEvents.OnSceneWasInitialized.Unsubscribe(HandleSceneInitialized);
-        MelonEvents.OnSceneWasUnloaded.Unsubscribe(HandleSceneUnloaded);
-        _subscribed = false;
-    }
-
-    private void HandleSceneInitialized(int buildIndex, string sceneName)
-    {
-        _sceneHooks?.OnSceneInitialized(buildIndex, sceneName);
-        try { _market?.OnSceneChanged(sceneName); }
+        _sceneHooks?.OnSceneInitialized(scene.buildIndex, scene.name);
+        try { _market?.OnSceneChanged(scene.name); }
         catch (Exception ex) { LogRuntimeError(ex); }
     }
 
-    private void HandleSceneUnloaded(int buildIndex, string sceneName)
+    private void HandleSceneUnloaded(Scene scene)
     {
         _panel?.Hide();
-        _sceneHooks?.OnSceneUnloaded(buildIndex, sceneName);
+        _sceneHooks?.OnSceneUnloaded(scene.buildIndex, scene.name);
     }
+}
+
+// 使用普通 MonoBehaviour 驱动每帧逻辑，随模组禁用一起销毁。
+public sealed class ModRuntime : MonoBehaviour
+{
+    internal ModEntry? Owner;
+    private void Start() => Owner?.StartRuntime();
+    private void Update() => Owner?.Tick();
+    private void OnGUI() => Owner?.DrawInput();
 }

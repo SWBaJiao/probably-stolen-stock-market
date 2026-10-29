@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-using Il2Cpp;
-using MelonLoader;
 using ProbablyStolenStockMarket.Localization;
 
 namespace ProbablyStolenStockMarket.Game;
@@ -14,10 +12,11 @@ internal static class GamePatches
     private static readonly List<MethodBase> Patched = new();
     [ThreadStatic] private static TradeCapture? _trade;
     [ThreadStatic] private static int _tradeDepth;
-    internal static void Install(HarmonyLib.Harmony harmony, MelonLogger.Instance log)
+    internal static void Install(HarmonyLib.Harmony harmony, ModLogger log)
     {
         Patch(harmony, typeof(PlayerStore), "LoadGame", prefix: nameof(LoadPrefix), finalizer: nameof(LoadFinalizer));
         Patch(harmony, typeof(PlayerStore), "SaveGame", prefix: nameof(SavePrefix), finalizer: nameof(SaveFinalizer));
+        Patch(harmony, typeof(HandnoteUIManager), "OpenPanel", prefix: nameof(IntelCardReadPrefix));
         Patch(harmony, typeof(PlayerStore), "DismissCurrentClient", prefix: nameof(DismissPrefix), postfix: nameof(DismissPostfix));
         foreach (string name in new[] { "BuyItem", "SellItem", "BuyItemFromTable", "SellItemFromTable", "OnItemsSold" })
             Patch(harmony, typeof(PlayerStore), name, prefix: nameof(TradePrefix), finalizer: nameof(TradeFinalizer));
@@ -35,7 +34,7 @@ internal static class GamePatches
         Patch(harmony, typeof(PlayerStore), "PlacedItemForSelling", prefix: nameof(ProtectItemPrefix));
         Patch(harmony, typeof(GameItem), "ActivateSlotItem", prefix: nameof(ActivatePrefix));
         Patch(harmony, typeof(GameItem), "Target", prefix: nameof(ProtectTargetPrefix));
-        Patch(harmony, typeof(GameItem), "MayRemove", prefix: nameof(MayRemovePrefix));
+        // 面板允许按原版规则移动，便于从桌面或窗外收回；出售与道具激活仍由各自入口保护。
         Patch(harmony, typeof(GameItem), "GetDisplayName", postfix: nameof(ItemDisplayNamePostfix));
         Patch(harmony, typeof(ItemMouseDragHandler), "StartDrag", prefix: nameof(InputPrefix));
         // 原版独立输入分发不受 UGUI 窗口遮挡影响，模态期间在入口暂停，EventSystem 仍处理股市控件。
@@ -46,7 +45,7 @@ internal static class GamePatches
         Patch(harmony, typeof(PlayerStore), "EndDay", prefix: nameof(DayEndPrefix));
         foreach (string name in new[] { "OpenShutter", "TryCallNextClient", "AcceptBarter", "PlacedItemForBuying", "PlacedItemForBarter" })
             Patch(harmony, typeof(PlayerStore), name, prefix: nameof(InputPrefix));
-        log.Msg($"[股市探针] 成功安装 {Patched.Count} 个原生方法补丁。");
+        log.Msg($"[股市面板] 成功安装 {Patched.Count} 个原生方法补丁。");
     }
     private static void Patch(HarmonyLib.Harmony harmony, Type type, string method, string? prefix = null, string? postfix = null, string? finalizer = null)
     {
@@ -62,13 +61,18 @@ internal static class GamePatches
     private static void LoadPrefix() => GameBridge.Current?.BeginLoad();
     private static Exception? LoadFinalizer(Exception? __exception) { GameBridge.Current?.EndLoad(__exception == null); return __exception; }
     private static void SavePrefix() => GameBridge.Current?.BeforeSave();
-    private static Exception? SaveFinalizer(Exception? __exception) { GameBridge.Current?.SaveCompleted(__exception == null); return __exception; }
-    private static bool DismissPrefix(PlayerStore __instance, out IntPtr __state)
+    private static void IntelCardReadPrefix(GameItem __0)
     {
-        __state = GameBridge.Current?.BlocksGameInput == true ? IntPtr.Zero : __instance.currentClientInstance?.Pointer ?? IntPtr.Zero;
+        try { if (__0 != null) GameBridge.Current?.PrepareIntelCardRead(__0); }
+        catch (Exception ex) { UnityEngine.Debug.LogWarning("[股市情报名片] 阅读前更新失败：" + ex); }
+    }
+    private static Exception? SaveFinalizer(Exception? __exception) { GameBridge.Current?.SaveCompleted(__exception == null); return __exception; }
+    private static bool DismissPrefix(PlayerStore __instance, out StoreClientInstance? __state)
+    {
+        __state = GameBridge.Current?.BlocksGameInput == true ? null : __instance.currentClientInstance;
         return GameBridge.Current?.BlocksGameInput != true;
     }
-    private static void DismissPostfix(IntPtr __state) => GameBridge.Current?.Dismissed(__state);
+    private static void DismissPostfix(StoreClientInstance? __state) => GameBridge.Current?.Dismissed(__state);
     private static bool TradePrefix(MethodBase __originalMethod, object[] __args, out bool __state)
     {
         __state = false;
@@ -78,7 +82,7 @@ internal static class GamePatches
         foreach (object arg in __args)
         {
             if (arg is GameItem item) items.Add(item);
-            else if (arg is Il2CppSystem.Collections.Generic.List<GameItem> list) foreach (var i in list) items.Add(i);
+            else if (arg is System.Collections.Generic.List<GameItem> list) foreach (var i in list) items.Add(i);
         }
         if (items.Any(i => bridge?.IsTerminal(i) == true)) return false;
         if (_tradeDepth == 0)
@@ -139,23 +143,23 @@ internal static class GamePatches
     {
         // 只翻译专用入口与已认领情报纸条，名称标记仍以原文随存档保存。
         if (GameBridge.Current?.IsTerminal(__instance) == true) __result = Localizer.Text("股市面板");
+        else if (GameBridge.Current?.IsLoanCard(__instance) == true) __result = Localizer.Text("沈衡的贷款名片");
+        else if (GameBridge.Current?.IsIntelCard(__instance) == true) __result = Localizer.Text("股市情报名片");
         else if (IntelDeliveryAdapter.IsOwnPaper(__instance)) __result = Localizer.Text("股市情报纸条");
     }
-    private static bool MayRemovePrefix(GameItem __instance, ref bool __result)
-    {
-        if (GameBridge.Current?.IsTerminal(__instance) != true) return true;
-        __result = false; return false;
-    }
     private static bool InputPrefix() => GameBridge.Current?.BlocksGameInput != true;
-    private static bool ShutterInputPrefix(MethodBase __originalMethod)
+    private static bool ShutterInputPrefix(StoreShutterButton __instance, MethodBase __originalMethod)
     {
         bool allowed = InputPrefix();
+        if (allowed && __originalMethod.Name == "EndAndClose")
+            allowed = GameBridge.Current?.ConfirmStartingDebtDayEnd(__instance.EndAndClose) ?? true;
         GameBridge.Current?.TraceStoreAction("StoreShutterButton." + __originalMethod.Name, !allowed);
         return allowed;
     }
-    private static bool DayEndPrefix()
+    private static bool DayEndPrefix(PlayerStore __instance)
     {
         bool allowed = InputPrefix();
+        if (allowed) allowed = GameBridge.Current?.ConfirmStartingDebtDayEnd(__instance.EndDay) ?? true;
         GameBridge.Current?.TraceStoreAction("PlayerStore.EndDay", !allowed);
         return allowed;
     }

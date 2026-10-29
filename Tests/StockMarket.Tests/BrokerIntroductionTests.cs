@@ -30,7 +30,7 @@ static class BrokerIntroductionTests
         var beforeIntroduction = restored.Serialize();
         var expected = JsonNode.Parse(beforeIntroduction)!;
         expected["Broker"]!["HasMetBroker"] = true;
-        check(restored.MarkBrokerIntroduced(due.VisitId) && restored.State.Broker.HasMetBroker && restored.Serialize() == expected.ToJsonString(MarketEngine.JsonOptions), "实际当前访客完成介绍只改变见面标记不改变预约信誉或行情");
+        check(restored.MarkBrokerIntroduced(due.VisitId) && restored.State.Broker.HasMetBroker && JsonNode.DeepEquals(JsonNode.Parse(restored.Serialize()), expected), "实际当前访客完成介绍只改变见面标记不改变预约信誉或行情");
         var introduced = restored.Serialize();
         check(restored.MarkBrokerIntroduced(due.VisitId) && restored.Serialize() == introduced, "当前访客重复介绍回调幂等且不改变随机状态");
         var familiar = new MarketEngine(restored.Config, MarketEngine.Deserialize(introduced, restored.Config));

@@ -8,7 +8,11 @@ namespace ProbablyStolenStockMarket.Game;
 internal static class IntelPaperMarker
 {
     private static readonly string[] Prefixes = { "\n档案号：", "\nArchive no.: ", "\n記録番号：", "\n기록 번호: " };
-    private static string Hash(string offerId) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(offerId)))[..12];
+    private static string Hash(string offerId)
+    {
+        using var sha = SHA256.Create();
+        return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(offerId))).Replace("-", "").Substring(0, 12);
+    }
     internal static string Canonical(string offerId) => Prefixes[0] + Hash(offerId);
     internal static bool Matches(string? sign, string offerId)
     {

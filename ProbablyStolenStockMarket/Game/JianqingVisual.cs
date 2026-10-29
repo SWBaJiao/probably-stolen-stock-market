@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Il2Cpp;
-using MelonLoader;
 using ProbablyStolenStockMarket.Features;
 using UnityEngine;
 
@@ -11,15 +9,15 @@ namespace ProbablyStolenStockMarket.Game;
 // 新人物沿用原版角色精灵的尺寸和锚点，图像只注册到运行时字典。
 internal abstract class BrokerCharacterVisual : IDisposable
 {
-    private readonly MelonLogger.Instance _log;
+    private readonly ModLogger _log;
     private readonly string _key, _file, _name;
-    private readonly List<Il2CppSystem.Collections.Generic.Dictionary<string, Sprite>> _registrations = new();
+    private readonly List<System.Collections.Generic.Dictionary<string, Sprite>> _registrations = new();
     private Texture2D? _texture;
     private Sprite? _sprite;
     private bool _disposed, _failed;
     private string _lastWarning = "";
 
-    protected BrokerCharacterVisual(MelonLogger.Instance log, string key, string file, string name)
+    protected BrokerCharacterVisual(ModLogger log, string key, string file, string name)
     { _log = log; _key = key; _file = file; _name = name; }
 
     internal bool EnsureRegistered()
@@ -33,21 +31,21 @@ internal abstract class BrokerCharacterVisual : IDisposable
             if (_sprite == null)
             {
                 Sprite? reference = null;
-                if (dict.bmMaleEntries != null)
-                    foreach (var entry in dict.bmMaleEntries)
+                if (NativeGameAccess.GetBrokerPortraits(dict) != null)
+                    foreach (var entry in NativeGameAccess.GetBrokerPortraits(dict))
                         if (entry?.sprite != null) { reference = entry.sprite; break; }
                 if (reference == null) return false;
                 Load(reference);
             }
-            if (sprites.ContainsKey(_key) && sprites[_key]?.Pointer != _sprite!.Pointer)
+            if (sprites.ContainsKey(_key) && sprites[_key] != _sprite!)
                 throw new InvalidOperationException("人物精灵键已被其它资源占用，未覆盖原值。");
             if (!sprites.ContainsKey(_key))
             {
                 sprites.Add(_key, _sprite!);
-                if (!_registrations.Exists(d => d.Pointer == sprites.Pointer)) _registrations.Add(sprites);
+                if (!_registrations.Exists(d => d == sprites)) _registrations.Add(sprites);
                 _log.Msg($"[股市人物图像] {_name} 已注册独立精灵 {_key}；实际人物显示待游戏验收。");
             }
-            if (dict.GetSprite(_key)?.Pointer != _sprite!.Pointer)
+            if (dict.GetSprite(_key) != _sprite!)
                 throw new InvalidOperationException("原生人物精灵解析读回不一致。");
             _lastWarning = "";
             return true;
@@ -70,7 +68,7 @@ internal abstract class BrokerCharacterVisual : IDisposable
             var width = Math.Clamp((int)reference.rect.width, 16, 2048);
             var height = Math.Clamp((int)reference.rect.height, 32, 4096);
             source = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-            if (!ImageConversion.LoadImage(source, File.ReadAllBytes(path), false))
+            if (!ImageConversion.LoadImage(source, ModPaths.ReadAssetBytes("Textures", "Characters", _file), false))
                 throw new InvalidDataException("人物 PNG 解码失败。");
             if ((long)source.width * source.height > 16000000)
                 throw new InvalidDataException("人物图像像素数超出限制。");
@@ -111,7 +109,7 @@ internal abstract class BrokerCharacterVisual : IDisposable
         if (_disposed) return;
         _disposed = true;
         foreach (var dict in _registrations)
-            try { if (dict.ContainsKey(_key) && dict[_key]?.Pointer == _sprite?.Pointer) dict.Remove(_key); }
+            try { if (dict.ContainsKey(_key) && dict[_key] == _sprite) dict.Remove(_key); }
             catch (Exception ex) { _log.Warning("[股市人物图像] 解绑人物精灵失败：" + ex.Message); }
         _registrations.Clear();
         if (_sprite != null) UnityEngine.Object.Destroy(_sprite);
@@ -123,11 +121,11 @@ internal abstract class BrokerCharacterVisual : IDisposable
 internal sealed class JianqingVisual : BrokerCharacterVisual
 {
     internal const string SpriteKey = "probably_stolen_stock.jianqing";
-    internal JianqingVisual(MelonLogger.Instance log) : base(log, SpriteKey, "jianqing.png", "剑清酱") { }
+    internal JianqingVisual(ModLogger log) : base(log, SpriteKey, "jianqing.png", "剑清酱") { }
 }
 
 internal sealed class WenzhouVisual : BrokerCharacterVisual
 {
     internal const string SpriteKey = "probably_stolen_stock.wenzhou";
-    internal WenzhouVisual(MelonLogger.Instance log) : base(log, SpriteKey, "wenzhou.png", "闻舟") { }
+    internal WenzhouVisual(ModLogger log) : base(log, SpriteKey, "wenzhou.png", "闻舟") { }
 }

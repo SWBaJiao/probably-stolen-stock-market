@@ -7,5 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../ProbablyStolenStockMarket/Game/TerminalGrantPolicy.cs" Link="TerminalGrantPolicy.cs" />
+    <Compile Include="../../ProbablyStolenStockMarket/Game/TerminalAccountService.cs" Link="TerminalAccountService.cs" />
   </ItemGroup>
 </Project>

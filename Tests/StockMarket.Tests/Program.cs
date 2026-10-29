@@ -248,7 +248,7 @@ reloadedCandles.AdvanceDay(10);
 Check(reloadedCandles.State.Companies.Values.All(c => c.Candles.Count == 2 && c.Candles[0].Day == 9 && c.Candles[1].Day == 10), "日 K 线按日期保留有限数量");
 
 var legacy = new MarketState { LastDay = 4, Companies = new() { ["water"] = new CompanyState { Price = 130m, History = new() { new PricePoint { Day = 2, Price = 110m }, new PricePoint { Day = 2, Price = 90m }, new PricePoint { Day = 4, Price = 120m }, new PricePoint { Day = 4, Price = 130m } } } } };
-var oldJson = System.Text.Json.Nodes.JsonNode.Parse(System.Text.Json.JsonSerializer.Serialize(legacy, MarketEngine.JsonOptions))!;
+var oldJson = System.Text.Json.Nodes.JsonNode.Parse(Newtonsoft.Json.JsonConvert.SerializeObject(legacy, MarketEngine.JsonOptions))!;
 oldJson["Companies"]!["water"]!.AsObject().Remove("Candles");
 var migrated = new MarketEngine(engine.Config, MarketEngine.Deserialize(oldJson.ToJsonString(), engine.Config));
 var oldCandles = migrated.State.Companies["water"].Candles;
@@ -353,6 +353,8 @@ MultiBrokerTests.Run(Check);
 SharedBrokerPhoneTests.Run(Check);
 StockScenarioTests.Run(Check);
 StockEventTests.Run(Check);
+LoanTests.Run(Check);
+NativeJsonCompatibilityTests.Run(Check);
 Console.WriteLine($"全部通过：{count} 项断言。");
 
 sealed class Wallet : IWallet

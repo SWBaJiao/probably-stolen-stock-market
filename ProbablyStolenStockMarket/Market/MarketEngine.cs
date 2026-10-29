@@ -1,14 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.Globalization;
 
 namespace ProbablyStolenStockMarket.Market;
 
 public sealed partial class MarketEngine
 {
-    public static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true, Converters = { new JsonStringEnumConverter() } };
+    // 替换集合而非向属性初始化值追加，保留旧配置和存档的精确数值。
+    public static readonly JsonSerializerSettings JsonOptions = new()
+    {
+        Formatting = Formatting.Indented,
+        ObjectCreationHandling = ObjectCreationHandling.Replace,
+        FloatParseHandling = FloatParseHandling.Decimal,
+        DateParseHandling = DateParseHandling.None,
+        Culture = CultureInfo.InvariantCulture,
+        Converters = { new StringEnumConverter(), new CanonicalDecimalConverter() }
+    };
     public MarketConfig Config { get; }
     public MarketState State { get; private set; }
     private bool _busy;
@@ -33,12 +43,12 @@ public sealed partial class MarketEngine
         EnsureStockCalendar(State.LastDay);
     }
 
-    public string Serialize() => JsonSerializer.Serialize(State, JsonOptions);
+    public string Serialize() => JsonConvert.SerializeObject(State, JsonOptions);
     // 由存档适配层接入时统一应用；启用交易不会清除已有的资金异常冻结。
     public void ApplyStorageAccess(bool confirmedRoundTrip) => State.StorageVerified = confirmedRoundTrip || !Config.RequireSaveReloadVerification;
     public static MarketState Deserialize(string json, MarketConfig config)
     {
-        var state = JsonSerializer.Deserialize<MarketState>(json, JsonOptions) ?? throw new ArgumentException("股市存档为空");
+        var state = JsonConvert.DeserializeObject<MarketState>(json, JsonOptions) ?? throw new ArgumentException("股市存档为空");
         ValidateState(state, config);
         MigrateShockBudget(state);
         ReconcileEventDirections(state, config);
@@ -59,6 +69,7 @@ public sealed partial class MarketEngine
         ValidateBrokerState(state);
         ValidateEventLifecycles(state);
         ValidateStockState(state);
+        ValidateLoanState(state);
         // 持仓公司不能被配置删除，否则无法出售已有股份。
         if (state.Positions.Any(x => x.Value.Quantity > 0 && !config.Companies.Any(c => c.Id == x.Key))) throw new ArgumentException("公司配置删除了仍有持仓的公司");
     }
@@ -323,7 +334,7 @@ public sealed partial class MarketEngine
         if (total < int.MinValue || total > int.MaxValue || total == int.MinValue) { quote.Message = "订单金额超出游戏资金范围。"; return quote; }
         quote.CashDelta = (int)total;
         if (side == OrderSide.Sell && total <= 0) { quote.Message = "卖出收入不足以支付手续费，请增加数量。"; return quote; }
-        if (side == OrderSide.Sell && State.Positions[companyId].Quantity < quantity) { quote.Message = "可卖持仓不足。"; return quote; }
+        if (side == OrderSide.Sell && GetAvailableShares(companyId) < quantity) { quote.Message = "可卖持仓不足，抵押股份在贷款结清前不能卖出。"; return quote; }
         if ((long)cash + quote.CashDelta < 0 || (long)cash + quote.CashDelta > int.MaxValue) { quote.Message = "余额不足或资金超出上限。"; return quote; }
         if (side == OrderSide.Buy && (long)State.Positions[companyId].Quantity + quantity > int.MaxValue) { quote.Message = "持仓数量超出上限。"; return quote; }
         quote.Success = true; quote.Message = "报价有效"; return quote;
@@ -350,6 +361,9 @@ public sealed partial class MarketEngine
     }
 
     private OperationResult Transact(IWallet wallet, int delta, Action persist, Action mutate)
+        => Transact(wallet, () => delta, persist, mutate);
+
+    private OperationResult Transact(IWallet wallet, Func<int> calculateDelta, Action persist, Action mutate)
     {
         if (_busy) return OperationResult.Fail("上一笔交易尚未完成。");
         _busy = true;
@@ -361,6 +375,8 @@ public sealed partial class MarketEngine
             snapshot = Serialize();
             initialCash = wallet.Cash;
             mutate();
+            var delta = calculateDelta();
+            if ((long)initialCash + delta < 0 || (long)initialCash + delta > int.MaxValue) throw new InvalidOperationException("资金变更超出游戏允许范围");
             // 先确认完整状态可序列化，再接触原版资金。
             _ = Serialize();
             cashTouched = true;

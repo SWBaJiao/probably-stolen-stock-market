@@ -1,5 +1,5 @@
 using ProbablyStolenStockMarket.Market;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Text.Json.Nodes;
 
 static class DailyTradeTests
@@ -83,7 +83,7 @@ static class DailyTradeTests
         var legacyConfig = TestConfig.Create();
         var legacy = new MarketState { LastDay = 1, Companies = legacyConfig.Companies.ToDictionary(c => c.Id, _ => new CompanyState()), Sessions = new() { ["pending"] = new CustomerSession { Signals = new() { ["medical"] = 700m }, TradeIds = new() { "legacy-trade" } }, ["closed"] = new CustomerSession { Closed = true, Signals = new() { ["water"] = 650m } } } };
         legacy.Companies["water"].Price = 101m;
-        var legacyJson = JsonNode.Parse(JsonSerializer.Serialize(legacy, MarketEngine.JsonOptions))!;
+        var legacyJson = JsonNode.Parse(JsonConvert.SerializeObject(legacy, MarketEngine.JsonOptions))!;
         legacyJson.AsObject().Remove("TradeSettlementVersion"); legacyJson.AsObject().Remove("TradeSignalsByDay");
         var migrated = new MarketEngine(legacyConfig, MarketEngine.Deserialize(legacyJson.ToJsonString(), legacyConfig));
         check(migrated.State.TradeSettlementVersion == 1 && migrated.State.TradeSignalsByDay[1]["medical"] == 700m && !migrated.State.TradeSignalsByDay[1].ContainsKey("water") && migrated.State.Companies["water"].Price == 101m, "旧档仅迁移未结束会话信号且不回放已涨价的关闭历史");

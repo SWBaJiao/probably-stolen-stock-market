@@ -4,9 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using HarmonyLib;
-using Il2Cpp;
-using Il2CppInterop.Runtime;
-using MelonLoader;
 using ProbablyStolenStockMarket.Localization;
 using ProbablyStolenStockMarket.Market;
 
@@ -17,7 +14,7 @@ internal sealed class IntelDeliveryAdapter : IDisposable
 {
     private static IntelDeliveryAdapter? _current;
     private readonly GameBridge _host;
-    private readonly MelonLogger.Instance _log;
+    private readonly ModLogger _log;
     private readonly Dictionary<string, GameItem> _previewItems = new();
     private readonly HashSet<string> _busy = new();
     private readonly HashSet<string> _reported = new();
@@ -28,7 +25,7 @@ internal sealed class IntelDeliveryAdapter : IDisposable
     private HarmonyLib.Harmony? _harmony;
     private MethodInfo? _openPanel, _openPrefix;
 
-    internal IntelDeliveryAdapter(GameBridge host, MelonLogger.Instance log) { _host = host; _log = log; }
+    internal IntelDeliveryAdapter(GameBridge host, ModLogger log) { _host = host; _log = log; }
 
     internal void Initialize(HarmonyLib.Harmony harmony)
     {
@@ -53,7 +50,7 @@ internal sealed class IntelDeliveryAdapter : IDisposable
         {
             var record = adapter._host.Engine?.GetIntelRecords().FirstOrDefault(r =>
                 HasOfferMarker(__0, r.OfferId) && (r.PaperItemId >= 0 && r.PaperItemId == __0.uniqueId
-                    || adapter._previewItems.TryGetValue(r.OfferId, out var preview) && preview.Pointer == __0.Pointer));
+                    || adapter._previewItems.TryGetValue(r.OfferId, out var preview) && preview == __0));
             // 必须同时命中本模组标记与已保存编号或自有预览实例，普通纸条不进入刷新流程。
             if (record != null) FillDocument(__0, record);
         }
@@ -62,8 +59,8 @@ internal sealed class IntelDeliveryAdapter : IDisposable
 
     public void Tick()
     {
-        if (_disposed || !_host.BrokerReady || Environment.TickCount64 < _nextPoll) return;
-        _nextPoll = Environment.TickCount64 + 5000;
+        if (_disposed || !_host.BrokerReady || NativeGameAccess.Milliseconds < _nextPoll) return;
+        _nextPoll = NativeGameAccess.Milliseconds + 5000;
         if (_identity != _host.BrokerSaveIdentity) { Reset(); _identity = _host.BrokerSaveIdentity; }
         var records = _host.Engine?.GetIntelRecords();
         if (records == null) return;
@@ -90,27 +87,27 @@ internal sealed class IntelDeliveryAdapter : IDisposable
             var entry = EmporiumEntry.Instance;
             var table = entry?.frontInvinvElement;
             // 原生 AddDirectSellingItemToTable 在 RVA 0x586932 使用此柜台入口。
-            if (entry == null || table == null || entry.frontInvWindow?.childElement?.Pointer != table.Pointer
+            if (entry == null || table == null || entry.frontInvWindow?.childElement != table
                 || table.widthPixels <= 0 || table.heightPixels <= 0 || entry.invElement == null) return;
             var owned = entry.GetAllOwnedItems();
             var all = entry.GetAllItems();
             if (owned == null || all == null) return;
-            var ownedPointers = new HashSet<IntPtr>();
-            var candidates = new Dictionary<IntPtr, GameItem>();
-            foreach (var item in owned) if (item != null) { candidates[item.Pointer] = item; ownedPointers.Add(item.Pointer); }
-            foreach (var item in table.childItems) if (item != null) candidates[item.Pointer] = item;
-            var allPointers = new HashSet<IntPtr>();
-            foreach (var item in all) if (item != null) allPointers.Add(item.Pointer);
+            var ownedPointers = new HashSet<object>(NativeReferenceComparer.Instance);
+            var candidates = new Dictionary<object, GameItem>(NativeReferenceComparer.Instance);
+            foreach (var item in owned) if (item != null) { candidates[item] = item; ownedPointers.Add(item); }
+            foreach (var item in table.childItems) if (item != null) candidates[item] = item;
+            var allPointers = new HashSet<object>(NativeReferenceComparer.Instance);
+            foreach (var item in all) if (item != null) allPointers.Add(item);
             // 查询必须覆盖实际主背包和柜台，空缓存不能被当成纸条丢失。
-            foreach (var item in entry.invElement.childItems) if (item != null && !allPointers.Contains(item.Pointer)) return;
-            foreach (var item in table.childItems) if (item != null && !allPointers.Contains(item.Pointer)) return;
+            foreach (var item in entry.invElement.childItems) if (item != null && !allPointers.Contains(item)) return;
+            foreach (var item in table.childItems) if (item != null && !allPointers.Contains(item)) return;
             var existing = candidates.Values.FirstOrDefault(item => item.identifier == "handnote"
                 && (item.uniqueId == record.PaperItemId || HasOfferMarker(item, offerId)));
-            if (existing != null && (ownedPointers.Contains(existing.Pointer) || IsDirectMember(table, existing)))
+            if (existing != null && (ownedPointers.Contains(existing) || IsDirectMember(table, existing)))
             {
                 SetState(engine!, offerId, IntelPaperState.Delivered, existing.uniqueId);
                 PersistState(offerId);
-                Once(offerId + ":adopt", $"已认领情报纸条 offer={offerId} item={existing.uniqueId} parent={existing.parentInventory?.Pointer}。");
+                Once(offerId + ":adopt", $"已认领情报纸条 offer={offerId} item={existing.uniqueId} parent={existing.parentInventory}。");
                 return;
             }
             // 记录过物品编号或存在不确定插入时，缺失查询绝不能触发第二次创建。
@@ -123,15 +120,15 @@ internal sealed class IntelDeliveryAdapter : IDisposable
             if (!SameSave(identity, engine)) return;
             SetState(engine!, offerId, IntelPaperState.Uncertain, created.uniqueId);
             PersistState(offerId);
-            Once(offerId + ":probe", $"发放探针 offer={offerId} item={created.uniqueId} target=EmporiumEntry.frontInvinvElement pointer={table.Pointer} size={table.widthPixels}x{table.heightPixels}。");
+            Once(offerId + ":probe", $"发放探针 offer={offerId} item={created.uniqueId} target=EmporiumEntry.frontInvinvElement pointer={table} size={table.widthPixels}x{table.heightPixels}。");
             insertStarted = true;
             _host.CurrentStore!.AddDirectSellingItemToTable(created, true, false, true, 0);
-            confirmed = created.parentInventory?.Pointer == table.Pointer && IsDirectMember(table, created);
+            confirmed = created.parentInventory == table && IsDirectMember(table, created);
             if (!confirmed)
             {
                 var afterOwned = entry.GetAllOwnedItems();
                 if (created.parentInventory != null && afterOwned != null)
-                    foreach (var item in afterOwned) if (item != null && item.Pointer == created.Pointer) confirmed = true;
+                    foreach (var item in afterOwned) if (item != null && item == created) confirmed = true;
             }
             uncertain = !confirmed && created.parentInventory != null;
             if (!SameSave(identity, engine)) { uncertain = true; return; }
@@ -139,7 +136,7 @@ internal sealed class IntelDeliveryAdapter : IDisposable
             {
                 SetState(engine!, offerId, IntelPaperState.Delivered, created.uniqueId);
                 PersistState(offerId);
-                _log.Msg($"[股市情报纸条] 柜台或已拥有父容器已确认 offer={offerId} item={created.uniqueId} parent={created.parentInventory?.Pointer}。");
+                _log.Msg($"[股市情报纸条] 柜台或已拥有父容器已确认 offer={offerId} item={created.uniqueId} parent={created.parentInventory}。");
             }
         }
         catch (Exception ex)
@@ -248,8 +245,7 @@ internal sealed class IntelDeliveryAdapter : IDisposable
     {
         value = Localizer.Text(value);
         Action<TagState> write = state => state.Enable().SetString(value);
-        var native = DelegateSupport.ConvertDelegate<Il2CppSystem.Action<TagState>>(write)
-            ?? throw new InvalidOperationException("纸条标签委托转换失败：" + key);
+        var native = write;
         item.ModifyTag(key, native);
         GC.KeepAlive(native); GC.KeepAlive(write);
         if (item.GetTagReadonly(key)?.GetString() != value) throw new InvalidOperationException("纸条标签读回不一致：" + key);
@@ -261,12 +257,12 @@ internal sealed class IntelDeliveryAdapter : IDisposable
         try
         {
             return adapter._host.Engine?.GetIntelRecords().Any(record => HasOfferMarker(item, record.OfferId)
-                && (record.PaperItemId == item.uniqueId || adapter._previewItems.TryGetValue(record.OfferId, out var preview) && preview.Pointer == item.Pointer)) == true;
+                && (record.PaperItemId == item.uniqueId || adapter._previewItems.TryGetValue(record.OfferId, out var preview) && preview == item)) == true;
         }
         catch { return false; }
     }
     private static bool IsDirectMember(GameGridInventory table, GameItem item)
-    { foreach (var child in table.childItems) if (child != null && child.Pointer == item.Pointer) return true; return false; }
+    { foreach (var child in table.childItems) if (child != null && child == item) return true; return false; }
     private bool SameSave(string identity, MarketEngine? engine) => _host.BrokerReady && _host.BrokerSaveIdentity == identity && ReferenceEquals(_host.Engine, engine);
     private void PersistState(string offerId)
     {

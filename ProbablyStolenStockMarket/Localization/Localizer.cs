@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
 namespace ProbablyStolenStockMarket.Localization;
@@ -82,12 +82,12 @@ public static class Localizer
     {
         var result = new Dictionary<string, Translation>(StringComparer.Ordinal);
         var assembly = typeof(Localizer).Assembly;
-        foreach (var name in new[] { "market", "game", "ui" })
+        foreach (var name in new[] { "market", "game", "ui", "loans" })
         {
             using var stream = assembly.GetManifestResourceStream("ProbablyStolenStockMarket.Localization." + name + ".json")
                 ?? throw new InvalidOperationException("缺少内置股市翻译资源：" + name);
             using var reader = new StreamReader(stream);
-            var items = JsonSerializer.Deserialize<Dictionary<string, Translation>>(reader.ReadToEnd())
+            var items = JsonConvert.DeserializeObject<Dictionary<string, Translation>>(reader.ReadToEnd())
                 ?? throw new InvalidOperationException("股市翻译资源为空：" + name);
             foreach (var item in items)
             {

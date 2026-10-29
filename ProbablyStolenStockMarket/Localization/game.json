@@ -1284,11 +1284,6 @@
     "ja": "株式約定",
     "ko": "주식 체결"
   },
-  "股市探针": {
-    "en": "Market probe",
-    "ja": "株式プローブ",
-    "ko": "주식 점검"
-  },
   "股市掮客": {
     "en": "Market broker",
     "ja": "株式仲介人",
@@ -1683,5 +1678,130 @@
     "en": "First introduction completed and recorded.",
     "ja": "初回の自己紹介を完了し、記録しました。",
     "ko": "첫 자기소개를 마치고 기록했습니다."
+  },
+  "股市情报名片": {
+    "en": "Stock Intelligence Business Card",
+    "ja": "株式情報の名刺",
+    "ko": "주식 정보 명함"
+  },
+  "预约电话：731206\n\n持有本存档的股市面板后，可在电话簿选择“行情消息专线”，或手动拨打 731206。确认预约后，闻舟或剑清酱会在次日营业时随机来访，每次只安排一人。\n\n情报需要付费购买，消息可能属实，也可能失实。名片仅提供联系方式，不替代股市面板，也不会直接创建预约。": {
+    "en": "Booking number: 731206\n\nWhile carrying this save’s Stock Market Terminal, select “Market News Hotline” in the phone book or dial 731206 manually. After you confirm the booking, either Wen Zhou or Jianqing-chan will be chosen to visit during business hours the next day. Only one visitor is booked at a time.\n\nIntelligence must be purchased, and reports may be true or false. This card only provides contact details; it does not replace the Stock Market Terminal or create a booking.",
+    "ja": "予約電話：731206\n\nこのセーブの株式端末を所持していれば、電話帳の「相場情報専用線」を選ぶか、731206 に直接電話できます。予約を確定すると、聞舟または剣清ちゃんのどちらか 1 人がランダムに選ばれ、翌日の営業時間中に来店します。\n\n情報の購入には料金がかかり、内容が正しいとは限りません。この名刺は連絡先を示すだけで、株式端末の代わりにはならず、予約も自動作成しません。",
+    "ko": "예약 전화: 731206\n\n이 저장 파일의 주식 단말기를 소지한 상태에서 전화번호부의 “시황 정보 전용선”을 선택하거나 731206으로 직접 전화하세요. 예약을 확정하면 원저우 또는 젠칭짱 중 한 명이 무작위로 선택되어 다음 날 영업시간에 방문합니다. 한 번에 한 명만 예약됩니다.\n\n정보는 유료이며 사실일 수도, 거짓일 수도 있습니다. 이 명함은 연락처만 제공하며 주식 단말기를 대신하거나 자동으로 예약을 만들지 않습니다."
+  },
+  "林澈": {
+    "en": "Lin Che",
+    "ja": "林澈",
+    "ko": "린처"
+  },
+  "林澈 · 证券开户专员": {
+    "en": "Lin Che · Securities Account Representative",
+    "ja": "林澈 · 証券口座開設担当",
+    "ko": "린처 · 증권 계좌 개설 담당자"
+  },
+  "证券开户专员尚未到访，请等到约定日期。": {
+    "en": "The securities account representative has not arrived yet. Please wait until the scheduled day.",
+    "ja": "証券口座の開設担当者はまだ来店していません。約束の日までお待ちください。",
+    "ko": "증권 계좌 개설 담당자가 아직 방문하지 않았습니다. 약속한 날짜까지 기다려 주세요."
+  },
+  "已开通证券账户，无需重复付费。": {
+    "en": "Your securities account is already open. No further payment is required.",
+    "ja": "証券口座は開設済みです。再度支払う必要はありません。",
+    "ko": "증권 계좌가 이미 개설되었습니다. 다시 결제할 필요가 없습니다."
+  },
+  "开户成功，已支付 50 元。": {
+    "en": "Account opened. Paid 50.",
+    "ja": "口座を開設しました。50 支払いました。",
+    "ko": "계좌가 개설되었습니다. 50을 결제했습니다."
+  },
+  "开户需要 50 元，当前余额不足。可以选择三天后再来。": {
+    "en": "Opening an account costs 50. You do not have enough cash. You can ask me to return in three days.",
+    "ja": "口座開設には 50 必要ですが、所持金が足りません。三日後に再訪することもできます。",
+    "ko": "계좌 개설에는 50이 필요하지만 잔액이 부족합니다. 사흘 후에 다시 방문하도록 요청할 수 있습니다."
+  },
+  "请等待证券开户专员来访，支付 50 元开户后领取股市面板。": {
+    "en": "Wait for the securities account representative, then pay 50 to open an account and receive the Stock Market Panel.",
+    "ja": "証券口座の開設担当者の来店を待ち、50 を支払って口座を開設すると株式市場パネルを受け取れます。",
+    "ko": "증권 계좌 개설 담당자가 방문하면 50을 내고 계좌를 개설한 뒤 주식 시장 패널을 받으세요."
+  },
+  "你好，我叫林澈，是证券开户专员。今天来介绍证券账户，开户费 50 元，办理后就能领取股市面板。暂时不方便的话，我可以三天后再来。": {
+    "en": "Hello, I'm Lin Che, a securities account representative. I'm here to introduce our securities accounts. Open one for 50 and receive a Stock Market Panel. If now is inconvenient, I can return in three days.",
+    "ja": "こんにちは、証券口座開設担当の林澈です。証券口座のご案内に伺いました。開設手数料は 50 で、手続き後に株式市場パネルをお渡しします。今はご都合が悪ければ、三日後にまた伺います。",
+    "ko": "안녕하세요, 증권 계좌 개설 담당자 린처입니다. 증권 계좌를 안내해 드리러 왔습니다. 개설 비용은 50이며, 개설하면 주식 시장 패널을 받습니다. 지금 곤란하시다면 사흘 후에 다시 오겠습니다."
+  },
+  "开户费只收一次，共 50 元。你可以现在办理，也可以让我三天后再来。": {
+    "en": "The account opening fee is a one-time payment of 50. You can open it now or ask me to return in three days.",
+    "ja": "口座開設手数料は一度だけ、50 です。今お手続きいただくか、三日後に再訪するかをお選びください。",
+    "ko": "계좌 개설 비용은 한 번만 50을 받습니다. 지금 개설하거나 사흘 후에 다시 방문하도록 요청할 수 있습니다."
+  },
+  "开户安排已经处理。祝你经营顺利，投资时记得留足日常周转资金。": {
+    "en": "Your account arrangements are settled. Good luck with your shop, and remember to keep enough cash for daily expenses when investing.",
+    "ja": "口座開設のご用件は承りました。商売がうまくいきますように。投資の際は日々の運転資金を十分に残してください。",
+    "ko": "계좌 개설 일정이 처리되었습니다. 장사가 잘되길 바랍니다. 투자할 때는 일상 운영 자금을 충분히 남겨 두세요."
+  },
+  "好的，我三天后再来。到时仍然只需支付 50 元开户。": {
+    "en": "All right, I'll return in three days. Opening an account will still cost just 50.",
+    "ja": "分かりました。三日後にまた伺います。その際も口座開設手数料は 50 です。",
+    "ko": "알겠습니다. 사흘 후에 다시 오겠습니다. 그때도 계좌 개설 비용은 50입니다."
+  },
+  "支付 50 元开户": {
+    "en": "Pay 50 to Open Account",
+    "ja": "50 支払って口座開設",
+    "ko": "50을 내고 계좌 개설"
+  },
+  "三天后再来": {
+    "en": "Return in Three Days",
+    "ja": "三日後に再訪",
+    "ko": "사흘 후에 방문"
+  },
+  "开通证券账户需要一次性支付 50 元，开户后会发放股市面板。双击面板即可查看行情和买卖股票。优先放入背包，背包满则放桌面，桌面也满则放窗外。丢失后可按 Ctrl+F8 免费补领，无需再次开户。\n\n现在开户，还是三天后再来？": {
+    "en": "Opening a securities account costs a one-time payment of 50 and includes a Stock Market Panel. Double-click the panel to view prices and trade stocks. It goes into your inventory first, then onto the desk if full, then outside the window if the desk is also full. If lost, press Ctrl+F8 for a free replacement without opening another account.\n\nOpen an account now, or shall I return in three days?",
+    "ja": "証券口座の開設には一度だけ 50 を支払い、株式市場パネルを受け取ります。ダブルクリックで相場の確認や株の売買ができます。まず持ち物に入れ、満杯なら机の上へ、机も満杯なら窓の外に置きます。紛失した場合は Ctrl+F8 で無料再発行でき、再度の口座開設は不要です。\n\n今すぐ開設しますか。それとも三日後に再訪しましょうか？",
+    "ko": "증권 계좌 개설에는 한 번만 50을 내며, 주식 시장 패널을 받습니다. 두 번 클릭하면 시세를 확인하고 주식을 거래할 수 있습니다. 먼저 가방에 넣고, 가방이 가득 차면 책상 위에, 책상도 가득 차면 창밖에 놓습니다. 분실하면 Ctrl+F8로 무료 재발급받을 수 있으며, 다시 계좌를 개설할 필요가 없습니다.\n\n지금 개설하시겠습니까, 아니면 사흘 후에 다시 올까요?"
+  },
+  "背包已满，股市面板已放在桌面上。": {
+    "en": "Your inventory is full. The Stock Market Panel has been placed on the desk.",
+    "ja": "持ち物がいっぱいのため、株式市場パネルを机の上に置きました。",
+    "ko": "가방이 가득 차서 주식 시장 패널을 책상 위에 놓았습니다."
+  },
+  "背包和桌面已满，股市面板已放在窗外。请在保存或结束营业前收好。": {
+    "en": "Your inventory and desk are full. The Stock Market Panel has been placed outside the window. Please collect it before saving or closing the shop.",
+    "ja": "持ち物と机がいっぱいのため、株式市場パネルを窓の外に置きました。セーブまたは閉店前に回収してください。",
+    "ko": "가방과 책상이 가득 차서 주식 시장 패널을 창밖에 놓았습니다. 저장하거나 영업을 마치기 전에 챙겨 주세요."
+  },
+  "物品放置区域尚未就绪，稍后重试。": {
+    "en": "The item placement areas are not ready yet. Try again shortly.",
+    "ja": "アイテムの配置場所はまだ準備できていません。しばらくしてから再試行してください。",
+    "ko": "아이템을 놓을 공간이 아직 준비되지 않았습니다. 잠시 후 다시 시도하세요."
+  },
+  "已发放股市面板；丢失后可按 Ctrl+F8 免费补领。": {
+    "en": "The Stock Market Panel has been delivered. If lost, press Ctrl+F8 for a free replacement.",
+    "ja": "株式市場パネルは配布済みです。紛失した場合は Ctrl+F8 で無料再発行できます。",
+    "ko": "주식 시장 패널이 지급되었습니다. 분실하면 Ctrl+F8로 무료 재발급받으세요."
+  },
+  "原股市面板仍存在或正在拖动，请先收好物品后再尝试补领。": {
+    "en": "The original Stock Market Panel still exists or is being dragged. Put your items away before requesting a replacement.",
+    "ja": "元の株式市場パネルがまだ存在するか、ドラッグ中です。アイテムを収納してから再発行をお試しください。",
+    "ko": "기존 주식 시장 패널이 남아 있거나 드래그 중입니다. 아이템을 정리한 뒤 재발급을 요청하세요."
+  },
+  "已找到现有股市面板，请检查背包、桌面、窗外及其他容器，未重复发放。": {
+    "en": "Your existing Stock Market Panel was found. Check your inventory, desk, outside the window, and other containers. No duplicate was issued.",
+    "ja": "既存の株式市場パネルが見つかりました。持ち物、机の上、窓の外、その他の容器をご確認ください。重複配布はしていません。",
+    "ko": "기존 주식 시장 패널을 찾았습니다. 가방, 책상, 창밖과 다른 보관함을 확인하세요. 중복 지급하지 않았습니다."
+  },
+  "背包、桌面和窗外都已满。开户资格已保留，腾出空间后自动发放，也可按 Ctrl+F8 免费补领。": {
+    "en": "Your inventory, desk, and the area outside the window are all full. Your account remains open. Delivery will retry when space is available, or press Ctrl+F8 for a free replacement.",
+    "ja": "持ち物、机の上、窓の外がすべていっぱいです。口座開設状態は保存されています。空きができると自動で配布します。Ctrl+F8 で無料再発行もできます。",
+    "ko": "가방, 책상, 창밖이 모두 가득 찼습니다. 계좌 개설 상태는 유지됩니다. 공간이 생기면 자동 지급되며, Ctrl+F8로 무료 재발급을 요청할 수도 있습니다."
+  },
+  "丢失后可按 Ctrl+F8 免费补领，无需再次开户。": {
+    "en": "If lost, press Ctrl+F8 for a free replacement without opening another account.",
+    "ja": "紛失した場合は Ctrl+F8 で無料再発行でき、再度の口座開設は不要です。",
+    "ko": "분실하면 Ctrl+F8로 무료 재발급받을 수 있으며, 다시 계좌를 개설할 필요가 없습니다."
+  },
+  "上次交付位置尚未确认，请保存并重新载入后再按 Ctrl+F8 补领。": {
+    "en": "The previous delivery location is unconfirmed. Save and reload, then press Ctrl+F8 to request a replacement.",
+    "ja": "前回の配布先が未確認です。セーブしてロードし直してから、Ctrl+F8 で再発行をお試しください。",
+    "ko": "이전 지급 위치가 확인되지 않았습니다. 저장하고 다시 불러온 뒤 Ctrl+F8로 재발급을 요청하세요."
   }
 }

@@ -1,21 +1,19 @@
+using System;
 using System.IO;
-using MelonLoader.Utils;
 
 namespace ProbablyStolenStockMarket;
 
 public static class ModPaths
 {
-    // 旧路径仅用于升级兼容，后续写入统一使用正式目录。
-    public static string DataDirectory => Path.Combine(MelonEnvironment.UserDataDirectory, "ProbablyStolenStockMarket");
-    public static string LegacyDataDirectory => Path.Combine(MelonEnvironment.UserDataDirectory, "MelonModTemplate");
-    public static string AssetsDirectory => Path.Combine(DataDirectory, "Assets");
+    public static string DataDirectory => ModHelper.GetModDataFolder(ModInfo.Id);
+    public static string AssetsDirectory => Path.Combine(ModHelper.GetModFolder(ModInfo.Id)
+        ?? throw new InvalidOperationException("股市模组尚未注册安装目录。"), "Assets");
 
-    public static string AssetPath(params string[] parts)
-    {
-        var relative = Path.Combine(parts);
-        var current = Path.Combine(AssetsDirectory, relative);
-        if (File.Exists(current)) return current;
-        var legacy = Path.Combine(LegacyDataDirectory, "Assets", relative);
-        return File.Exists(legacy) ? legacy : current;
-    }
+    public static string AssetPath(params string[] parts) => Path.Combine(AssetsDirectory, Path.Combine(parts));
+    private static string RelativeAsset(params string[] parts) => "Assets/" + Path.Combine(parts).Replace('\\', '/');
+    public static bool AssetExists(params string[] parts) => ModHelper.ModFileExists(ModInfo.Id, RelativeAsset(parts));
+    public static byte[] ReadAssetBytes(params string[] parts) => ModHelper.ReadModFileBytes(ModInfo.Id, RelativeAsset(parts))
+        ?? throw new InvalidOperationException("缺少股市模组资源：" + RelativeAsset(parts));
+    public static string ReadAssetText(params string[] parts) => ModHelper.ReadModFileText(ModInfo.Id, RelativeAsset(parts))
+        ?? throw new InvalidOperationException("缺少股市模组资源：" + RelativeAsset(parts));
 }

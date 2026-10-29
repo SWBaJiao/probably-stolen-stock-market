@@ -20,6 +20,13 @@ internal sealed class TerminalGrantPolicy
         if (AttemptInProgress || GrantedThisSession) return false;
         AttemptInProgress = true; return true;
     }
+    // 仅供显式补领在完整扫描缺失且旧实例已销毁后解除会话锁。
+    public bool ConfirmLossForRecovery()
+    {
+        if (AttemptInProgress) return false;
+        GrantedThisSession = false;
+        return true;
+    }
     public void FinishAttempt(bool placementConfirmed, bool outcomeUncertain = false)
     {
         if (placementConfirmed || outcomeUncertain) GrantedThisSession = true;

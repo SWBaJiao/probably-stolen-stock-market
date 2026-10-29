@@ -1,18 +1,17 @@
 using System;
-using MelonLoader;
 
 namespace ProbablyStolenStockMarket.Features;
 
 // 在此模块扩展场景相关功能；入口统一负责订阅与解绑。
 public sealed class SceneHooks
 {
-    private readonly MelonLogger.Instance _logger;
+    private readonly ModLogger _logger;
 
     public int InitializedCount { get; private set; }
     public int UnloadedCount { get; private set; }
     public string LastInitializedSceneName { get; private set; } = string.Empty;
 
-    public SceneHooks(MelonLogger.Instance logger)
+    public SceneHooks(ModLogger logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }

@@ -1,20 +1,22 @@
 # Probably Stolen 股市 Mod
 
-基于 MelonLoader 的投资玩法 Mod：10 家虚构公司、商品交叉关联、顾客成交驱动行情、原版与企业专用事件、现货持仓与付费真假内幕。
+基于正式版原生 Mod API 的投资玩法 Mod：10 家虚构公司、商品交叉关联、顾客成交驱动行情、原版与企业专用事件、现货持仓与付费真假内幕。
 
-安装包见 [GitHub Releases](https://github.com/SWBaJiao/probably-stolen-stock-market/releases)，解压安装与旧版升级步骤见 [安装说明](docs/RELEASE-INSTALL.md)。
+正式版 0.16.0 安装包见 [GitHub Release v0.16.0](https://github.com/SWBaJiao/probably-stolen-stock-market/releases/tag/v0.16.0)，历史版本见 [GitHub Releases](https://github.com/SWBaJiao/probably-stolen-stock-market/releases)。解压安装与旧版升级步骤见 [安装说明](docs/RELEASE-INSTALL.md)。
 
 <img src="ProbablyStolenStockMarket/Assets/Textures/Items/stock_market_terminal.png" height="220" alt="股市面板道具图标">
 
-进入存档后自动赠送“股市面板”，双击打开。现货买卖默认开放，资金与投资状态随原版存档保存。背包满时延后赠送，旧版道具编号失效时可按 `Ctrl+F8` 显式恢复，已发放后不会因空查询重复创建。
+第 3 天营业时，证券开户专员林澈会来访，支付 50 元开户后发放“股市面板”，双击打开；也可以让他三天后再来，直接遣散同样延期三天。面板依次尝试放入背包、桌面和窗外；窗外的面板请在保存或结束营业前收好，该区域不随存档保存且会在睡眠时清空。开户只收费一次，已开户后丢失面板可按 `Ctrl+F8` 免费补领，补领前会扫描现有面板，避免重复创建；旧存档已有面板时保留开户资格。现货买卖默认开放，资金与投资状态随原版存档保存。
+
+持有股市面板后会自动获赠“股市情报名片”，放入主物品栏；满包时延后发放。名片可双击阅读，注明电话 **731206**、预约确认和次日来访方式，新旧存档均仅发放一次。贷款名片仍按原有规则交付柜台。
 
 支持中文、日语、英语与韩语，自动跟随游戏语言；切换语言会刷新股市窗口文字与字体。内幕纸条和日历下次打开时使用当前语言，存档中的消息原文和投资数据不因翻译改变。自定义配置中新增的文案保留原文，其他游戏语言回退英语。
 
 ## 当前状态
 
-开发目标为 Probably Stolen Demo 0.46D、Unity 2021.3.45f2、MelonLoader 0.7.3、Windows .NET 6 IL2CPP 环境。使用 CrossOver 安装时，构建路径填写容器在 macOS 上的实际磁盘路径。
+开发目标为 Probably Stolen 正式版的 Windows x64 Mono 环境，本机迁移依据为 Steam Build 26284217。模组使用游戏内置加载器、`IMod` 与自带 Harmony，目标框架为 `netstandard2.1`。使用 CrossOver 安装时，构建路径填写正式版容器在 macOS 上的实际磁盘路径。
 
-已完成源码、独立逻辑测试、构建与部署配置。游戏中的回调顺序、背包入口、保存恢复与画面显示需要实际游玩验收；测试和编译通过不能代替游戏内验证。详见 [开发与安装说明](ProbablyStolenStockMarket/README.md) 和 [适配证据与验收步骤](ProbablyStolenStockMarket/Game/ADAPTER-NOTES.md)。
+0.15.0 将现有股市与贷款功能迁移为正式版原生模组，包含入口、托管游戏类型、UI、资源路径和发布结构。游戏中的回调顺序、背包入口、保存恢复与画面显示需要实际游玩验收；独立测试和编译通过不能代替游戏内验证。详见 [开发与安装说明](ProbablyStolenStockMarket/README.md) 和 [适配证据与验收步骤](ProbablyStolenStockMarket/Game/ADAPTER-NOTES.md)。
 
 第 41～42 日 K 线、批发成交漏记及交易门控的检查结果见 [行情诊断](docs/PRICE-DIAGNOSIS.md)。
 
@@ -22,6 +24,8 @@
 
 ## 玩法
 
+- 创建存档时可选择“负债店主”：炒股亏损后，你只剩 1500 元现金，并背上固定欠款 5000 元，决定重新经营店铺还债。沿用原版职业方式跳过部分基础教程，首日起有完整 28 个游戏日还清，支持部分还款与提前结清，不计利息或罚息，不提供宽限。沈衡的电话 **731207** 开局解锁；最后一天关店前再次确认，日结先扣普通服务费用，再用现金结清剩余旧债，余额不足触发“抵债停业”。结清后正常继续经营。读档不补钱、不重置期限，普通开局和旧存档不新增该债务。
+- 每日服务结算界面中，所有已解锁、未冷却的付费服务单价都高于现金时，次日安排贷款专员沈衡到访并留下独立像素名片。认识后可拨打 **731207** 办理无抵押或股票抵押贷款，选择 1～28 天期限；同一时间只能有一笔贷款。期限越长日利率越高，支持部分还款和提前结清；抵押股份不能卖出，逾期会罚息或处置抵押物，到期后第 8 天仍有欠款则进入“抵债停业”结局。
 - 商品成交按分类权重分配到多家公司，多分类取平均；玩家卖出利好，买入利空，当日买卖先抵消，次日统一结算前一天的成交信号。成交和遣散顾客都不即时变价。
 - 每日小幅波动与估值回归叠加昨日成交量影响，默认非事件变动合计不超过 ±3%，其中成交影响上限为 ±2%。事件期内随机一天大幅跳价，此前可能小幅预热，之后小幅延续，结束后逐步消退并随机保留 20%～50% 的实际影响；同一事件可让不同公司出现相反走势。
 - 未显式配置的事件根据原版商品价格修正反向推导股价：商品涨价对应相关公司利空，降价对应利好，再按商品关联权重分配并限幅。例如供水危机提高水和净水物资售价，将压低相关股票；自定义事件影响表仍优先。
@@ -43,15 +47,17 @@
 
 ## 开发
 
-1. 安装 MelonLoader 并运行游戏一次，生成对应版本的 `MelonLoader/Il2CppAssemblies`。
+1. 安装正式版游戏，确认 `Probably Stolen_Data/Managed/` 提供 `Assembly-CSharp.dll`、`0Harmony.dll` 和 Unity 程序集。
 2. 复制 `ProbablyStolenStockMarket/Game.local.props.example` 为 `Game.local.props`，填写 `GameDirectory`。
 3. 执行 `dotnet build ProbablyStolenStockMarket/ProbablyStolenStockMarket.csproj -c Release`。构建成功后自动部署 DLL 和资源；只编译使用 `-p:DeployOnBuild=false`。
 
-模组目标框架为 .NET 6；独立测试使用 .NET 10 SDK，命令为 `dotnet run --project Tests/StockMarket.Tests`。测试不加载游戏，也不需要游戏 DLL。
+模组目标框架为 `netstandard2.1`，直接引用正式版 Managed 程序集；独立测试使用 .NET 10 SDK，命令为 `dotnet run --project Tests/StockMarket.Tests`。测试不启动游戏，JSON 兼容测试使用游戏自带的 Newtonsoft.Json。
 
-运行配置首次生成在 `<游戏>/UserData/ProbablyStolenStockMarket/market-config.json`。修改后重启游戏生效；非法配置会停止股市初始化并保留原文件。已有配置不会被构建覆盖。
+构建产物部署至 `<游戏>/Mods/ProbablyStolenStockMarket/`，其中包含 `manifest.xml`、DLL 和 `Assets/`。在游戏“模组”菜单启用后重启，F8 控制台可执行 `mod-scan probably_stolen_stock_market` 检查发布包。
 
-0.12.1 将项目目录、程序集和资源目录统一命名为 `ProbablyStolenStockMarket`。部署成功后，旧 `MelonModTemplate.dll` 及符号文件移入新 UserData 目录的 `LegacyBackup`，避免同时加载两份模组。首次运行优先使用新配置；仅存在旧配置时，验证后原样复制到新目录，资源也支持从旧目录读取。存档标识、持仓、内幕与 NPC 标识保持稳定。
+运行配置保存在游戏持久化目录的 `ModData/probably_stolen_stock_market/market-config.json`，具体路径会写入日志。资源通过 `ModHelper` 从模组目录读取，用户配置不会写进创意工坊目录。修改配置后重启生效；非法配置会停止股市初始化并保留原文件。已有配置不会被构建覆盖。
+
+0.15.0 正式版与 Demo 的安装目录分开。Demo 的旧 DLL、配置与资源保留在原目录；配置如需沿用，可在退出游戏后复制到日志显示的正式版配置目录。原生版本保留存档标识、持仓、内幕、贷款与 NPC 标识，继续读取旧股市状态。0.12.1 的程序集改名和旧目录备份属于 Demo 版本历史。
 
 0.10.0 为自动事件规则增加来源和方向版本。能确认来源的旧事件若尚未大跳，只更新未来影响方向，保留已发生的预热、随机日期及实际价格；已执行大跳的事件继续原有生命周期。方向调整涉及的旧待核实内幕标为“未能验证”，不扣来源信誉。仍与旧版出厂配置完全一致的动员事件规则会在加载时升级，用户修改过的显式规则保留。
 
@@ -59,4 +65,4 @@
 
 ## 来源
 
-开发流程参考 [dragonpan2/probably-stolen-modding](https://github.com/dragonpan2/probably-stolen-modding) 的 LearnerMod。当前游戏的原生 ModLoader 处于受限状态，因此实现使用 MelonLoader 与 Harmony；不依赖较新原生 ModHelper API。加载器、游戏及生成代理程序集不包含在仓库中。
+开发流程参考 [dragonpan2/probably-stolen-modding](https://github.com/dragonpan2/probably-stolen-modding)，并以本机正式版程序集核对接口。当前使用游戏原生 `ModLoader`、`ModHelper`、Harmony 与 CustomUI；游戏、框架程序集不随发布包分发。原生目录结构也适用于创意工坊内容，上传工坊需另行通过 SteamCMD 完成。

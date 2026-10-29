@@ -1,5 +1,5 @@
 using ProbablyStolenStockMarket.Market;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Text.Json.Nodes;
 
 static class BrokerTests
@@ -48,7 +48,7 @@ static class BrokerTests
         check(same!.OfferId == p.visit!.OfferId && p.engine.Serialize() == savedPlan, "同日重复计划保持报价来源真假与外观完全稳定");
         var copy = new MarketEngine(p.engine.Config, MarketEngine.Deserialize(savedPlan, p.engine.Config));
         check(copy.GetBrokerVisit()!.AppearanceKey == p.visit.AppearanceKey && copy.Serialize() == savedPlan, "读档保留专属情报商计划与报价");
-        var publicOffer = JsonSerializer.Serialize(p.visit, MarketEngine.JsonOptions);
+        var publicOffer = JsonConvert.SerializeObject(p.visit, MarketEngine.JsonOptions);
         check(!publicOffer.Contains("安盾") && !publicOffer.Contains("环宇") && !publicOffer.Contains("方向") && !publicOffer.Contains("broker-private-event") && !publicOffer.Contains("真正事件") && p.engine.GetIntelRecords().Count == 0, "付款前仅公开来源产品类别且无可读情报记录");
         check(!p.engine.BuyBrokerOffer(p.visit.OfferId, new[] { Future() }, new Wallet(), () => { }).Success && !p.engine.BuyRumor(p.visit.OfferId, new Wallet(), () => { }).Success, "未实际到访不可购买且旧购买接口不能绕过专属校验");
         check(p.engine.SetBrokerAppearance(p.visit.VisitId, "known-portrait") && p.engine.GetBrokerVisit()!.AppearanceKey == "known-portrait", "实际外观选择可稳定写入到访状态");
@@ -92,7 +92,7 @@ static class BrokerTests
         check(intel.Reliability == .5m && intel.IsGroupIdentity && intel.Correct == 0 && intel.Incorrect == 0 && p.visit.ProductKind.Contains("武器、防护装备"), "纸条提供来源可信度与群组记录且未购商品展示安全行业类别");
         intel.CompanyDirections.Clear();
         check(p.engine.GetIntelRecords()[0].CompanyDirections.Count > 0, "已购投影方向集合不会反向修改持久化情报");
-        var visible = JsonSerializer.Serialize(p.engine.GetIntelRecords()[0], MarketEngine.JsonOptions);
+        var visible = JsonConvert.SerializeObject(p.engine.GetIntelRecords()[0], MarketEngine.JsonOptions);
         check(!visible.Contains("broker-private-event") && !visible.Contains("真正事件") && !visible.Contains("PredictsOccurrence") && !visible.Contains("OccurrenceKey"), "已购纸条日历投影也不包含内部事件或真假依据");
 
         foreach (var kind in new[] { "行业情报", "公司情报" }) foreach (var correct in new[] { true, false })

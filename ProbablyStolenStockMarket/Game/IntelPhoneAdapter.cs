@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
-using Il2Cpp;
-using Il2CppInterop.Runtime;
-using MelonLoader;
 using ProbablyStolenStockMarket.Localization;
 using ProbablyStolenStockMarket.Market;
 
@@ -15,7 +12,7 @@ internal sealed class IntelPhoneAdapter : IDisposable
 {
     internal const long PhoneNumber = 731206L;
     private readonly GameBridge _host;
-    private readonly MelonLogger.Instance _log;
+    private readonly ModLogger _log;
     private readonly List<(MethodBase Original, MethodInfo Patch)> _patches = new();
     private readonly List<ConfirmationTicket> _roots = new();
     private readonly IntelPhoneQuickDial _quickDial;
@@ -27,7 +24,7 @@ internal sealed class IntelPhoneAdapter : IDisposable
     private int _epoch;
     private static IntelPhoneAdapter? Current;
 
-    internal IntelPhoneAdapter(GameBridge host, MelonLogger.Instance log)
+    internal IntelPhoneAdapter(GameBridge host, ModLogger log)
     {
         _host = host; _log = log;
         _quickDial = new IntelPhoneQuickDial(log, "行情消息专线", PhoneNumber, CanShowQuickDial, StartQuickDial);
@@ -95,7 +92,7 @@ internal sealed class IntelPhoneAdapter : IDisposable
             Invalidate(true);
             phone.StopCall();
             phone.phoneBookUIManager?.CloseUI();
-            phone.currentNumber = PhoneNumber;
+            NativeGameAccess.SetPhoneNumber(phone, PhoneNumber);
             phone.StartCalling();
         }
         catch (Exception ex) { Report("快捷拨号失败", ex); }
@@ -118,10 +115,8 @@ internal sealed class IntelPhoneAdapter : IDisposable
         var ticket = new ConfirmationTicket(_epoch, _host.BrokerSaveIdentity, engine, day, phone, ui);
         ticket.ManagedConfirm = () => Resolve(ticket, true);
         ticket.ManagedCancel = () => Resolve(ticket, false);
-        ticket.Confirm = DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(ticket.ManagedConfirm)
-            ?? throw new InvalidOperationException("预约确认委托转换失败。");
-        ticket.Cancel = DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(ticket.ManagedCancel)
-            ?? throw new InvalidOperationException("预约取消委托转换失败。");
+        ticket.Confirm = ticket.ManagedConfirm;
+        ticket.Cancel = ticket.ManagedCancel;
         _pending = ticket; _roots.Add(ticket);
         try
         {
@@ -162,11 +157,11 @@ internal sealed class IntelPhoneAdapter : IDisposable
     }
 
     private static bool FieldsOwned(ConfirmationTicket ticket) => ticket.Manager != null
-        && ticket.Manager.onConfirm?.Pointer == ticket.Confirm?.Pointer && ticket.Manager.onCancel?.Pointer == ticket.Cancel?.Pointer;
+        && NativeGameAccess.OwnsConfirmation(ticket.Manager, ticket.Confirm, ticket.Cancel);
     private static bool OwnsVisiblePrompt(ConfirmationTicket ticket) => FieldsOwned(ticket) && ticket.Manager.panel != null && ticket.Manager.panel.activeSelf;
     private static bool SamePhone(ConfirmationTicket ticket) => ticket.Phone != null && PhoneUIManager.Instance != null
-        && PhoneUIManager.Instance.Pointer == ticket.Phone.Pointer && ticket.Phone.phonePanel != null && ticket.Phone.phonePanel.activeInHierarchy
-        && ticket.Phone.currentNumber == 0 && !ticket.Phone.isCalling && !ticket.Phone.isTalking;
+        && PhoneUIManager.Instance == ticket.Phone && ticket.Phone.phonePanel != null && ticket.Phone.phonePanel.activeInHierarchy
+        && NativeGameAccess.GetPhoneNumber(ticket.Phone) == 0 && !NativeGameAccess.IsCalling(ticket.Phone) && !NativeGameAccess.IsTalking(ticket.Phone);
 
     private void Consume(ConfirmationTicket ticket, bool close)
     {
@@ -175,7 +170,7 @@ internal sealed class IntelPhoneAdapter : IDisposable
         try
         {
             if (!FieldsOwned(ticket)) return;
-            ticket.Manager.onConfirm = null; ticket.Manager.onCancel = null;
+            NativeGameAccess.ClearConfirmation(ticket.Manager);
             if (close && ticket.Manager.panel != null && ticket.Manager.panel.activeSelf) ticket.Manager.ClosePanel();
         }
         catch (Exception ex) { Report("确认回调清理失败", ex); }
@@ -236,13 +231,13 @@ internal sealed class IntelPhoneAdapter : IDisposable
     private static void PhoneChangedPrefix(PhoneUIManager __instance)
     {
         var adapter = Current;
-        if (adapter?._pending is not { } ticket || ticket.Phone.Pointer != __instance.Pointer) return;
+        if (adapter?._pending is not { } ticket || ticket.Phone != __instance) return;
         adapter.Invalidate(true);
     }
     private static void ConfirmationChangedPrefix(GenericConfirmationUIManager __instance)
     {
         var adapter = Current;
-        if (adapter == null || adapter._opening || adapter._pending is not { } ticket || ticket.Manager.Pointer != __instance.Pointer) return;
+        if (adapter == null || adapter._opening || adapter._pending is not { } ticket || ticket.Manager != __instance) return;
         adapter.Invalidate(false);
     }
     private static void PhoneBookOpenedPostfix(PhoneBookUIManager __instance)
@@ -262,8 +257,8 @@ internal sealed class IntelPhoneAdapter : IDisposable
         internal readonly GenericConfirmationUIManager Manager;
         internal Action? ManagedConfirm;
         internal Action? ManagedCancel;
-        internal Il2CppSystem.Action? Confirm;
-        internal Il2CppSystem.Action? Cancel;
+        internal System.Action? Confirm;
+        internal System.Action? Cancel;
         internal bool Consumed;
         internal ConfirmationTicket(int epoch, string identity, MarketEngine engine, int day, PhoneUIManager phone, GenericConfirmationUIManager manager)
         { Epoch = epoch; Identity = identity; Engine = engine; Day = day; Phone = phone; Manager = manager; }

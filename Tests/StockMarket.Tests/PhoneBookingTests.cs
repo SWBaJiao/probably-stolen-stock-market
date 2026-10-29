@@ -1,5 +1,5 @@
 using ProbablyStolenStockMarket.Market;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Text.Json.Nodes;
 
 static class PhoneBookingTests
@@ -28,16 +28,16 @@ static class PhoneBookingTests
         check(e.BookBrokerByPhone(new[] { Future() }).Success, "电话预约不受原三日自动到访冷却限制");
         var booked = e.GetBrokerPhoneBooking()!;
         check(booked.RequestDay == 1 && booked.ArrivalDay == 2 && booked.Status == BrokerPhoneBookingStatus.Booked && e.State.Broker.IsPhoneBooking && !e.State.Broker.IsManual && e.State.LastDay == 1 && e.State.Companies.All(c => pricesBefore[c.Key] == (c.Value.Price, c.Value.History.Count, c.Value.Candles.Count, c.Value.IntradayPoints.Count)), "预约只固定明日计划不临时推进日期行情或价格记录");
-        var publicBooking = JsonSerializer.Serialize(booked, MarketEngine.JsonOptions);
+        var publicBooking = JsonConvert.SerializeObject(booked, MarketEngine.JsonOptions);
         check(!publicBooking.Contains("安盾") && !publicBooking.Contains("环宇") && !publicBooking.Contains("phone-private-event") && !publicBooking.Contains("事件标题") && !publicBooking.Contains("CompanyDirections"), "电话预约投影仅公开到访日来源商品类别不泄露预测内容");
         var saved = e.Serialize();
         check(e.BookBrokerByPhone(new[] { Future() }).Success && e.Serialize() == saved && e.GetDueBrokerPhoneVisit(new[] { Future() }) == null, "同日重拨复用已固定报价且预约当日不提前到访");
         var reloaded = new MarketEngine(e.Config, MarketEngine.Deserialize(saved, e.Config));
         check(reloaded.Serialize() == saved && reloaded.GetBrokerPhoneBooking()!.OfferId == booked.OfferId && reloaded.GetBrokerVisit()!.AppearanceKey == e.GetBrokerVisit()!.AppearanceKey, "明日预约报价真假来源外观保存重读后保持不变");
-        var quoteBefore = JsonSerializer.Serialize(e.State.Rumors[booked.OfferId], MarketEngine.JsonOptions);
+        var quoteBefore = JsonConvert.SerializeObject(e.State.Rumors[booked.OfferId], MarketEngine.JsonOptions);
         reloaded.AdvanceDay(2);
         var due = reloaded.GetDueBrokerPhoneVisit(new[] { Future() });
-        check(due != null && due.VisitId == booked.VisitId && due.IsPhoneBooking && !due.Expired && JsonSerializer.Serialize(reloaded.State.Rumors[booked.OfferId], MarketEngine.JsonOptions) == quoteBefore && reloaded.MarkBrokerArrived(due.VisitId) && reloaded.State.Broker.LastArrivalDay == 2, "次日仅发送既定电话预约并允许在旧冷却中实际到访");
+        check(due != null && due.VisitId == booked.VisitId && due.IsPhoneBooking && !due.Expired && JsonConvert.SerializeObject(reloaded.State.Rumors[booked.OfferId], MarketEngine.JsonOptions) == quoteBefore && reloaded.MarkBrokerArrived(due.VisitId) && reloaded.State.Broker.LastArrivalDay == 2, "次日仅发送既定电话预约并允许在旧冷却中实际到访");
         var arrivedSave = reloaded.Serialize();
         var arrived = new MarketEngine(reloaded.Config, MarketEngine.Deserialize(arrivedSave, reloaded.Config));
         check(arrived.GetDueBrokerPhoneVisit(new[] { Future() })!.HasArrived && arrived.GetBrokerPhoneBooking()!.Status == BrokerPhoneBookingStatus.Arrived && arrived.Serialize() == arrivedSave, "已到访电话预约读档时只恢复既定访客");
@@ -89,14 +89,14 @@ static class PhoneBookingTests
             var source = previousVersion.State.Rumors[previousVisit.OfferId].SellerKey;
             previousVersion.State.Reputations[source] = new SellerReputation { Correct = 3, Incorrect = 2 };
             var upgraded = new MarketEngine(previousVersion.Config, MarketEngine.Deserialize(previousVersion.Serialize(), previousVersion.Config));
-            var oldQuote = JsonSerializer.Serialize(upgraded.State.Rumors[previousVisit.OfferId], MarketEngine.JsonOptions);
+            var oldQuote = JsonConvert.SerializeObject(upgraded.State.Rumors[previousVisit.OfferId], MarketEngine.JsonOptions);
             var prices = upgraded.State.Companies.ToDictionary(c => c.Key, c => c.Value.Price);
             check(!upgraded.BookBrokerByPhone(new[] { Future() }).Success && !upgraded.State.Broker.Departed, $"旧{(wasManual ? "手动" : "自动")}在场计划未经实际适配确认仍不能被预约替换");
             upgraded.CloseBrokerVisit(previousVisit.VisitId);
             // 未购旧报价仅增加失效标记，已有内容与来源不能被升级清理覆盖。
-            var closedQuote = JsonSerializer.Serialize(upgraded.State.Rumors[previousVisit.OfferId], MarketEngine.JsonOptions);
+            var closedQuote = JsonConvert.SerializeObject(upgraded.State.Rumors[previousVisit.OfferId], MarketEngine.JsonOptions);
             var oldQuoteNode = JsonNode.Parse(oldQuote)!; oldQuoteNode["Expired"] = true;
-            check(upgraded.BookBrokerByPhone(new[] { Future() }).Success && upgraded.GetBrokerPhoneBooking()!.ArrivalDay == 2 && upgraded.GetBrokerPhoneBooking()!.RequestDay == 1 && upgraded.State.Rumors.ContainsKey(previousVisit.OfferId) && closedQuote == oldQuoteNode.ToJsonString(MarketEngine.JsonOptions) && JsonSerializer.Serialize(upgraded.State.Rumors[previousVisit.OfferId], MarketEngine.JsonOptions) == closedQuote && upgraded.State.Reputations[source].Correct == 3 && upgraded.State.Reputations[source].Incorrect == 2 && upgraded.State.Companies.All(c => prices[c.Key] == c.Value.Price), $"旧{(wasManual ? "手动" : "自动")}残留到访明确结束后可预约次日且保留旧情报信誉行情");
+            check(upgraded.BookBrokerByPhone(new[] { Future() }).Success && upgraded.GetBrokerPhoneBooking()!.ArrivalDay == 2 && upgraded.GetBrokerPhoneBooking()!.RequestDay == 1 && upgraded.State.Rumors.ContainsKey(previousVisit.OfferId) && JsonNode.DeepEquals(JsonNode.Parse(closedQuote), oldQuoteNode) && JsonConvert.SerializeObject(upgraded.State.Rumors[previousVisit.OfferId], MarketEngine.JsonOptions) == closedQuote && upgraded.State.Reputations[source].Correct == 3 && upgraded.State.Reputations[source].Incorrect == 2 && upgraded.State.Companies.All(c => prices[c.Key] == c.Value.Price), $"旧{(wasManual ? "手动" : "自动")}残留到访明确结束后可预约次日且保留旧情报信誉行情");
         }
     }
     sealed class Wallet : IWallet

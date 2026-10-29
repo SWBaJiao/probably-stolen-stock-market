@@ -1,0 +1,10 @@
+<Project>
+  <Import Project="$(MSBuildProjectDirectory)/Game.local.props" Condition="Exists('$(MSBuildProjectDirectory)/Game.local.props')" />
+  <PropertyGroup>
+    <ManagedDirectory Condition="'$(ManagedDirectory)' == '' and '$(GameDirectory)' != ''">$(GameDirectory)/Probably Stolen_Data/Managed</ManagedDirectory>
+    <ModAssetsDirectory>$(MSBuildProjectDirectory)/Assets</ModAssetsDirectory>
+    <ModManifestPath>$(MSBuildProjectDirectory)/manifest.xml</ModManifestPath>
+    <DeployOnBuild Condition="'$(DeployOnBuild)' == ''">true</DeployOnBuild>
+    <DeployDebugSymbols Condition="'$(DeployDebugSymbols)' == ''">false</DeployDebugSymbols>
+  </PropertyGroup>
+</Project>

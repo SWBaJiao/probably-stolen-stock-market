@@ -6,16 +6,16 @@
   "StockTemplateCooldownDays": 14,
   "StockDurationMinDays": 2,
   "StockDurationMaxDays": 4,
-  "StockIntensityMin": 0.80,
-  "StockIntensityMax": 1.20,
+  "StockIntensityMin": 0.8,
+  "StockIntensityMax": 1.2,
   "EventShockDailyLimit": 0.15,
   "StockEventTemplates": [
     {
       "Id": "stock:harvest_supply_contract",
       "PrimaryCompanyId": "harvest",
       "Polarity": 1,
-      "Title": "\u4E30\u79BE\u7B7E\u4E0B\u957F\u671F\u4F9B\u8D27\u5408\u540C",
-      "Body": "\u4E30\u79BE\u4F9B\u7ED9\u516C\u5E03\u65B0\u7684\u957F\u671F\u98DF\u54C1\u4F9B\u8D27\u5408\u540C\uFF0C\u7A33\u5B9A\u7684\u91C7\u8D2D\u5B89\u6392\u6709\u671B\u6539\u5584\u4ED3\u5E93\u5468\u8F6C\u3002\u73AF\u5B87\u5546\u8D38\u53C2\u4E0E\u5206\u9500\uFF0C\u6668\u661F\u7269\u6D41\u627F\u63A5\u914D\u5957\u8FD0\u8F93\uFF0C\u56E0\u6B64\u4E5F\u53D7\u5230\u8BA2\u5355\u6269\u5927\u7684\u5E26\u52A8\u3002",
+      "Title": "丰禾签下长期供货合同",
+      "Body": "丰禾供给公布新的长期食品供货合同，稳定的采购安排有望改善仓库周转。环宇商贸参与分销，晨星物流承接配套运输，因此也受到订单扩大的带动。",
       "Sectors": [
         "food"
       ],
@@ -29,8 +29,8 @@
       "Id": "stock:harvest_batch_recall",
       "PrimaryCompanyId": "harvest",
       "Polarity": -1,
-      "Title": "\u4E30\u79BE\u98DF\u54C1\u6279\u6B21\u53EC\u56DE",
-      "Body": "\u4E30\u79BE\u4F9B\u7ED9\u5BA3\u5E03\u53EC\u56DE\u4E00\u6279\u98DF\u54C1\u5E76\u5F00\u5C55\u8D28\u91CF\u590D\u67E5\uFF0C\u9000\u6362\u4E0E\u6574\u6539\u6210\u672C\u538B\u4F4E\u4E86\u5E02\u573A\u9884\u671F\u3002\u73AF\u5B87\u5546\u8D38\u9700\u8981\u8C03\u6574\u5206\u9500\u8BA1\u5212\uFF0C\u6668\u661F\u7269\u6D41\u7684\u539F\u5B9A\u8D27\u8FD0\u5B89\u6392\u4E5F\u9762\u4E34\u7F29\u51CF\u3002",
+      "Title": "丰禾食品批次召回",
+      "Body": "丰禾供给宣布召回一批食品并开展质量复查，退换与整改成本压低了市场预期。环宇商贸需要调整分销计划，晨星物流的原定货运安排也面临缩减。",
       "Sectors": [
         "food"
       ],
@@ -44,8 +44,8 @@
       "Id": "stock:water_new_plant",
       "PrimaryCompanyId": "water",
       "Polarity": 1,
-      "Title": "\u6E05\u6CC9\u65B0\u51C0\u6C34\u8BBE\u5907\u6295\u4EA7",
-      "Body": "\u6E05\u6CC9\u5FAA\u73AF\u7684\u65B0\u51C0\u6C34\u8BBE\u5907\u8FDB\u5165\u6295\u4EA7\u9636\u6BB5\uFF0C\u5E02\u573A\u671F\u5F85\u4F9B\u5E94\u80FD\u529B\u4E0E\u5904\u7406\u6548\u7387\u6539\u5584\u3002\u661F\u953B\u5DE5\u4E1A\u83B7\u5F97\u8BBE\u5907\u914D\u5957\u9700\u6C42\uFF0C\u805A\u5408\u6750\u6599\u7684\u6C34\u5904\u7406\u8017\u6750\u4E5F\u8FCE\u6765\u8865\u8D27\u673A\u4F1A\u3002",
+      "Title": "清泉新净水设备投产",
+      "Body": "清泉循环的新净水设备进入投产阶段，市场期待供应能力与处理效率改善。星锻工业获得设备配套需求，聚合材料的水处理耗材也迎来补货机会。",
       "Sectors": [
         "water"
       ],
@@ -59,13 +59,13 @@
       "Id": "stock:water_filter_quality",
       "PrimaryCompanyId": "water",
       "Polarity": -1,
-      "Title": "\u6E05\u6CC9\u6EE4\u82AF\u8D28\u91CF\u4E8B\u6545",
-      "Body": "\u6E05\u6CC9\u5FAA\u73AF\u62AB\u9732\u6EE4\u82AF\u8D28\u91CF\u4E8B\u6545\uFF0C\u9700\u8981\u627F\u62C5\u8D54\u507F\u548C\u6574\u6539\u6210\u672C\u3002\u4E0D\u8FC7\u66FF\u4EE3\u6EE4\u6750\u4E0E\u8BBE\u5907\u62A2\u4FEE\u9700\u6C42\u589E\u52A0\uFF0C\u805A\u5408\u6750\u6599\u548C\u661F\u953B\u5DE5\u4E1A\u56E0\u6B64\u53EF\u80FD\u83B7\u5F97\u989D\u5916\u8BA2\u5355\uFF0C\u76F8\u5173\u516C\u53F8\u9884\u671F\u51FA\u73B0\u5206\u5316\u3002",
+      "Title": "清泉滤芯质量事故",
+      "Body": "清泉循环披露滤芯质量事故，需要承担赔偿和整改成本。不过替代滤材与设备抢修需求增加，聚合材料和星锻工业因此可能获得额外订单，相关公司预期出现分化。",
       "Sectors": [
         "water"
       ],
       "Impacts": {
-        "water": -0.10,
+        "water": -0.1,
         "materials": 0.03,
         "industrial": 0.02
       }
@@ -74,8 +74,8 @@
       "Id": "stock:medical_clinic_order",
       "PrimaryCompanyId": "medical",
       "Polarity": 1,
-      "Title": "\u767D\u5854\u83B7\u5F97\u8BCA\u6240\u8054\u5408\u91C7\u8D2D\u8BA2\u5355",
-      "Body": "\u591A\u5BB6\u8BCA\u6240\u7684\u8054\u5408\u91C7\u8D2D\u8BA2\u5355\u843D\u5230\u767D\u5854\u533B\u7597\uFF0C\u836F\u54C1\u548C\u533B\u7597\u8017\u6750\u7684\u51FA\u8D27\u9884\u671F\u63D0\u5347\u3002\u805A\u5408\u6750\u6599\u4E3A\u751F\u4EA7\u63D0\u4F9B\u539F\u6599\uFF0C\u8FDC\u661F\u79D1\u6280\u53C2\u4E0E\u8BBE\u5907\u6A21\u5757\u914D\u5957\uFF0C\u4E5F\u6709\u671B\u5206\u4EAB\u5230\u65B0\u589E\u9700\u6C42\u3002",
+      "Title": "白塔获得诊所联合采购订单",
+      "Body": "多家诊所的联合采购订单落到白塔医疗，药品和医疗耗材的出货预期提升。聚合材料为生产提供原料，远星科技参与设备模块配套，也有望分享到新增需求。",
       "Sectors": [
         "medical"
       ],
@@ -89,8 +89,8 @@
       "Id": "stock:medical_approval_delay",
       "PrimaryCompanyId": "medical",
       "Polarity": -1,
-      "Title": "\u767D\u5854\u65B0\u836F\u5BA1\u6279\u53D7\u963B",
-      "Body": "\u767D\u5854\u533B\u7597\u7684\u65B0\u836F\u5BA1\u6279\u8FDB\u7A0B\u53D7\u963B\uFF0C\u76F8\u5173\u4EA7\u54C1\u6295\u4EA7\u4E0E\u9500\u552E\u8BA1\u5212\u88AB\u63A8\u8FDF\u3002\u805A\u5408\u6750\u6599\u7684\u539F\u6599\u8BA2\u5355\u9884\u671F\u968F\u4E4B\u51CF\u5C11\uFF0C\u73AF\u5B87\u5546\u8D38\u539F\u5B9A\u7684\u6E20\u9053\u94FA\u8D27\u5B89\u6392\u4E5F\u53D7\u5230\u5F71\u54CD\u3002",
+      "Title": "白塔新药审批受阻",
+      "Body": "白塔医疗的新药审批进程受阻，相关产品投产与销售计划被推迟。聚合材料的原料订单预期随之减少，环宇商贸原定的渠道铺货安排也受到影响。",
       "Sectors": [
         "medical"
       ],
@@ -104,8 +104,8 @@
       "Id": "stock:industrial_export_order",
       "PrimaryCompanyId": "industrial",
       "Polarity": 1,
-      "Title": "\u661F\u953B\u83B7\u5F97\u673A\u68B0\u51FA\u53E3\u8BA2\u5355",
-      "Body": "\u661F\u953B\u5DE5\u4E1A\u83B7\u5F97\u4E00\u6279\u673A\u68B0\u51FA\u53E3\u8BA2\u5355\uFF0C\u751F\u4EA7\u7EBF\u548C\u96F6\u4EF6\u91C7\u8D2D\u5B89\u6392\u8F6C\u8D8B\u7E41\u5FD9\u3002\u6668\u661F\u7269\u6D41\u53D7\u76CA\u4E8E\u8BBE\u5907\u8FD0\u8F93\u9700\u6C42\uFF0C\u9706\u5149\u80FD\u6E90\u4E5F\u53EF\u80FD\u83B7\u5F97\u66F4\u591A\u751F\u4EA7\u4F9B\u80FD\u4E0E\u80FD\u6E90\u914D\u5957\u8BA2\u5355\u3002",
+      "Title": "星锻获得机械出口订单",
+      "Body": "星锻工业获得一批机械出口订单，生产线和零件采购安排转趋繁忙。晨星物流受益于设备运输需求，霆光能源也可能获得更多生产供能与能源配套订单。",
       "Sectors": [
         "tools"
       ],
@@ -119,13 +119,13 @@
       "Id": "stock:industrial_line_accident",
       "PrimaryCompanyId": "industrial",
       "Polarity": -1,
-      "Title": "\u661F\u953B\u751F\u4EA7\u7EBF\u4E8B\u6545",
-      "Body": "\u661F\u953B\u5DE5\u4E1A\u7684\u751F\u4EA7\u7EBF\u53D1\u751F\u4E8B\u6545\uFF0C\u68C0\u4FEE\u505C\u5DE5\u4EE4\u4EA4\u8D27\u9884\u671F\u627F\u538B\u3002\u5B89\u76FE\u9632\u52A1\u4F9D\u8D56\u7684\u673A\u68B0\u90E8\u4EF6\u4F9B\u5E94\u53D7\u5230\u7275\u8FDE\uFF0C\u9706\u5149\u80FD\u6E90\u9762\u5411\u8BE5\u751F\u4EA7\u7EBF\u7684\u4F9B\u80FD\u9700\u6C42\u4E5F\u53EF\u80FD\u4E0B\u964D\u3002",
+      "Title": "星锻生产线事故",
+      "Body": "星锻工业的生产线发生事故，检修停工令交货预期承压。安盾防务依赖的机械部件供应受到牵连，霆光能源面向该生产线的供能需求也可能下降。",
       "Sectors": [
         "tools"
       ],
       "Impacts": {
-        "industrial": -0.10,
+        "industrial": -0.1,
         "defense": -0.03,
         "energy": -0.02
       }
@@ -134,13 +134,13 @@
       "Id": "stock:technology_control_breakthrough",
       "PrimaryCompanyId": "technology",
       "Polarity": 1,
-      "Title": "\u8FDC\u661F\u63A7\u5236\u6A21\u5757\u53D6\u5F97\u7A81\u7834",
-      "Body": "\u8FDC\u661F\u79D1\u6280\u516C\u5E03\u63A7\u5236\u6A21\u5757\u6280\u672F\u7A81\u7834\uFF0C\u5E02\u573A\u671F\u5F85\u65B0\u6A21\u5757\u62D3\u5C55\u5E94\u7528\u3002\u9706\u5149\u80FD\u6E90\u7684\u4F9B\u7535\u63A7\u5236\u8BBE\u5907\u548C\u767D\u5854\u533B\u7597\u7684\u7535\u5B50\u8BCA\u7597\u8BBE\u5907\u90FD\u4E0E\u8FD9\u7C7B\u6A21\u5757\u6709\u5173\uFF0C\u914D\u5957\u4E1A\u52A1\u9884\u671F\u4E00\u540C\u6539\u5584\u3002",
+      "Title": "远星控制模块取得突破",
+      "Body": "远星科技公布控制模块技术突破，市场期待新模块拓展应用。霆光能源的供电控制设备和白塔医疗的电子诊疗设备都与这类模块有关，配套业务预期一同改善。",
       "Sectors": [
         "electronics"
       ],
       "Impacts": {
-        "technology": 0.10,
+        "technology": 0.1,
         "energy": 0.03,
         "medical": 0.02
       }
@@ -149,13 +149,13 @@
       "Id": "stock:technology_module_recall",
       "PrimaryCompanyId": "technology",
       "Polarity": -1,
-      "Title": "\u8FDC\u661F\u5173\u952E\u6A21\u5757\u53EC\u56DE",
-      "Body": "\u8FDC\u661F\u79D1\u6280\u5BA3\u5E03\u53EC\u56DE\u5173\u952E\u6A21\u5757\uFF0C\u7EF4\u4FEE\u4E0E\u66FF\u6362\u5B89\u6392\u4EE4\u4EA4\u4ED8\u9884\u671F\u627F\u538B\u3002\u9706\u5149\u80FD\u6E90\u548C\u767D\u5854\u533B\u7597\u7684\u76F8\u5173\u914D\u5957\u8BBE\u5907\u4E5F\u9700\u8981\u91CD\u65B0\u68C0\u67E5\uFF0C\u5E02\u573A\u56E0\u800C\u4E0B\u8C03\u8FD9\u4E9B\u4E1A\u52A1\u7684\u8FD1\u671F\u9884\u671F\u3002",
+      "Title": "远星关键模块召回",
+      "Body": "远星科技宣布召回关键模块，维修与替换安排令交付预期承压。霆光能源和白塔医疗的相关配套设备也需要重新检查，市场因而下调这些业务的近期预期。",
       "Sectors": [
         "electronics"
       ],
       "Impacts": {
-        "technology": -0.10,
+        "technology": -0.1,
         "energy": -0.03,
         "medical": -0.02
       }
@@ -164,8 +164,8 @@
       "Id": "stock:commerce_district_rights",
       "PrimaryCompanyId": "commerce",
       "Polarity": 1,
-      "Title": "\u73AF\u5B87\u53D6\u5F97\u5546\u4E1A\u533A\u72EC\u5BB6\u7ECF\u9500\u6743",
-      "Body": "\u73AF\u5B87\u5546\u8D38\u53D6\u5F97\u4E00\u5904\u5546\u4E1A\u533A\u7684\u72EC\u5BB6\u7ECF\u9500\u6743\uFF0C\u65B0\u589E\u6E20\u9053\u6709\u671B\u6269\u5927\u8D27\u7269\u6D41\u901A\u3002\u6668\u661F\u7269\u6D41\u53C2\u4E0E\u914D\u9001\u5B89\u6392\uFF0C\u4E30\u79BE\u4F9B\u7ED9\u7684\u98DF\u54C1\u4E5F\u8FDB\u5165\u65B0\u7684\u9500\u552E\u7F51\u7EDC\uFF0C\u76F8\u5173\u4E1A\u52A1\u9884\u671F\u53D7\u76CA\u3002",
+      "Title": "环宇取得商业区独家经销权",
+      "Body": "环宇商贸取得一处商业区的独家经销权，新增渠道有望扩大货物流通。晨星物流参与配送安排，丰禾供给的食品也进入新的销售网络，相关业务预期受益。",
       "Sectors": [
         "luxury"
       ],
@@ -179,13 +179,13 @@
       "Id": "stock:commerce_channel_closure",
       "PrimaryCompanyId": "commerce",
       "Polarity": -1,
-      "Title": "\u73AF\u5B87\u8FDD\u89C4\u6E20\u9053\u906D\u67E5\u5C01",
-      "Body": "\u73AF\u5B87\u5546\u8D38\u7684\u4E00\u6761\u8FDD\u89C4\u6E20\u9053\u906D\u5230\u67E5\u5C01\uFF0C\u6E20\u9053\u6536\u5165\u548C\u6668\u661F\u7269\u6D41\u7684\u76F8\u5173\u914D\u9001\u9884\u671F\u53D7\u5230\u6253\u51FB\u3002\u5B89\u76FE\u9632\u52A1\u53EF\u80FD\u63A5\u624B\u90E8\u5206\u5408\u89C4\u4F9B\u8D27\u9700\u6C42\uFF0C\u56E0\u6B64\u5728\u8FD9\u6B21\u6D88\u606F\u4E2D\u53CD\u800C\u53D7\u5230\u5229\u597D\u5E26\u52A8\u3002",
+      "Title": "环宇违规渠道遭查封",
+      "Body": "环宇商贸的一条违规渠道遭到查封，渠道收入和晨星物流的相关配送预期受到打击。安盾防务可能接手部分合规供货需求，因此在这次消息中反而受到利好带动。",
       "Sectors": [
         "luxury"
       ],
       "Impacts": {
-        "commerce": -0.10,
+        "commerce": -0.1,
         "logistics": -0.03,
         "defense": 0.02
       }
@@ -194,13 +194,13 @@
       "Id": "stock:energy_storage_order",
       "PrimaryCompanyId": "energy",
       "Polarity": 1,
-      "Title": "\u9706\u5149\u83B7\u5F97\u50A8\u80FD\u7535\u6C60\u5927\u5355",
-      "Body": "\u9706\u5149\u80FD\u6E90\u83B7\u5F97\u50A8\u80FD\u7535\u6C60\u5927\u5355\uFF0C\u80FD\u6E90\u8BBE\u5907\u51FA\u8D27\u9884\u671F\u4E0A\u5347\u3002\u8FDC\u661F\u79D1\u6280\u63D0\u4F9B\u63A7\u5236\u6A21\u5757\uFF0C\u661F\u953B\u5DE5\u4E1A\u53C2\u4E0E\u673A\u68B0\u4E0E\u8BBE\u5907\u914D\u5957\uFF0C\u8BA2\u5355\u6269\u5927\u6709\u671B\u5E26\u52A8\u4E24\u5BB6\u516C\u53F8\u7684\u76F8\u5173\u4E1A\u52A1\u3002",
+      "Title": "霆光获得储能电池大单",
+      "Body": "霆光能源获得储能电池大单，能源设备出货预期上升。远星科技提供控制模块，星锻工业参与机械与设备配套，订单扩大有望带动两家公司的相关业务。",
       "Sectors": [
         "energy"
       ],
       "Impacts": {
-        "energy": 0.10,
+        "energy": 0.1,
         "technology": 0.03,
         "industrial": 0.02
       }
@@ -209,13 +209,13 @@
       "Id": "stock:energy_fuel_contract_loss",
       "PrimaryCompanyId": "energy",
       "Polarity": -1,
-      "Title": "\u9706\u5149\u71C3\u6599\u91C7\u8D2D\u5408\u540C\u7834\u88C2",
-      "Body": "\u9706\u5149\u80FD\u6E90\u7684\u71C3\u6599\u91C7\u8D2D\u5408\u540C\u7834\u88C2\uFF0C\u91C7\u8D2D\u4E0E\u4EA4\u4ED8\u8BA1\u5212\u9762\u4E34\u91CD\u65B0\u5B89\u6392\u3002\u661F\u953B\u5DE5\u4E1A\u7684\u751F\u4EA7\u4F9B\u80FD\u9884\u671F\u627F\u538B\uFF0C\u6668\u661F\u7269\u6D41\u539F\u5B9A\u7684\u80FD\u6E90\u8D27\u8FD0\u9700\u6C42\u4E5F\u53EF\u80FD\u51CF\u5C11\u3002",
+      "Title": "霆光燃料采购合同破裂",
+      "Body": "霆光能源的燃料采购合同破裂，采购与交付计划面临重新安排。星锻工业的生产供能预期承压，晨星物流原定的能源货运需求也可能减少。",
       "Sectors": [
         "energy"
       ],
       "Impacts": {
-        "energy": -0.10,
+        "energy": -0.1,
         "industrial": -0.03,
         "logistics": -0.02
       }
@@ -224,8 +224,8 @@
       "Id": "stock:logistics_route_approval",
       "PrimaryCompanyId": "logistics",
       "Polarity": 1,
-      "Title": "\u6668\u661F\u65B0\u8D27\u8FD0\u822A\u7EBF\u83B7\u6279",
-      "Body": "\u6668\u661F\u7269\u6D41\u7684\u65B0\u8D27\u8FD0\u822A\u7EBF\u83B7\u6279\uFF0C\u8FD0\u8F93\u80FD\u529B\u4E0E\u914D\u9001\u8986\u76D6\u6709\u671B\u6269\u5927\u3002\u73AF\u5B87\u5546\u8D38\u53EF\u4EE5\u62D3\u5C55\u8D27\u7269\u6D41\u901A\uFF0C\u4E30\u79BE\u4F9B\u7ED9\u4E5F\u591A\u4E86\u4E00\u6761\u98DF\u54C1\u8FD0\u8F93\u901A\u9053\uFF0C\u4F9B\u5E94\u94FE\u4F19\u4F34\u7684\u9884\u671F\u968F\u4E4B\u6539\u5584\u3002",
+      "Title": "晨星新货运航线获批",
+      "Body": "晨星物流的新货运航线获批，运输能力与配送覆盖有望扩大。环宇商贸可以拓展货物流通，丰禾供给也多了一条食品运输通道，供应链伙伴的预期随之改善。",
       "Sectors": [
         "food"
       ],
@@ -239,13 +239,13 @@
       "Id": "stock:logistics_equipment_failure",
       "PrimaryCompanyId": "logistics",
       "Polarity": -1,
-      "Title": "\u6668\u661F\u8D27\u8FD0\u8BBE\u5907\u5927\u9762\u79EF\u6545\u969C",
-      "Body": "\u6668\u661F\u7269\u6D41\u7684\u8D27\u8FD0\u8BBE\u5907\u5927\u9762\u79EF\u6545\u969C\uFF0C\u8FD0\u8F93\u4E0E\u73AF\u5B87\u5546\u8D38\u7684\u6E20\u9053\u5468\u8F6C\u9884\u671F\u627F\u538B\u3002\u8BBE\u5907\u7EF4\u4FEE\u9700\u6C42\u540C\u65F6\u589E\u52A0\uFF0C\u661F\u953B\u5DE5\u4E1A\u53EF\u80FD\u63A5\u5230\u66F4\u591A\u68C0\u4FEE\u4E0E\u66FF\u6362\u90E8\u4EF6\u8BA2\u5355\uFF0C\u5F62\u6210\u4E0D\u540C\u65B9\u5411\u7684\u5F71\u54CD\u3002",
+      "Title": "晨星货运设备大面积故障",
+      "Body": "晨星物流的货运设备大面积故障，运输与环宇商贸的渠道周转预期承压。设备维修需求同时增加，星锻工业可能接到更多检修与替换部件订单，形成不同方向的影响。",
       "Sectors": [
         "tools"
       ],
       "Impacts": {
-        "logistics": -0.10,
+        "logistics": -0.1,
         "commerce": -0.03,
         "industrial": 0.02
       }
@@ -254,8 +254,8 @@
       "Id": "stock:defense_security_contract",
       "PrimaryCompanyId": "defense",
       "Polarity": 1,
-      "Title": "\u5B89\u76FE\u83B7\u5F97\u957F\u671F\u5B89\u4FDD\u5408\u540C",
-      "Body": "\u5B89\u76FE\u9632\u52A1\u83B7\u5F97\u957F\u671F\u5B89\u4FDD\u5408\u540C\uFF0C\u88C5\u5907\u548C\u5B89\u5168\u5668\u6750\u9700\u6C42\u9884\u671F\u589E\u957F\u3002\u661F\u953B\u5DE5\u4E1A\u7684\u673A\u68B0\u90E8\u4EF6\u4E0E\u8FDC\u661F\u79D1\u6280\u7684\u7535\u5B50\u7EC4\u4EF6\u53C2\u4E0E\u914D\u5957\uFF0C\u5E02\u573A\u4E5F\u4E0A\u8C03\u4E86\u4E24\u5BB6\u4F9B\u5E94\u5546\u7684\u76F8\u5173\u4E1A\u52A1\u9884\u671F\u3002",
+      "Title": "安盾获得长期安保合同",
+      "Body": "安盾防务获得长期安保合同，装备和安全器材需求预期增长。星锻工业的机械部件与远星科技的电子组件参与配套，市场也上调了两家供应商的相关业务预期。",
       "Sectors": [
         "weapons"
       ],
@@ -269,8 +269,8 @@
       "Id": "stock:defense_armor_recall",
       "PrimaryCompanyId": "defense",
       "Polarity": -1,
-      "Title": "\u5B89\u76FE\u9632\u62A4\u88C5\u5907\u53EC\u56DE",
-      "Body": "\u5B89\u76FE\u9632\u52A1\u5BA3\u5E03\u53EC\u56DE\u4E00\u6279\u9632\u62A4\u88C5\u5907\uFF0C\u8D28\u4FDD\u6210\u672C\u4E0E\u4EA4\u4ED8\u5EF6\u8BEF\u4EE4\u5E02\u573A\u9884\u671F\u4E0B\u964D\u3002\u661F\u953B\u5DE5\u4E1A\u548C\u8FDC\u661F\u79D1\u6280\u9762\u5411\u8BE5\u6279\u88C5\u5907\u7684\u90E8\u4EF6\u4E0E\u7535\u5B50\u7EC4\u4EF6\u8BA2\u5355\u4E5F\u53D7\u5230\u7275\u8FDE\u3002",
+      "Title": "安盾防护装备召回",
+      "Body": "安盾防务宣布召回一批防护装备，质保成本与交付延误令市场预期下降。星锻工业和远星科技面向该批装备的部件与电子组件订单也受到牵连。",
       "Sectors": [
         "weapons"
       ],
@@ -284,8 +284,8 @@
       "Id": "stock:materials_treatment_certified",
       "PrimaryCompanyId": "materials",
       "Polarity": 1,
-      "Title": "\u805A\u5408\u51C0\u6C34\u836F\u5242\u901A\u8FC7\u8BA4\u8BC1",
-      "Body": "\u805A\u5408\u6750\u6599\u7684\u51C0\u6C34\u836F\u5242\u901A\u8FC7\u8BA4\u8BC1\uFF0C\u5E02\u573A\u671F\u5F85\u6C34\u5904\u7406\u539F\u6599\u4E1A\u52A1\u62D3\u5C55\u3002\u6E05\u6CC9\u5FAA\u73AF\u53EF\u5C06\u5176\u7528\u4E8E\u51C0\u6C34\u914D\u5957\uFF0C\u767D\u5854\u533B\u7597\u76F8\u5173\u536B\u751F\u8017\u6750\u7684\u539F\u6599\u4F9B\u5E94\u9884\u671F\u4E5F\u5F97\u5230\u6539\u5584\u3002",
+      "Title": "聚合净水药剂通过认证",
+      "Body": "聚合材料的净水药剂通过认证，市场期待水处理原料业务拓展。清泉循环可将其用于净水配套，白塔医疗相关卫生耗材的原料供应预期也得到改善。",
       "Sectors": [
         "materials"
       ],
@@ -299,13 +299,13 @@
       "Id": "stock:materials_pollution_shutdown",
       "PrimaryCompanyId": "materials",
       "Polarity": -1,
-      "Title": "\u805A\u5408\u5DE5\u5382\u56E0\u6C61\u67D3\u505C\u4EA7",
-      "Body": "\u805A\u5408\u6750\u6599\u7684\u5DE5\u5382\u56E0\u6C61\u67D3\u505C\u4EA7\uFF0C\u6574\u6539\u548C\u505C\u5DE5\u6210\u672C\u4EE4\u7ECF\u8425\u9884\u671F\u627F\u538B\u3002\u6E05\u6CC9\u5FAA\u73AF\u4F9D\u8D56\u7684\u6C34\u5904\u7406\u539F\u6599\u4E0E\u767D\u5854\u533B\u7597\u7684\u76F8\u5173\u539F\u6599\u4F9B\u5E94\u4E5F\u53EF\u80FD\u53D7\u5230\u5F71\u54CD\uFF0C\u9884\u671F\u540C\u6B65\u8F6C\u5F31\u3002",
+      "Title": "聚合工厂因污染停产",
+      "Body": "聚合材料的工厂因污染停产，整改和停工成本令经营预期承压。清泉循环依赖的水处理原料与白塔医疗的相关原料供应也可能受到影响，预期同步转弱。",
       "Sectors": [
         "materials"
       ],
       "Impacts": {
-        "materials": -0.10,
+        "materials": -0.1,
         "water": -0.03,
         "medical": -0.02
       }
@@ -319,20 +319,20 @@
   "EventPreheatChance": 0.65,
   "EventPreheatScale": 0.05,
   "EventPreheatLimit": 0.005,
-  "EventContinuationScale": 0.10,
+  "EventContinuationScale": 0.1,
   "EventContinuationLimit": 0.0075,
   "EventContinuationBudget": 0.25,
   "EventRecoveryRate": 0.25,
   "EventDailyDriftLimit": 0.01,
-  "EventRetentionMin": 0.20,
-  "EventRetentionMax": 0.50,
+  "EventRetentionMin": 0.2,
+  "EventRetentionMax": 0.5,
   "CustomerLimit": 0.02,
   "RetailDailyLimit": 0.08,
   "SignalScale": 1000,
   "FeeRate": 0.005,
   "MinimumFee": 1,
   "RumorPrice": 50,
-  "JianqingReverseProbability": 0.70,
+  "JianqingReverseProbability": 0.7,
   "RumorHorizon": 3,
   "BrokerCooldownDays": 3,
   "HistoryLimit": 240,
@@ -343,72 +343,72 @@
   "Companies": [
     {
       "Id": "harvest",
-      "Name": "\u4E30\u79BE\u4F9B\u7ED9",
-      "Description": "\u4E30\u79BE\u4F9B\u7ED9\u6700\u65E9\u9760\u4E00\u8F86\u5F80\u8FD4\u79CD\u690D\u533A\u7684\u5C0F\u8D27\u8F66\u8D77\u5BB6\uFF0C\u5982\u4ECA\u66FF\u8857\u89D2\u5546\u5E97\u548C\u98DF\u5802\u6536\u8D2D\u8425\u517B\u679C\u3001\u519C\u4EA7\u54C1\u4E0E\u8010\u50A8\u98DF\u54C1\u3002\u5B83\u4F1A\u5411\u6E05\u6CC9\u5FAA\u73AF\u91C7\u8D2D\u704C\u88C5\u7528\u6C34\uFF0C\u4E5F\u501F\u6668\u661F\u7269\u6D41\u7684\u8D27\u8231\u628A\u6613\u8150\u8D27\u7269\u8D76\u5728\u53D8\u8D28\u524D\u9001\u8FBE\u3002\u4E30\u6536\u65F6\u4ED3\u5E93\u5FD9\u4E8E\u5468\u8F6C\uFF0C\u7F3A\u6C34\u6216\u8FD0\u8F93\u53D7\u963B\u65F6\uFF0C\u91C7\u8D2D\u5458\u5219\u5F97\u4E3A\u4E0B\u4E00\u6279\u8D27\u91CD\u65B0\u8BA8\u4EF7\u8FD8\u4EF7\u3002"
+      "Name": "丰禾供给",
+      "Description": "丰禾供给最早靠一辆往返种植区的小货车起家，如今替街角商店和食堂收购营养果、农产品与耐储食品。它会向清泉循环采购灌装用水，也借晨星物流的货舱把易腐货物赶在变质前送达。丰收时仓库忙于周转，缺水或运输受阻时，采购员则得为下一批货重新讨价还价。"
     },
     {
       "Id": "water",
-      "Name": "\u6E05\u6CC9\u5FAA\u73AF",
-      "Description": "\u6E05\u6CC9\u5FAA\u73AF\u63A5\u7BA1\u8FC7\u4E00\u5EA7\u5E74\u4E45\u5931\u4FEE\u7684\u51C0\u6C34\u7AD9\uFF0C\u9760\u68C0\u4FEE\u7BA1\u7EBF\u3001\u56DE\u6536\u65E7\u6EE4\u82AF\u548C\u5206\u88C5\u996E\u7528\u6C34\u6162\u6162\u7AD9\u7A33\u811A\u8DDF\u3002\u5982\u4ECA\u5B83\u65E2\u4F9B\u5E94\u65E5\u5E38\u7528\u6C34\uFF0C\u4E5F\u7ECF\u8425\u8FC7\u6EE4\u5668\u548C\u51C0\u6C34\u7269\u8D44\uFF0C\u5904\u7406\u836F\u5242\u5E38\u8981\u5411\u805A\u5408\u6750\u6599\u8BE2\u4EF7\uFF0C\u8BBE\u5907\u6545\u969C\u65F6\u5219\u79BB\u4E0D\u5F00\u661F\u953B\u5DE5\u4E1A\u7684\u96F6\u4EF6\u3002\u5BF9\u8FD9\u5BB6\u516C\u53F8\u800C\u8A00\uFF0C\u6C34\u8D28\u3001\u8017\u6750\u548C\u673A\u5668\u5F00\u5DE5\u7387\u603B\u662F\u540C\u4E00\u672C\u8D26\u4E0A\u7684\u4E8B\u3002"
+      "Name": "清泉循环",
+      "Description": "清泉循环接管过一座年久失修的净水站，靠检修管线、回收旧滤芯和分装饮用水慢慢站稳脚跟。如今它既供应日常用水，也经营过滤器和净水物资，处理药剂常要向聚合材料询价，设备故障时则离不开星锻工业的零件。对这家公司而言，水质、耗材和机器开工率总是同一本账上的事。"
     },
     {
       "Id": "medical",
-      "Name": "\u767D\u5854\u533B\u7597",
-      "Description": "\u767D\u5854\u533B\u7597\u4ECE\u4E00\u95F4\u66FF\u8BCA\u6240\u5206\u88C5\u836F\u54C1\u7684\u5C0F\u4F5C\u574A\u53D1\u5C55\u800C\u6765\uFF0C\u67DC\u53F0\u4E0A\u65E2\u6709\u5E38\u7528\u836F\u548C\u533B\u7597\u8017\u6750\uFF0C\u4E5F\u6709\u9700\u8981\u5B9A\u671F\u7EF4\u4FEE\u7684\u8BCA\u7597\u8BBE\u5907\u3002\u836F\u5242\u5E08\u4F1A\u5411\u805A\u5408\u6750\u6599\u91C7\u8D2D\u914D\u836F\u4E0E\u6D88\u6BD2\u539F\u6599\uFF0C\u6280\u672F\u4EBA\u5458\u5219\u5BFB\u627E\u8FDC\u661F\u79D1\u6280\u63D0\u4F9B\u7684\u7535\u5B50\u6A21\u5757\u3002\u539F\u6599\u77ED\u7F3A\u3001\u8BBE\u5907\u505C\u6446\u6216\u8BCA\u6240\u96C6\u4E2D\u8865\u8D27\uFF0C\u90FD\u4F1A\u8BA9\u4ED3\u5E93\u7684\u51FA\u8D27\u5B89\u6392\u968F\u4E4B\u6539\u53D8\u3002"
+      "Name": "白塔医疗",
+      "Description": "白塔医疗从一间替诊所分装药品的小作坊发展而来，柜台上既有常用药和医疗耗材，也有需要定期维修的诊疗设备。药剂师会向聚合材料采购配药与消毒原料，技术人员则寻找远星科技提供的电子模块。原料短缺、设备停摆或诊所集中补货，都会让仓库的出货安排随之改变。"
     },
     {
       "Id": "industrial",
-      "Name": "\u661F\u953B\u5DE5\u4E1A",
-      "Description": "\u661F\u953B\u5DE5\u4E1A\u7684\u62DB\u724C\u6302\u5728\u8001\u77FF\u533A\u65C1\uFF0C\u8F66\u95F4\u91CC\u65E2\u6536\u77FF\u77F3\u548C\u91D1\u5C5E\uFF0C\u4E5F\u4FEE\u5DE5\u5177\u3001\u7EC4\u88C5\u673A\u68B0\uFF0C\u51FA\u552E\u80FD\u8BA9\u65E7\u8BBE\u5907\u7EE7\u7EED\u8FD0\u8F6C\u7684\u96F6\u4EF6\u3002\u9706\u5149\u80FD\u6E90\u7684\u7535\u6C60\u4E0E\u4F9B\u7535\u8BBE\u5907\u652F\u6491\u7740\u751F\u4EA7\u7EBF\uFF0C\u5B89\u76FE\u9632\u52A1\u7684\u88C5\u5907\u7EF4\u4FEE\u53C8\u5E26\u6765\u53E6\u4E00\u7C7B\u8BA2\u5355\u3002\u77FF\u6599\u8FDB\u4EF7\u3001\u673A\u5668\u505C\u5DE5\u548C\u5BA2\u6237\u662F\u5426\u8865\u5145\u5E93\u5B58\uFF0C\u51B3\u5B9A\u4E86\u5DE5\u5934\u6BCF\u5929\u5148\u5F00\u54EA\u4E00\u5F20\u5DE5\u5355\u3002"
+      "Name": "星锻工业",
+      "Description": "星锻工业的招牌挂在老矿区旁，车间里既收矿石和金属，也修工具、组装机械，出售能让旧设备继续运转的零件。霆光能源的电池与供电设备支撑着生产线，安盾防务的装备维修又带来另一类订单。矿料进价、机器停工和客户是否补充库存，决定了工头每天先开哪一张工单。"
     },
     {
       "Id": "technology",
-      "Name": "\u8FDC\u661F\u79D1\u6280",
-      "Description": "\u8FDC\u661F\u79D1\u6280\u9760\u62C6\u89E3\u65E7\u7EC8\u7AEF\u548C\u91CD\u65B0\u914D\u5236\u7535\u5B50\u6A21\u5757\u6512\u4E0B\u7B2C\u4E00\u6279\u5BA2\u6237\uFF0C\u540E\u6765\u624D\u628A\u4E1A\u52A1\u4F38\u5411\u79D1\u7814\u88C5\u7F6E\u4E0E\u8BBE\u5907\u63A7\u5236\u7CFB\u7EDF\u3002\u5B83\u4E3A\u9706\u5149\u80FD\u6E90\u7684\u4F9B\u7535\u8BBE\u5907\u5BFB\u627E\u63A7\u5236\u90E8\u4EF6\uFF0C\u4E5F\u5411\u5B89\u76FE\u9632\u52A1\u63D0\u4F9B\u88C5\u5907\u6240\u9700\u7684\u7535\u5B50\u7EC4\u4EF6\u3002\u770B\u4F3C\u4E0D\u8D77\u773C\u7684\u6A21\u5757\u65AD\u8D27\uFF0C\u5F80\u5F80\u4F1A\u62D6\u6162\u6574\u53F0\u673A\u5668\u4EA4\u4ED8\uFF0C\u4ED3\u5E93\u56E0\u6B64\u59CB\u7EC8\u7559\u7740\u4E00\u6392\u7B49\u5F85\u914D\u4EF6\u7684\u7A7A\u7BB1\u3002"
+      "Name": "远星科技",
+      "Description": "远星科技靠拆解旧终端和重新配制电子模块攒下第一批客户，后来才把业务伸向科研装置与设备控制系统。它为霆光能源的供电设备寻找控制部件，也向安盾防务提供装备所需的电子组件。看似不起眼的模块断货，往往会拖慢整台机器交付，仓库因此始终留着一排等待配件的空箱。"
     },
     {
       "Id": "commerce",
-      "Name": "\u73AF\u5B87\u5546\u8D38",
-      "Description": "\u73AF\u5B87\u5546\u8D38\u6CA1\u6709\u7EDF\u4E00\u98CE\u683C\u7684\u8D27\u67B6\uFF1A\u98DF\u54C1\u3001\u533B\u7597\u7528\u54C1\u3001\u7535\u5B50\u8BBE\u5907\u4E0E\u9632\u62A4\u88C5\u5907\u65C1\u8FB9\uFF0C\u5E38\u6446\u7740\u6765\u81EA\u8FDC\u5904\u7684\u5962\u4F88\u54C1\u3002\u91C7\u8D2D\u5458\u4ECE\u4E30\u79BE\u4F9B\u7ED9\u8FD9\u6837\u7684\u4F9B\u5E94\u5546\u624B\u91CC\u51D1\u9F50\u8D27\u5355\uFF0C\u518D\u501F\u6668\u661F\u7269\u6D41\u628A\u8D27\u5206\u9001\u5230\u4E0D\u540C\u8857\u533A\u3002\u5B83\u9760\u6E20\u9053\u548C\u5468\u8F6C\u8854\u63A5\u4E70\u5356\u53CC\u65B9\uFF0C\u8D27\u7269\u6DA8\u4EF7\u3001\u5546\u8DEF\u4E2D\u65AD\u6216\u987E\u5BA2\u53E3\u5473\u8F6C\u53D8\uFF0C\u90FD\u4F1A\u6539\u5199\u4E0B\u4E00\u8F6E\u8FDB\u8D27\u8BA1\u5212\u3002"
+      "Name": "环宇商贸",
+      "Description": "环宇商贸没有统一风格的货架：食品、医疗用品、电子设备与防护装备旁边，常摆着来自远处的奢侈品。采购员从丰禾供给这样的供应商手里凑齐货单，再借晨星物流把货分送到不同街区。它靠渠道和周转衔接买卖双方，货物涨价、商路中断或顾客口味转变，都会改写下一轮进货计划。"
     },
     {
       "Id": "energy",
-      "Name": "\u9706\u5149\u80FD\u6E90",
-      "Description": "\u9706\u5149\u80FD\u6E90\u8D77\u521D\u53EA\u66FF\u4FEE\u7406\u94FA\u8865\u5145\u7535\u6C60\uFF0C\u540E\u6765\u9010\u6E10\u63A5\u624B\u71C3\u6599\u3001\u80FD\u6E90\u7535\u6C60\u548C\u4F9B\u7535\u8BBE\u5907\u7684\u4E70\u5356\u3002\u661F\u953B\u5DE5\u4E1A\u7684\u673A\u68B0\u5F00\u5DE5\u79BB\u4E0D\u5F00\u7A33\u5B9A\u4F9B\u80FD\uFF0C\u8FDC\u661F\u79D1\u6280\u7684\u7535\u5B50\u6A21\u5757\u53C8\u5F71\u54CD\u7740\u5B83\u7684\u8BBE\u5907\u7EF4\u62A4\u3002\u4E1A\u52A1\u770B\u8D77\u6765\u8D2F\u7A7F\u6574\u4E2A\u7AD9\u533A\uFF0C\u4ED3\u5E93\u91CC\u5374\u4ECD\u8981\u9010\u4EF6\u6838\u7B97\u80FD\u6E90\u8D27\u7269\u7684\u8FDB\u4EF7\u3001\u8017\u635F\u4E0E\u8FD0\u8F93\u6210\u672C\uFF0C\u4E00\u6B21\u7F3A\u8D27\u5C31\u53EF\u80FD\u6253\u4E71\u591A\u5BB6\u5BA2\u6237\u7684\u6392\u7A0B\u3002"
+      "Name": "霆光能源",
+      "Description": "霆光能源起初只替修理铺补充电池，后来逐渐接手燃料、能源电池和供电设备的买卖。星锻工业的机械开工离不开稳定供能，远星科技的电子模块又影响着它的设备维护。业务看起来贯穿整个站区，仓库里却仍要逐件核算能源货物的进价、耗损与运输成本，一次缺货就可能打乱多家客户的排程。"
     },
     {
       "Id": "logistics",
-      "Name": "\u6668\u661F\u7269\u6D41",
-      "Description": "\u6668\u661F\u7269\u6D41\u7684\u5458\u5DE5\u4E60\u60EF\u5728\u522B\u4EBA\u5173\u5E97\u540E\u6E05\u70B9\u8D27\u7BB1\uFF0C\u66FF\u5404\u884C\u4E1A\u7ECF\u8425\u8FD0\u8F93\u3001\u4ED3\u50A8\u548C\u8865\u8D27\u8854\u63A5\u3002\u4E30\u79BE\u4F9B\u7ED9\u7684\u98DF\u54C1\u8981\u8D76\u5728\u53D8\u8D28\u524D\u9001\u8FBE\uFF0C\u767D\u5854\u533B\u7597\u7684\u836F\u54C1\u4E0E\u8017\u6750\u5219\u9700\u8981\u5206\u6E05\u6279\u6B21\u59A5\u5584\u5B58\u653E\uFF1B\u673A\u68B0\u3001\u80FD\u6E90\u4E0E\u5962\u4F88\u54C1\u4E5F\u6324\u5728\u540C\u4E00\u5F20\u8C03\u5EA6\u8868\u4E0A\u3002\u5546\u8DEF\u7545\u901A\u65F6\u5B83\u5FD9\u7740\u5468\u8F6C\uFF0C\u901A\u9053\u53D7\u963B\u65F6\u4FBF\u5F97\u534F\u8C03\u6539\u9053\u3001\u9000\u8D27\u548C\u5806\u79EF\u7684\u5E93\u5B58\u3002"
+      "Name": "晨星物流",
+      "Description": "晨星物流的员工习惯在别人关店后清点货箱，替各行业经营运输、仓储和补货衔接。丰禾供给的食品要赶在变质前送达，白塔医疗的药品与耗材则需要分清批次妥善存放；机械、能源与奢侈品也挤在同一张调度表上。商路畅通时它忙着周转，通道受阻时便得协调改道、退货和堆积的库存。"
     },
     {
       "Id": "defense",
-      "Name": "\u5B89\u76FE\u9632\u52A1",
-      "Description": "\u5B89\u76FE\u9632\u52A1\u6700\u65E9\u66FF\u5DE1\u903B\u4EBA\u5458\u4FEE\u8865\u9632\u62A4\u88C5\u5907\uFF0C\u540E\u6765\u624D\u6269\u5C55\u5230\u6B66\u5668\u3001\u5B89\u5168\u5668\u6750\u548C\u914D\u5957\u96F6\u4EF6\u7684\u4F9B\u5E94\u3002\u5B83\u5411\u661F\u953B\u5DE5\u4E1A\u5BFB\u627E\u91D1\u5C5E\u548C\u673A\u68B0\u90E8\u4EF6\uFF0C\u4E5F\u901A\u8FC7\u73AF\u5B87\u5546\u8D38\u63A5\u89E6\u5206\u6563\u5728\u5404\u5904\u7684\u4E70\u5BB6\u3002\u65B0\u8BA2\u5355\u4F1A\u5E26\u52A8\u8F66\u95F4\u5907\u6599\uFF0C\u8FD0\u8F93\u9650\u5236\u548C\u90E8\u4EF6\u77ED\u7F3A\u5219\u53EF\u80FD\u62D6\u5EF6\u4EA4\u4ED8\uFF1B\u67DC\u53F0\u540E\u7684\u91C7\u8D2D\u5355\uFF0C\u5F80\u5F80\u6BD4\u95E8\u524D\u7684\u62DB\u724C\u66F4\u65E9\u53CD\u6620\u751F\u610F\u51B7\u6696\u3002"
+      "Name": "安盾防务",
+      "Description": "安盾防务最早替巡逻人员修补防护装备，后来才扩展到武器、安全器材和配套零件的供应。它向星锻工业寻找金属和机械部件，也通过环宇商贸接触分散在各处的买家。新订单会带动车间备料，运输限制和部件短缺则可能拖延交付；柜台后的采购单，往往比门前的招牌更早反映生意冷暖。"
     },
     {
       "Id": "materials",
-      "Name": "\u805A\u5408\u6750\u6599",
-      "Description": "\u805A\u5408\u6750\u6599\u628A\u4E00\u95F4\u65E7\u4ED3\u5E93\u6539\u6210\u5206\u88C5\u8F66\u95F4\uFF0C\u7ECF\u8425\u5316\u5B66\u54C1\u3001\u5DE5\u4E1A\u539F\u6599\u548C\u4F9B\u4E0B\u6E38\u52A0\u5DE5\u4F7F\u7528\u7684\u6750\u6599\u3002\u767D\u5854\u533B\u7597\u9700\u8981\u914D\u836F\u4E0E\u6D88\u6BD2\u539F\u6599\uFF0C\u6E05\u6CC9\u5FAA\u73AF\u9700\u8981\u6C34\u5904\u7406\u836F\u5242\uFF0C\u7EF4\u4FEE\u548C\u7535\u5B50\u884C\u4E1A\u4E5F\u4F1A\u6765\u627E\u9002\u7528\u7684\u8017\u6750\u3002\u540C\u4E00\u6279\u539F\u6599\u6709\u65F6\u4F1A\u88AB\u51E0\u7C7B\u5BA2\u6237\u540C\u65F6\u8BE2\u4EF7\uFF0C\u91C7\u8D2D\u5458\u5FC5\u987B\u5728\u4F9B\u5E94\u3001\u5B58\u653E\u6761\u4EF6\u548C\u4E0D\u540C\u8BA2\u5355\u4E4B\u95F4\u53CD\u590D\u5B89\u6392\u3002"
+      "Name": "聚合材料",
+      "Description": "聚合材料把一间旧仓库改成分装车间，经营化学品、工业原料和供下游加工使用的材料。白塔医疗需要配药与消毒原料，清泉循环需要水处理药剂，维修和电子行业也会来找适用的耗材。同一批原料有时会被几类客户同时询价，采购员必须在供应、存放条件和不同订单之间反复安排。"
     }
   ],
   "Sectors": [
     {
       "Id": "food",
-      "Name": "\u98DF\u54C1\u3001\u519C\u4EA7\u54C1",
+      "Name": "食品、农产品",
       "ItemTypes": [
         "food",
         "agriculture"
       ],
       "Weights": {
         "harvest": 0.65,
-        "commerce": 0.20,
+        "commerce": 0.2,
         "logistics": 0.15
       }
     },
     {
       "Id": "water",
-      "Name": "\u996E\u7528\u6C34\u3001\u6C34\u5904\u7406\u7528\u54C1",
+      "Name": "饮用水、水处理用品",
       "ItemTypes": [
         "water",
         "WATER_PURIFICATION_SUPPLY",
@@ -416,41 +416,41 @@
       ],
       "Weights": {
         "water": 0.65,
-        "harvest": 0.20,
+        "harvest": 0.2,
         "logistics": 0.15
       }
     },
     {
       "Id": "medical",
-      "Name": "\u836F\u54C1\u3001\u533B\u7597\u8017\u6750",
+      "Name": "药品、医疗耗材",
       "ItemTypes": [
         "medical",
         "medicine"
       ],
       "Weights": {
-        "medical": 0.70,
-        "commerce": 0.20,
-        "logistics": 0.10
+        "medical": 0.7,
+        "commerce": 0.2,
+        "logistics": 0.1
       }
     },
     {
       "Id": "tools",
-      "Name": "\u5DE5\u5177\u3001\u673A\u68B0",
+      "Name": "工具、机械",
       "ItemTypes": [
         "tool",
         "tools",
         "machine"
       ],
       "Weights": {
-        "industrial": 0.60,
-        "materials": 0.20,
-        "defense": 0.10,
-        "logistics": 0.10
+        "industrial": 0.6,
+        "materials": 0.2,
+        "defense": 0.1,
+        "logistics": 0.1
       }
     },
     {
       "Id": "minerals",
-      "Name": "\u77FF\u77F3\u3001\u91D1\u5C5E\u3001\u5DE5\u4E1A\u6750\u6599",
+      "Name": "矿石、金属、工业材料",
       "ItemTypes": [
         "mineral",
         "ore",
@@ -460,29 +460,29 @@
       ],
       "Weights": {
         "industrial": 0.55,
-        "energy": 0.20,
+        "energy": 0.2,
         "defense": 0.15,
-        "logistics": 0.10
+        "logistics": 0.1
       }
     },
     {
       "Id": "electronics",
-      "Name": "\u7535\u5B50\u3001\u6A21\u5757",
+      "Name": "电子、模块",
       "ItemTypes": [
         "electronic",
         "electronics",
         "module"
       ],
       "Weights": {
-        "technology": 0.50,
-        "energy": 0.20,
-        "industrial": 0.20,
-        "commerce": 0.10
+        "technology": 0.5,
+        "energy": 0.2,
+        "industrial": 0.2,
+        "commerce": 0.1
       }
     },
     {
       "Id": "energy",
-      "Name": "\u71C3\u6599\u3001\u7535\u6C60",
+      "Name": "燃料、电池",
       "ItemTypes": [
         "fuel",
         "battery",
@@ -491,28 +491,28 @@
       ],
       "Weights": {
         "energy": 0.65,
-        "industrial": 0.20,
+        "industrial": 0.2,
         "logistics": 0.15
       }
     },
     {
       "Id": "materials",
-      "Name": "\u5316\u5B66\u54C1",
+      "Name": "化学品",
       "ItemTypes": [
         "chemical",
         "substance",
         "CHEMICAL_SUPPLIES"
       ],
       "Weights": {
-        "materials": 0.50,
-        "medical": 0.20,
-        "technology": 0.20,
-        "water": 0.10
+        "materials": 0.5,
+        "medical": 0.2,
+        "technology": 0.2,
+        "water": 0.1
       }
     },
     {
       "Id": "weapons",
-      "Name": "\u6B66\u5668\u3001\u9632\u62A4\u88C5\u5907",
+      "Name": "武器、防护装备",
       "ItemTypes": [
         "weapon",
         "armor",
@@ -520,13 +520,13 @@
       ],
       "Weights": {
         "defense": 0.65,
-        "commerce": 0.20,
+        "commerce": 0.2,
         "technology": 0.15
       }
     },
     {
       "Id": "luxury",
-      "Name": "\u5962\u4F88\u54C1",
+      "Name": "奢侈品",
       "ItemTypes": [
         "luxury",
         "LUXURY_ITEM"
@@ -534,7 +534,7 @@
       "Weights": {
         "commerce": 0.75,
         "logistics": 0.15,
-        "technology": 0.10
+        "technology": 0.1
       }
     }
   ],
@@ -543,9 +543,9 @@
       "ImpactSource": "builtin-price",
       "DirectionVersion": 1,
       "EventId": "badNutrifruitHarvest",
-      "Description": "\u8425\u517B\u679C\u6B49\u6536\uFF0C\u98DF\u54C1\u4F9B\u5E94\u627F\u538B",
-      "TrueHint": "\u98DF\u54C1\u4F9B\u5E94\u53EF\u80FD\u6536\u7D27\uFF0C\u76F8\u5173\u5546\u5BB6\u7684\u8FDB\u8D27\u538B\u529B\u6B63\u5728\u589E\u52A0",
-      "FalseHint": "\u98DF\u54C1\u4F9B\u5E94\u53EF\u80FD\u589E\u52A0\uFF0C\u76F8\u5173\u5546\u5BB6\u7684\u8FDB\u8D27\u538B\u529B\u6B63\u5728\u7F13\u89E3",
+      "Description": "营养果歉收，食品供应承压",
+      "TrueHint": "食品供应可能收紧，相关商家的进货压力正在增加",
+      "FalseHint": "食品供应可能增加，相关商家的进货压力正在缓解",
       "Impacts": {
         "harvest": -0.12,
         "commerce": -0.05,
@@ -559,11 +559,11 @@
       "ImpactSource": "builtin-price",
       "DirectionVersion": 1,
       "EventId": "bm_illegal_weapon_shipment",
-      "Description": "\u975E\u6CD5\u6B66\u5668\u8D27\u7269\u5230\u6E2F\uFF0C\u9632\u52A1\u5E02\u573A\u51FA\u73B0\u6CE2\u52A8",
-      "TrueHint": "\u4E00\u6279\u9632\u52A1\u7269\u8D44\u53EF\u80FD\u6D41\u5165\u5E02\u573A\uFF0C\u4F9B\u5E94\u6E20\u9053\u6B63\u5728\u6269\u5F20",
-      "FalseHint": "\u9632\u52A1\u7269\u8D44\u6D41\u901A\u53EF\u80FD\u6536\u7D27\uFF0C\u4F9B\u5E94\u6E20\u9053\u6B63\u5728\u6536\u7F29",
+      "Description": "非法武器货物到港，防务市场出现波动",
+      "TrueHint": "一批防务物资可能流入市场，供应渠道正在扩张",
+      "FalseHint": "防务物资流通可能收紧，供应渠道正在收缩",
       "Impacts": {
-        "defense": 0.10,
+        "defense": 0.1,
         "commerce": 0.06,
         "technology": 0.05
       },
@@ -576,9 +576,9 @@
       "ImpactSource": "builtin-price",
       "DirectionVersion": 2,
       "EventId": "rev_mobilization_secret",
-      "Description": "\u6B66\u5668\u9700\u6C42\u589E\u52A0",
-      "TrueHint": "\u6709\u7EC4\u7EC7\u6B63\u5728\u7B79\u96C6\u88C5\u5907\uFF0C\u76F8\u5173\u91C7\u8D2D\u89C4\u6A21\u53EF\u80FD\u6269\u5927",
-      "FalseHint": "\u6709\u7EC4\u7EC7\u6B63\u5728\u7F29\u51CF\u88C5\u5907\u91C7\u8D2D\uFF0C\u76F8\u5173\u8BA2\u5355\u89C4\u6A21\u53EF\u80FD\u56DE\u843D",
+      "Description": "武器需求增加",
+      "TrueHint": "有组织正在筹集装备，相关采购规模可能扩大",
+      "FalseHint": "有组织正在缩减装备采购，相关订单规模可能回落",
       "Impacts": {
         "defense": -0.12,
         "industrial": -0.07,
@@ -595,14 +595,14 @@
     {
       "Identifier": "shadyCustomerInformation",
       "Faction": "",
-      "Identity": "\u60C5\u62A5\u5546",
+      "Identity": "情报商",
       "BaseReliability": 0.65,
       "Sectors": []
     },
     {
       "Identifier": "pharmacist",
       "Faction": "",
-      "Identity": "\u836F\u5242\u5E08",
+      "Identity": "药剂师",
       "BaseReliability": 0.75,
       "Sectors": [
         "medical",
@@ -612,7 +612,7 @@
     {
       "Identifier": "hospitalAdmin",
       "Faction": "",
-      "Identity": "\u533B\u9662\u7BA1\u7406\u8005",
+      "Identity": "医院管理者",
       "BaseReliability": 0.75,
       "Sectors": [
         "medical"
@@ -621,7 +621,7 @@
     {
       "Identifier": "clinicNurse",
       "Faction": "",
-      "Identity": "\u8BCA\u6240\u62A4\u58EB",
+      "Identity": "诊所护士",
       "BaseReliability": 0.75,
       "Sectors": [
         "medical"
@@ -630,7 +630,7 @@
     {
       "Identifier": "lowerLevelChemist",
       "Faction": "",
-      "Identity": "\u5316\u5B66\u4ECE\u4E1A\u8005",
+      "Identity": "化学从业者",
       "BaseReliability": 0.75,
       "Sectors": [
         "materials"
@@ -639,7 +639,7 @@
     {
       "Identifier": "farmerMinor",
       "Faction": "",
-      "Identity": "\u519C\u4E1A\u4ECE\u4E1A\u8005",
+      "Identity": "农业从业者",
       "BaseReliability": 0.75,
       "Sectors": [
         "food"
@@ -648,7 +648,7 @@
     {
       "Identifier": "miner",
       "Faction": "",
-      "Identity": "\u77FF\u4E1A\u4ECE\u4E1A\u8005",
+      "Identity": "矿业从业者",
       "BaseReliability": 0.75,
       "Sectors": [
         "minerals",
@@ -658,7 +658,7 @@
     {
       "Identifier": "minerMinor",
       "Faction": "",
-      "Identity": "\u77FF\u4E1A\u4ECE\u4E1A\u8005",
+      "Identity": "矿业从业者",
       "BaseReliability": 0.75,
       "Sectors": [
         "minerals"
@@ -667,7 +667,7 @@
     {
       "Identifier": "iceMiner",
       "Faction": "",
-      "Identity": "\u51B0\u77FF\u4ECE\u4E1A\u8005",
+      "Identity": "冰矿从业者",
       "BaseReliability": 0.75,
       "Sectors": [
         "water",
@@ -677,7 +677,7 @@
     {
       "Identifier": "maintenanceWorker",
       "Faction": "",
-      "Identity": "\u7EF4\u4FEE\u4ECE\u4E1A\u8005",
+      "Identity": "维修从业者",
       "BaseReliability": 0.75,
       "Sectors": [
         "tools",
@@ -688,7 +688,7 @@
     {
       "Identifier": "retired_water_merchant",
       "Faction": "",
-      "Identity": "\u9000\u4F11\u6C34\u5546",
+      "Identity": "退休水商",
       "BaseReliability": 0.75,
       "Sectors": [
         "water"
@@ -697,7 +697,7 @@
     {
       "Identifier": "patrolOfficer",
       "Faction": "",
-      "Identity": "\u5DE1\u903B\u8B66\u5458",
+      "Identity": "巡逻警员",
       "BaseReliability": 0.75,
       "Sectors": [
         "weapons"
@@ -706,7 +706,7 @@
     {
       "Identifier": "securityInspector",
       "Faction": "",
-      "Identity": "\u5B89\u4FDD\u68C0\u67E5\u5458",
+      "Identity": "安保检查员",
       "BaseReliability": 0.75,
       "Sectors": [
         "weapons"
@@ -715,9 +715,37 @@
     {
       "Identifier": "thief",
       "Faction": "",
-      "Identity": "\u53EF\u7591\u6765\u6E90",
-      "BaseReliability": 0.30,
+      "Identity": "可疑来源",
+      "BaseReliability": 0.3,
       "Sectors": []
     }
-  ]
+  ],
+  "Loans": {
+    "Enabled": true,
+    "MaxDurationDays": 28,
+    "UnsecuredMaximum": 500,
+    "SecuredMaximum": 2000,
+    "UnsecuredBaseAmount": 100,
+    "UnsecuredServiceMultiple": 5,
+    "SecuredServiceMultiple": 20,
+    "CollateralRatio": 0.5,
+    "CreditReducedRatio": 0.75,
+    "UnsecuredDailyRates": [
+      0.02,
+      0.0225,
+      0.025,
+      0.0275
+    ],
+    "SecuredDailyRates": [
+      0.01,
+      0.0125,
+      0.015,
+      0.0175
+    ],
+    "GraceDays": 2,
+    "EndingOverdueDays": 8,
+    "CooldownDays": 3,
+    "PenaltyDailyRate": 0.005,
+    "PenaltyCapRate": 0.1
+  }
 }

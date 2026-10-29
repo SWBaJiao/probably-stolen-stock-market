@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Manifest>
+  <ID>probably_stolen_stock_market</ID>
+  <Name>Probably Stolen Stock Market</Name>
+  <Author>ProbablyStolen Mods</Author>
+  <ModVersion>0.16.0</ModVersion>
+  <Description>股市交易、行情事件、电话情报掮客、贷款服务与负债店主开局。</Description>
+  <GameVersions />
+  <Prerequisites />
+  <Assemblies>
+    <Assembly>ProbablyStolenStockMarket.dll</Assembly>
+  </Assemblies>
+  <!-- 适配通过反射访问游戏内部成员和图像覆盖状态；已按正式版扫描器核对。 -->
+  <Capabilities>
+    <Capability>reflection-external</Capability>
+  </Capabilities>
+</Manifest>

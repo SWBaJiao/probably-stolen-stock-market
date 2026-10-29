@@ -155,6 +155,7 @@ public sealed class RumorView
 }
 public sealed class MarketState
 {
+    public LoanState Loan { get; set; } = new();
     public StockEventCalendar StockEvents { get; set; } = new();
     public Dictionary<string, EventLifecycleState> EventLifecycles { get; set; } = new();
     public Dictionary<string, decimal> EventRetentions { get; set; } = new();

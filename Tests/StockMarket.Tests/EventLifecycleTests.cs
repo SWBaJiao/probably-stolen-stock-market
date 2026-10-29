@@ -1,5 +1,5 @@
 using ProbablyStolenStockMarket.Market;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Text.Json.Nodes;
 
 static class EventLifecycleTests

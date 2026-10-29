@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../GameJsonReference.props" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../ProbablyStolenStockMarket/Market/**/*.cs" Link="Market/%(Filename)%(Extension)" />
+    <Compile Include="../../ProbablyStolenStockMarket/Game/StartingDebtScenario.cs" Link="Game/StartingDebtScenario.cs" />
+    <Compile Include="../../ProbablyStolenStockMarket/Game/LoanBorrowerIdentity.cs" Link="Game/LoanBorrowerIdentity.cs" />
+    <Compile Include="../../ProbablyStolenStockMarket/Localization/Localizer.cs" Link="Localizer.cs" />
+    <Compile Include="../../ProbablyStolenStockMarket/ModInfo.cs" Link="ModInfo.cs" />
+    <EmbeddedResource Include="../../ProbablyStolenStockMarket/Localization/*.json" LogicalName="ProbablyStolenStockMarket.Localization.%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

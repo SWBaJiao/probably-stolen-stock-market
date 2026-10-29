@@ -3,10 +3,7 @@ using ProbablyStolenStockMarket.Localization;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Il2CppInterop.Runtime;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppTMPro;
-using MelonLoader;
+using TMPro;
 using ProbablyStolenStockMarket.Market;
 using UnityEngine;
 using UnityEngine.UI;
@@ -56,7 +53,7 @@ public sealed class NativeCandlestickChart : IDisposable
         _rect.offsetMax = Vector2.zero;
         try
         {
-            var background = _root.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+            var background = _root.AddComponent<Image>();
             background.color = StockUiTheme.ChartBackground;
             background.raycastTarget = false;
             _title = Text("Title", TextAlignmentOptions.TopLeft, 13, Ink);
@@ -127,7 +124,7 @@ public sealed class NativeCandlestickChart : IDisposable
         {
             // 原生图形出现异常时停用本图，避免每次轮询继续触发错误；交易面板仍可使用。
             _faulted = true;
-            MelonLogger.Warning("[原生日K线] 绘制失败，本窗口不再重试：" + Environment.NewLine + ex);
+            UnityEngine.Debug.LogWarning("[原生日K线] 绘制失败，本窗口不再重试：" + Environment.NewLine + ex);
             try { HidePlot(); _note.Text!.text = Localizer.Text("日 K 线暂不可用，请查看加载日志。"); } catch { }
         }
     }
@@ -223,7 +220,7 @@ public sealed class NativeCandlestickChart : IDisposable
     private GraphicNode Block(string name, Color color)
     {
         var go = RectObject(name, _rect);
-        var image = go.AddComponent(Il2CppType.Of<Image>()).Cast<Image>();
+        var image = go.AddComponent<Image>();
         image.raycastTarget = false; image.color = color; image.type = Image.Type.Simple;
         if (_material != null) image.material = _material;
         return new GraphicNode(go, GetRect(go), image, null);
@@ -232,7 +229,7 @@ public sealed class NativeCandlestickChart : IDisposable
     private GraphicNode Text(string name, TextAlignmentOptions alignment, float size, Color color)
     {
         var go = RectObject(name, _rect);
-        var text = go.AddComponent(Il2CppType.Of<TextMeshProUGUI>()).Cast<TextMeshProUGUI>();
+        var text = go.AddComponent<TextMeshProUGUI>();
         text.font = _font; text.fontSize = size; text.color = color; text.alignment = alignment;
         text.raycastTarget = false; text.richText = false; text.enableWordWrapping = false;
         return new GraphicNode(go, GetRect(go), null, text);
@@ -240,13 +237,13 @@ public sealed class NativeCandlestickChart : IDisposable
 
     private static GameObject RectObject(string name, Transform parent)
     {
-        var types = new Il2CppReferenceArray<Il2CppSystem.Type>(new[] { Il2CppType.Of<RectTransform>() });
+        var types = new[] { typeof(RectTransform) };
         var go = new GameObject("StockMarket.Chart." + name, types);
         go.transform.SetParent(parent, false);
         return go;
     }
 
-    private static RectTransform GetRect(GameObject go) => go.GetComponent(Il2CppType.Of<RectTransform>()).Cast<RectTransform>();
+    private static RectTransform GetRect(GameObject go) => go.GetComponent<RectTransform>();
 
     private static void Place(GraphicNode node, float x, float y, float width, float height)
     {
@@ -286,7 +283,7 @@ public sealed class NativeCandlestickChart : IDisposable
 
     public void SetHoverBounds(RectTransform windowRoot)
     {
-        if (_disposed || _hover?.WindowPointer == windowRoot.Pointer) return;
+        if (_disposed || _hover?.WindowId == windowRoot.GetInstanceID()) return;
         _hover?.Release(this); _hover = null;
         try { _hover = ChartHoverOverlay.Acquire(windowRoot, _font); }
         catch (Exception ex) { HoverWarning(ex); }
@@ -324,7 +321,7 @@ public sealed class NativeCandlestickChart : IDisposable
     {
         if (_hoverWarned) return;
         _hoverWarned = true;
-        MelonLogger.Warning("[日K线悬停] 本窗口悬停暂不可用：" + ex);
+        UnityEngine.Debug.LogWarning("[日K线悬停] 本窗口悬停暂不可用：" + ex);
     }
 
     public void Dispose()
@@ -336,7 +333,7 @@ public sealed class NativeCandlestickChart : IDisposable
         _hover = null;
         // 只销毁本图的对象树；字体与材质属于游戏，不能释放。
         try { UnityEngine.Object.Destroy(_root); }
-        catch (Exception ex) { MelonLogger.Warning("[原生日K线] 图表对象清理失败：" + ex); }
+        catch (Exception ex) { UnityEngine.Debug.LogWarning("[原生日K线] 图表对象清理失败：" + ex); }
     }
 
     private sealed record CandleSample(int Day, decimal? Open, decimal? High, decimal? Low, decimal Close, bool IsPartial)

@@ -1,5 +1,5 @@
 using ProbablyStolenStockMarket.Market;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Text.Json.Nodes;
 
 static class MultiBrokerTests
@@ -19,7 +19,7 @@ static class MultiBrokerTests
     {
         var config = MarketConfig.Deserialize(engine.Config.Serialize()); return new MarketEngine(config, MarketEngine.Deserialize(engine.Serialize(), config));
     }
-    static string Snapshot(object value) => JsonSerializer.Serialize(value, MarketEngine.JsonOptions);
+    static string Snapshot(object value) => JsonConvert.SerializeObject(value, MarketEngine.JsonOptions);
     sealed class Wallet : IWallet { public int Cash { get; private set; } = 1000; public void ChangeCash(int delta) => Cash += delta; }
     public static void Run(Action<bool, string> check)
     {

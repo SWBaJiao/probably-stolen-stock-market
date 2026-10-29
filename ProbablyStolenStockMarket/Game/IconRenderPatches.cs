@@ -1,16 +1,14 @@
 using System;
 using System.Reflection;
 using HarmonyLib;
-using Il2Cpp;
-using MelonLoader;
 using UnityEngine;
 
 namespace ProbablyStolenStockMarket.Game;
 
-// 原生 Validate 会重新解析精灵；仅为已登记的当前股市道具返回专用图像。
+// 原生 Validate 会重新解析精灵；仅为已登记的股市终端和联系名片返回专用图像。
 internal static class IconRenderPatches
 {
-    public static void Install(HarmonyLib.Harmony harmony, MelonLogger.Instance log)
+    public static void Install(HarmonyLib.Harmony harmony, ModLogger log)
     {
         try
         {
@@ -29,7 +27,8 @@ internal static class IconRenderPatches
     }
     private static bool ResolvePrefix(GameItemElement __instance, string __0, ref Sprite __result)
     {
-        if (!TerminalVisual.TryResolve(__instance, __0, out var sprite)) return true;
+        if (!TerminalVisual.TryResolve(__instance, __0, out var sprite)
+            && !BusinessCardVisual.TryResolve(__instance, __0, out sprite)) return true;
         __result = sprite!; return false;
     }
 }
